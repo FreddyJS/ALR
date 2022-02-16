@@ -1,15 +1,7 @@
-FROM node:16.10.0-slim
+FROM node:16.4-slim
 
-WORKDIR /usr/src/app
+WORKDIR /app
+COPY . .
+ENV PATH /app/node_modules/.bin:$PATH
 
-# ENV PATH /app/node_modules/.bin:$PATH
-
-COPY . /usr/src/app/
-
-# install and app dependencies
-RUN npm install -g npm
-RUN npm install --force
-RUN npm install -g @angular/cli
-RUN ng update --all --force
-
-CMD ng serve --host 0.0.0.0 --port 4200 --configuration=development --disable-host-check
+RUN yarn install

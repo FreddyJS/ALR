@@ -1,9 +1,0 @@
-div {
-    position: absolute;
-    background-color: rgb(206, 195, 195);
-    top: 50%;
-    left: 50%;
-    margin-top: -50px;
-    margin-left: -50px;
-    z-index: 1;
-}

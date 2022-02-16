@@ -1,8 +1,0 @@
-<div style="align-items: center; justify-content: center; text-align: center;">
-    <h2>Porfavor introduce el nº de habitación</h2>
-    <input type="text" #roomInput>
-    <button (click)="onSubmit(roomInput.value)">Enviar</button>
-
-    <h3 *ngIf="roomNumber">Habitación {{roomNumber}}</h3>
-    <app-confirmation [question]="confirmationMessage" [onConfirm]="submitRoute" *ngIf="roomNumber"></app-confirmation>
-</div>
