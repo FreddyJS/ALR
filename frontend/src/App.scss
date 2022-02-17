@@ -1,6 +1,9 @@
-@import './components/PageHeader/page-header.scss';
+@import 'carbon-components/scss/globals/scss/vars.scss'; 
+
 @import './content/HomePage/home-page.scss';
 @import './content/CounterPage/counter-page.scss';
+
+@import './components/PageHeader/page-header.scss';
 
 .App {
   text-align: center;

@@ -1206,6 +1206,11 @@
   resolved "https://registry.yarnpkg.com/@carbon/colors/-/colors-10.30.0.tgz#942db7c4ed14df8a989861b931548f732c8463e3"
   integrity sha512-jwLZcUSq7qdR68r6sGQyY4qTgTnSbaWjGqPUsh1spxXED2E3xMbBwvnHHVjEmHknBZnFp9wSfl/xjOmyzDhEDQ==
 
+"@carbon/colors@^10.36.0":
+  version "10.36.0"
+  resolved "https://registry.yarnpkg.com/@carbon/colors/-/colors-10.36.0.tgz#35a16b80bd40da5ee71a3a7ec75c85e1d90bd47e"
+  integrity sha512-C2M4SfsumD9lgCChR5d/2WM4941DBe6Or/lTvTOlEWX2Emm9tihr+yKhq5ztoOYk1w0iYVKTtVxi4CyYAnkJcw==
+
 "@carbon/feature-flags@^0.6.0":
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/@carbon/feature-flags/-/feature-flags-0.6.0.tgz#9452194af71b56dab0f2b9c75db3ddf6196453f1"
