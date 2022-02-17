@@ -5,7 +5,7 @@ if [ -f $FICHERO ]
 then
    echo "Rutas ya calculadas."
 else
-   echo -e "Rutas aún no calculadas, se procede a su cálculo..\n"
+   echo -e "Rutas aún no calculadas, se procede a su cálculo...\n"
 
 
 ubicacionMapa=~/GNS3/projects/
