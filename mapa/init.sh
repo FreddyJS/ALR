@@ -11,13 +11,15 @@ else
 ubicacionMapa=~/GNS3/projects/
 mapa=mapa_prueba/mapa_prueba.gns3
 gns3 -q $ubicacionMapa$mapa &
-tiempo=90
+tiempo=160
 echo "Cargando mapa... "
 echo -n "0%..."
 for(( c=1; c<=$tiempo; c++))
 do
  let aux=$c*100/$tiempo
- let aux2=aux%10
+ let aux1=$tiempo/10
+ let aux2=$c%aux1
+
  if [ $aux2 -eq 0 ]
  then 
   echo -n $aux"%"
@@ -36,7 +38,9 @@ echo -n "0%..."
 for(( c=1; c<=$tiempo; c++))
 do
  let aux=$c*100/$tiempo
- let aux2=aux%10
+ let aux1=$tiempo/10
+ let aux2=$c%aux1
+
  if [ $aux2 -eq 0 ]
  then 
   echo -n $aux"%"
@@ -44,10 +48,9 @@ do
   then
     echo -n "..."
   fi
- fi
- sleep 1
+fi
+sleep 1
 done
-
 echo -e '\n\nParseando rutas calculadas...\n'
 python3 ~/Clase/lpro/compartido/leer_archivos.py 
 
