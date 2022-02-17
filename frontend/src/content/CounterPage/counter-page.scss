@@ -5,10 +5,10 @@
         justify-content: center;
         padding: 1rem;
         margin: 1rem;
-        background-color: rgb(34, 33, 33);
+        background-color: $interactive-01;
     }
     
     button:hover {
-        background-color: rgb(0, 0, 0);
+        background-color: $hover-primary-text;
     }
 }
