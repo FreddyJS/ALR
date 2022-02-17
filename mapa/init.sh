@@ -1,4 +1,13 @@
 #!/bin/bash
+
+FICHERO=compartido/*.txt
+if [ -f $FICHERO ]
+then
+   echo "Rutas ya calculadas."
+else
+   echo -e "Rutas aún no calculadas, se procede a su cálculo..\n"
+
+
 ubicacionMapa=~/GNS3/projects/
 mapa=mapa_prueba/mapa_prueba.gns3
 gns3 -q $ubicacionMapa$mapa &
@@ -48,3 +57,5 @@ pkill -9 ubridge
 (pkill -9 gns3)
 
 vboxmanage controlvm "ubu" poweroff soft
+
+fi
