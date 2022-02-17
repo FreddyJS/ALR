@@ -1,7 +1,7 @@
 #!/bin/bash
 
-FICHERO=compartido/*.txt
-if [ -f $FICHERO ]
+FICHERO=$(ls compartido/*.txt 2>/dev/null)
+if [ "$FICHERO" != "" ]
 then
    echo "Rutas ya calculadas."
 else
