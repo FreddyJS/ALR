@@ -1,0 +1,30 @@
+.room-page__header {
+    margin-bottom: 1rem;
+    text-align: center;
+
+    h1 {
+        color: $interactive-01;
+    }
+}
+
+.room-page__content {
+    text-align: center;
+}
+
+.room-page__keyboard {
+    margin-top: 1rem;
+}
+
+.room-page__keyboard-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+    .room-page__keyboard-button {
+        justify-content: center;
+        border-radius: 0.5rem;
+        margin: 0.5rem;
+        padding: 1rem;
+    }
+}
