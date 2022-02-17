@@ -1,0 +1,12 @@
+.bx--header {
+    background-color: $interactive-01 !important;
+    border-bottom: $visited-link !important;
+}
+
+.bx--header__menu-item:hover {
+    background-color: $hover-primary-text !important;
+}
+
+.bx--header__action:hover {
+    background-color: $hover-primary-text !important;
+}
