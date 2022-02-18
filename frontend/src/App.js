@@ -7,6 +7,7 @@ import { Route, Switch } from 'react-router-dom';
 
 import HomePage from './content/HomePage';
 import CounterPage from './content/CounterPage';
+import RoomPage from './content/RoomPage';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Switch>
           <Route exact path="/" component={HomePage} />
           <Route path="/counter" component={CounterPage} />
+          <Route path="/room" component={RoomPage} />
         </Switch>
       </Content>
     </>
