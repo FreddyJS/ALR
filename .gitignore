@@ -1,2 +1,6 @@
 # Ignore IDE config files
 .vscode
+
+# Ignore Django files
+__pycache__
+db.sqlite3
