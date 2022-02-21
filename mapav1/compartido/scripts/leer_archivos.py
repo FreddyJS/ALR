@@ -9,5 +9,5 @@ for i in archivos:
 		txt.append(i)
 
 for i in txt:
-	os.system("python3 " + ruta + "/parser.py " + ruta + "/" + i)
+	os.system("python3 " + "./compartido/scripts/parser.py " + ruta + "/" + i)
 

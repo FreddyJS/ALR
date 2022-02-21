@@ -8,8 +8,8 @@ else
    echo -e "Rutas aún no calculadas, se procede a su cálculo...\n"
 
 
-ubicacionMapa=~/GNS3/projects/
-mapa=mapa_prueba/mapa_prueba.gns3
+ubicacionMapa=./GNS3/
+mapa=mapa/mapa-1.gns3
 gns3 -q $ubicacionMapa$mapa &
 tiempo=160
 echo "Cargando mapa... "
@@ -52,7 +52,7 @@ fi
 sleep 1
 done
 echo -e '\n\nParseando rutas calculadas...\n'
-python3 ~/Clase/lpro/compartido/rutas/leer_archivos.py 
+python3 ~/Clase/lpro/mapav1/compartido/rutas/leer_archivos.py 
 
 echo 'Cerrando programas...'
 pkill -9 dynamips
