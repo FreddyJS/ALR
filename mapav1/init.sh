@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FICHERO=$(ls compartido/*.txt 2>/dev/null)
+FICHERO=$(ls compartido/rutas/*.txt 2>/dev/null)
 if [ "$FICHERO" != "" ]
 then
    echo "Rutas ya calculadas."
@@ -31,7 +31,7 @@ do
  sleep 1
 done
 
-vboxmanage guestcontrol "ubu" --username asd --password 123 run /media/sf_compartido/calc_rutas.sh
+vboxmanage guestcontrol "ubu" --username asd --password 123 run /media/sf_compartido/scripts/calc_rutas.sh
 tiempo=20
 echo -e "\n\nObteniendo rutas... "
 echo -n "0%..."
@@ -52,7 +52,7 @@ fi
 sleep 1
 done
 echo -e '\n\nParseando rutas calculadas...\n'
-python3 ~/Clase/lpro/compartido/leer_archivos.py 
+python3 ~/Clase/lpro/compartido/rutas/leer_archivos.py 
 
 echo 'Cerrando programas...'
 pkill -9 dynamips

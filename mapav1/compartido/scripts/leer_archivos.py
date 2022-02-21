@@ -1,6 +1,6 @@
 import os 
 
-ruta = os.getcwd() + "/compartido/"
+ruta = os.getcwd() + "/compartido/rutas/"
 archivos = [f for f in os.listdir(ruta)]
 txt = []
 
