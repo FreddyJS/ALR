@@ -16,12 +16,14 @@ class ListaNodos:
 
     def push(self, nodo):
         self.nodos.append(nodo)
-
+    
+    '''
     def pop(self):
         if (len(self.nodos) == 0):
             return None
         else:
             return self.nodos.pop()
+    '''
 
     def pop(self):
         coste = float("inf")
