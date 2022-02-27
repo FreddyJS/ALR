@@ -1,6 +1,8 @@
 import sys
 import json
 
+from sqlalchemy import false
+
 class Nodo:
     def __init__(self, id, padre, coste_acumulado):
         self.id = id
@@ -77,6 +79,18 @@ class Mapa:
 
         return []
     
+    def esCruce(self, id):
+        for marca in self.mapa:
+            if (marca["id"] == id):
+                if (marca["tipo"] == "cruce"):
+                    return True
+                else:
+                    return false
+
+    def getNodo(self, id):
+        for marca in self.mapa:
+            if (marca["id"] == id):
+                return marca
 
     def getMarca(self, habitacion_id):
         for marca in self.mapa:
@@ -119,7 +133,6 @@ def get_ruta(mapa, inicio, fin):
             id = hijo.get("id")
             coste_acumulado = nodo.coste_acumulado + hijo.get("distancia")
             nodo_hijo = Nodo(id, nodo.id, coste_acumulado)
-            #print("Direcciones del nodo :" + nodo_hijo.id + " -> " + str(hijo.get("direccion")))
             if (not visitados.contiene(nodo_hijo)):
                 frontera.push(nodo_hijo)
 
@@ -133,18 +146,22 @@ def get_direcciones(mapa, ruta):
             e = mapa.enlaces(ruta[i])
             for enl in e:
                 if(enl.get("id") == ruta[i+1]):
-                    print("Girando... " + str(enl.get("direccion")) + "   ")
-
+                    if(mapa.getNodo(ruta[i+1])["tipo"] in "cruce"):
+                       # print(ruta[i+1] + " es un: " + mapa.getNodo(ruta[i+1])["tipo"] +  " - ", end="")
+                        direcciones.append(enl.get("direccion"))
         
             i+=1
-    except IndexError as error:        
-        print("Ruta calculada.")
-    return
+    except IndexError as error:  
+        #se añade ultimo enlace, no se añadió antes puesto que para el utlimo enlace lee que el siguiente nodo es de habnitaciones ->
+        #no entra if, no lo añade
+        n = len(ruta)-2
+        for enlace in mapa.enlaces(ruta[n]):
+            if(enlace.get("id") == ruta[n+1]):
+                direcciones.append(enlace.get("direccion"))
 
-ruta = get_ruta("mapa-hospital.json", sys.argv[1], sys.argv[2])
-get_direcciones("mapa-hospital.json", ruta)
+        print("Ruta calculada: ", end="")
+    return direcciones
 
-
-#ruta = get_ruta("mapa-hospital.json", "08", "03")
-#print(str(ruta) + "\n\n")
+#b = get_direcciones("mapa-hospital.json", get_ruta("mapa-hospital.json", sys.argv[1], sys.argv[2]))
+print(str(get_direcciones("mapa-hospital.json", get_ruta("mapa-hospital.json", sys.argv[1], sys.argv[2]))))
 
