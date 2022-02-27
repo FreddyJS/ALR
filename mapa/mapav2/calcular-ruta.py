@@ -105,6 +105,7 @@ class Mapa:
 
 
 def get_ruta(mapa, inicio, fin):
+
     mapa = Mapa(mapa)
     visitados = ListaNodos()
     frontera = ListaNodos()
@@ -165,5 +166,12 @@ def get_direcciones(mapa, ruta):
     return direcciones
 
 #b = get_direcciones("mapa-hospital.json", get_ruta("mapa-hospital.json", sys.argv[1], sys.argv[2]))
-print(str(get_direcciones("mapa-hospital.json", get_ruta("mapa-hospital.json", sys.argv[1], sys.argv[2]))))
 
+
+if __name__ == "__main__":
+
+    if(len(sys.argv) != 4):
+        print("\nSintaxis: python3 calcular-ruta.py nombre_mapa.json origen destino\n")
+        exit()
+
+    print(str(get_direcciones(sys.argv[1], get_ruta(sys.argv[1], sys.argv[2], sys.argv[3]))))
