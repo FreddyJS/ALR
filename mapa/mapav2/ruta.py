@@ -99,7 +99,8 @@ class Mapa:
                 #print("La marca con id " + habitacion_id + ", es un cruce.")
                 if(habitacion_id in marca["id"]):
                     return marca["id"]
-            
+
+    
         return None
 
 
@@ -113,6 +114,10 @@ def get_ruta(mapa, inicio, fin):
 
     marca_inicio = mapa.getMarca(inicio)
     marca_fin = mapa.getMarca(fin)
+
+    if (marca_fin == None or marca_inicio == None):
+        print("Número introducido no válido.")
+        exit(-1)
 
 
     nodo = Nodo(marca_inicio,marca_inicio,0)
