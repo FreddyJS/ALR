@@ -1,5 +1,11 @@
 # Create your views here.
-from django.http import HttpResponse
+from rest_framework import viewsets
 
-def index(request):
-    return HttpResponse("Hello, world. You're at the routes index.")
+from .serializers import RouteSerializer
+from .models import Route
+
+
+# ViewSets define the view behavior.
+class RoutesViewSet(viewsets.ModelViewSet):
+    queryset = Route.objects.all()
+    serializer_class = RouteSerializer
