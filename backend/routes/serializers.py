@@ -1,9 +1,18 @@
-from django.contrib.auth.models import User
 from rest_framework import serializers
+from .models import Route
 
 
-# Serializers define the API representation.
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class RouteSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ['url', 'username', 'email', 'is_staff']
+        model = Route
+        fields = ['room']
+    
+    def to_representation(self, instance):
+        rep =  super().to_representation(instance)
+        rep['route'] = []
+
+        steps = instance.route.split(';')
+        for step in steps:
+            rep['route'].append(step)
+
+        return rep

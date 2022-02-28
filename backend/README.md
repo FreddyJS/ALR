@@ -1,7 +1,7 @@
 # ALR Backend
 
 ## Start server
-Run `python manage.py runserver`  
+Run `python manage.py runserver 0.0.0.0:8000`  
 
 ## Make and migrate db
 * `python manage.py makemigrations`

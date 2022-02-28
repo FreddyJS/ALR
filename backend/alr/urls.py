@@ -19,7 +19,7 @@ from django.urls import include, path
 from routes import views as routes_views
 
 router = routers.DefaultRouter()
-router.register('routes', routes_views.UserViewSet)
+router.register('routes', routes_views.RoutesViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
