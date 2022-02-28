@@ -13,7 +13,20 @@ services:
       - bash
       - -c
       - echo 'Freezing container. Execute in container "yarn start"' && tail -f /dev/null
-  
+  db:
+    image: postgres:13.0-alpine
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DBNAME: ${POSTGRES_DBNAME:-alr}
+      POSTGRES_USER: ${POSTGRES_USER:-alr}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-alr}
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "alr"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+
   backend:
     build:
       context: ./backend
@@ -22,6 +35,13 @@ services:
       - 8000:8000
     volumes:
       - ./backend:/api
+    environment:
+      POSTGRES_DBNAME: ${POSTGRES_DBNAME:-alr}
+      POSTGRES_USER: ${POSTGRES_USER:-alr}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-alr}
+    depends_on:
+      db:
+        condition: service_healthy
     command:
       - bash
       - -c
@@ -29,3 +49,4 @@ services:
 
 volumes:
     node_modules:
+    pgdata:
