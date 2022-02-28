@@ -91,10 +91,12 @@ class Mapa:
 
     def getMarca(self, habitacion_id):
         for marca in self.mapa:
-            if (marca["tipo"] == "habitaciones"):
+            if (marca["tipo"] == "habitaciones"):    
                 if (habitacion_id in marca["habitaciones"]):
                     return marca["id"]
-            
+                if(habitacion_id in marca["id"]):
+                    return marca["id"]
+
             elif (marca["tipo"] == "cruce"):
                 #print("La marca con id " + habitacion_id + ", es un cruce.")
                 if(habitacion_id in marca["id"]):
