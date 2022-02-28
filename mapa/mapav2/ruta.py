@@ -17,14 +17,6 @@ class ListaNodos:
 
     def push(self, nodo):
         self.nodos.append(nodo)
-    
-    '''
-    def pop(self):
-        if (len(self.nodos) == 0):
-            return None
-        else:
-            return self.nodos.pop()
-    '''
 
     def pop(self):
         coste = float("inf")
@@ -100,7 +92,12 @@ class Mapa:
             if (marca["tipo"] == "habitaciones"):
                 if (habitacion_id in marca["habitaciones"]):
                     return marca["id"]
-
+            
+            elif (marca["tipo"] == "cruce"):
+                #print("La marca con id " + habitacion_id + ", es un cruce.")
+                if(habitacion_id in marca["id"]):
+                    return marca["id"]
+            
         return None
 
 
