@@ -16,3 +16,4 @@ Run `python manage.py startapp routes`
 ## Documentation
 * [Django](https://www.djangoproject.com/)
 * [Django Rest Framework](https://www.django-rest-framework.org/#)
+* [Django Channels](https://channels.readthedocs.io/en/stable/tutorial/part_1.html)
