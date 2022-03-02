@@ -22,7 +22,7 @@ const RoomPage = () => {
         </Modal>
       )}
       <div className="room-page__header">
-        <h1>ALR: Automated Leading Robot</h1>
+        <h1>guiaMe: Automated Guiding Robot</h1>
         <p>Un guía de confianza para gente de todo tipo</p>
       </div>
 
