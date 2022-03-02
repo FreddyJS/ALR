@@ -43,7 +43,7 @@ INSTALLED_APPS = [
 
     # Our apps
     "routes",
-    "ui",
+    "robots",
 ]
 
 MIDDLEWARE = [
