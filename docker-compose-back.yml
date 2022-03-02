@@ -5,11 +5,11 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     environment:
-      POSTGRES_DBNAME: ${POSTGRES_DBNAME:-alr}
-      POSTGRES_USER: ${POSTGRES_USER:-alr}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-alr}
+      POSTGRES_DBNAME: ${POSTGRES_DBNAME:-guiaMe}
+      POSTGRES_USER: ${POSTGRES_USER:-guiaMe}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-guiaMe}
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "alr"]
+      test: ["CMD", "pg_isready", "-U", "guiaMe"]
       interval: 5s
       timeout: 2s
       retries: 5
@@ -23,16 +23,16 @@ services:
     volumes:
       - ./backend:/api
     environment:
-      POSTGRES_DBNAME: ${POSTGRES_DBNAME:-alr}
-      POSTGRES_USER: ${POSTGRES_USER:-alr}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-alr}
+      POSTGRES_DBNAME: ${POSTGRES_DBNAME:-guiaMe}
+      POSTGRES_USER: ${POSTGRES_USER:-guiaMe}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-guiaMe}
     depends_on:
       db:
         condition: service_healthy
     command:
       - bash
       - -c
-      - echo 'Freezing container. Execute in container "python manage.py runserver"' && tail -f /dev/null
+      - echo 'Freezing container. Execute in container "python manage.py runserver 0.0.0.0:8000"' && tail -f /dev/null
 
 volumes:
     node_modules:

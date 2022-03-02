@@ -54,7 +54,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'alr.urls'
+ROOT_URLCONF = 'guiaMe.urls'
 
 TEMPLATES = [
     {
@@ -72,7 +72,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'alr.wsgi.application'
+WSGI_APPLICATION = 'guiaMe.wsgi.application'
 
 
 # Database

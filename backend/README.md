@@ -1,9 +1,9 @@
-# ALR Backend
+# guiaMe Backend
 
 ## Start server
 Run `python manage.py runserver 0.0.0.0:8000`  
 
-## Make and migrate db
+## Makemigrations and migrate db
 * `python manage.py makemigrations`
 * `python manage.py migrate`
 
