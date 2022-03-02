@@ -135,3 +135,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Channels
 ASGI_APPLICATION = 'guiaMe.asgi.application'
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}

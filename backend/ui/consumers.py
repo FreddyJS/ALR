@@ -1,18 +1,43 @@
 import json
 
-from channels.generic.websocket import WebsocketConsumer
+from channels.generic.websocket import AsyncWebsocketConsumer
 
-class UIConsumer(WebsocketConsumer):
-    def connect(self):
-        self.accept()
+class UIConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        # Join a group
+        await self.channel_layer.group_add(
+            "test_group",
+            self.channel_name
+        )
 
-    def disconnect(self, close_code):
-        pass
+        await self.accept()
 
-    def receive(self, text_data):
+    async def disconnect(self, close_code):
+        # Leave group
+        await self.channel_layer.group_discard(
+            "test_group",
+            self.channel_name
+        )
+
+    async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
 
-        self.send(text_data=json.dumps({
-            'message': message + ' - from backend'
+        # Send message to group
+        await self.channel_layer.group_send(
+            "test_group",
+            {
+                'type': 'chat_message',
+                'message': message + " - from backend"
+            }
+        )
+
+        # Echo message back to client
+        await self.send(text_data=json.dumps({
+            'message': message + " - from backend"
         }))
+    
+    # Receive message from group
+    async def chat_message(self, event):
+        message = event['message']
+        print("A message was received: " + message)
