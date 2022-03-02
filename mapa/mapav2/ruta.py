@@ -79,10 +79,10 @@ class Mapa:
     def esCruce(self, id):
         for marca in self.mapa:
             if (marca["id"] == id):
-                if (marca["tipo"] == "cruce"):
+                if (marca["tipo"] in "cruce"):
                     return True
                 else:
-                    return false
+                    return False
 
     def getNodo(self, id):
         for marca in self.mapa:
@@ -156,7 +156,7 @@ def get_direcciones(mapa, ruta):
             e = mapa.enlaces(ruta[i])
             for enl in e:
                 if(enl.get("id") == ruta[i+1]):
-                    if(mapa.getNodo(ruta[i+1])["tipo"] in "cruce"):
+                    if(mapa.getNodo(ruta[i+1])["tipo"] in "cruce" or mapa.getNodo(ruta[i+1])["tipo"] in "habitaciones"):
                        # print(ruta[i+1] + " es un: " + mapa.getNodo(ruta[i+1])["tipo"] +  " - ", end="")
                         direcciones.append(enl.get("direccion"))
         
@@ -169,29 +169,165 @@ def get_direcciones(mapa, ruta):
             if(enlace.get("id") == ruta[n+1]):
                 direcciones.append(enlace.get("direccion"))
 
-        print("Cálculo de ruta finalizado.")
+        print("Cálculo de ruta finalizado.\n")
+        ctr = 0
+        ult_cruce = -1
+
+        for elemento in ruta:
+            if (mapa.esCruce(elemento)):
+                ult_cruce = ctr
+            ctr +=1
+
+        direcciones[ult_cruce - 1] = str(direcciones[ult_cruce - 1]) + "-Este es el último cruce." #se le añade esta string a la direccion para saber que es el ultimo cruce
+        direcciones.pop() #se quita el ultimo elemento porque se repite
     return direcciones
 
 
 if __name__ == "__main__":
 
-    if (len(sys.argv) != 4):
-        print("\nSintaxis: python3 ruta.py nombre_mapa.json origen destino\n")
+    if (len(sys.argv) != 5):
+        print("\nSintaxis: python3 ruta.py nombre_mapa.json origen destino direccion_actual(grados-> norte 0, este 90...)\n")
         exit(-1)
 
     if (os.path.exists("./rutas/" + sys.argv[2] + "_" +  sys.argv[3] + ".txt")):
-        print("Ruta de " + sys.argv[2] + " a " + sys.argv[3] + " ya calculada anteriormente.")
+        print("Ruta de " + sys.argv[2] + " a " + sys.argv[3] + " ya calculada anteriormente.\n")
         exit(-2)
 
     #print(str(get_direcciones(sys.argv[1], get_ruta(sys.argv[1], sys.argv[2], sys.argv[3]))))
     ruta = get_direcciones(sys.argv[1], get_ruta(sys.argv[1], sys.argv[2], sys.argv[3]))
+
+    grados = int(sys.argv[4])
+    giros = []
+    aux = ""
+
+
+
+    for d in ruta:
+       grados = grados % 360
+
+       if (grados == 0):
+           if ("norte" in d):
+               grados += 0
+               if("cruce" not in d):
+                   giros.append("Recto.")    
+               else:
+                   giros.append("Recto. Llegando al último cruce")
+
+           elif ("oeste" in d):
+               grados += 270
+               if("cruce" not in d):
+                   giros.append("Izquierda.")    
+               else:
+                   giros.append("Izquierda. Llegando al último cruce")
+           
+           elif ("este" in d):
+               grados += 90
+               if("cruce" not in d):
+                   giros.append("Derecha.")    
+               else:
+                   giros.append("Derecha. Llegando al último cruce")
+
+           elif ("sur" in d):
+               grados += 180
+               if("cruce" not in d):
+                   giros.append("Dar vuelta.")    
+               else:
+                   giros.append("Dar vuelta. Llegando al último cruce")
+
+       elif (grados == 90):
+           if ("norte" in d):
+               grados += 270
+               if("cruce" not in d):
+                   giros.append("Izquierda.")    
+               else:
+                   giros.append("Izquierda. Llegando al último cruce")
+
+           elif ("oeste" in d):
+               grados += 180
+               if("cruce" not in d):
+                   giros.append("Dar la vuelta.")    
+               else:
+                   giros.append("Dar la vuelta. Llegando al último cruce")
+           
+           elif ("este" in d):
+               grados += 0
+               if("cruce" not in d):
+                   giros.append("Recto.")    
+               else:
+                   giros.append("Recto. Llegando al último cruce")
+
+           elif ("sur" in d):
+               grados += 90
+               if("cruce" not in d):
+                   giros.append("Derecha.")    
+               else:
+                   giros.append("Derecha. Llegando al último cruce")
     
+       elif (grados == 270):
+           if ("norte" in d):
+               grados += 90
+               if("cruce" not in d):
+                   giros.append("Derecha.")    
+               else:
+                   giros.append("Derecha. Llegando al último cruce")
+
+           elif ("oeste" in d):
+               grados += 0
+               if("cruce" not in d):
+                   giros.append("Recto.")    
+               else:
+                   giros.append("Recto. Llegando al último cruce")
+           
+           elif ("este" in d):
+               grados += 180
+               if("cruce" not in d):
+                   giros.append("Dar la vuelta.")    
+               else:
+                   giros.append("Dar la vuelta. Llegando al último cruce")
+
+           elif ("sur" in d):
+               grados += 270
+               if("cruce" not in d):
+                   giros.append("Izquierda.")    
+               else:
+                   giros.append("Izquierda. Llegando al último cruce")
+        
+       elif (grados == 180):
+           if ("norte" in d):
+               grados += 180
+               if("cruce" not in d):
+                   giros.append("Dar la vuelta.")    
+               else:
+                   giros.append("Dar la vuelta. Llegando al último cruce")
+
+           elif ("oeste" in d):
+               grados += 90
+               if("cruce" not in d):
+                   giros.append("Derecha.")    
+               else:
+                   giros.append("Derecha. Llegando al último cruce")
+           
+           elif ("este" in d):
+               grados += 270
+               if("cruce" not in d):
+                   giros.append("Izquierda.")    
+               else:
+                   giros.append("Izquierda. Llegando al último cruce")
+
+           elif ("sur" in d):
+               grados += 0
+               if("cruce" not in d):
+                   giros.append("Recto.")    
+               else:
+                   giros.append("Recto. Llegando al último cruce")
+
+    giros.append(grados)               
     try:
         outputFile = open ("./rutas/" + sys.argv[2] + "_" +  sys.argv[3] + ".txt", "w")
     except:
         os.system("mkdir rutas")
         outputFile = open ("./rutas/" + sys.argv[2] + "_" +  sys.argv[3] + ".txt", "w")
     finally:
-        for cruce in ruta:
+        for cruce in giros:
             outputFile.write(str(cruce) + "\n")
         exit(0)
