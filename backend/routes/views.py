@@ -1,9 +1,8 @@
 # Create your views here.
 from rest_framework import viewsets
 
-from .serializers import RouteSerializer
 from .models import Route
-
+from .serializers import RouteSerializer
 
 # ViewSets define the view behavior.
 class RoutesViewSet(viewsets.ModelViewSet):
