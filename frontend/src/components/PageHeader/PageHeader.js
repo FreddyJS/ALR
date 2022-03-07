@@ -24,18 +24,18 @@ import { Link } from 'react-router-dom';
 const PageHeader = () => (
   <HeaderContainer
     render={({ isSideNavExpanded, onClickSideNavExpand }) => (
-      <Header aria-label="React App">
+      <Header aria-label="guiaMe">
         <SkipToContent />
         <HeaderMenuButton
           aria-label="Open menu"
           onClick={onClickSideNavExpand}
           isActive={isSideNavExpanded}
         />
-        <HeaderName element={Link} to="/" prefix="JS">
-            React App
+        <HeaderName element={Link} to="/" prefix="AGR">
+          guiaMe
         </HeaderName>
-        <HeaderNavigation aria-label="React App">
-          <HeaderMenuItem element={Link} to="/counter">Counter</HeaderMenuItem>
+        <HeaderNavigation aria-label="guiaMe">
+          <HeaderMenuItem element={Link} to="/room">Room Page</HeaderMenuItem>
         </HeaderNavigation>
         <SideNav
           aria-label="Side navigation"
@@ -43,8 +43,8 @@ const PageHeader = () => (
           isPersistent={false}>
           <SideNavItems>
             <HeaderSideNavItems>
-                <HeaderMenuItem element={Link} to="/counter">
-                    Counter
+                <HeaderMenuItem element={Link} to="/">
+                    Room Page
                 </HeaderMenuItem>
             </HeaderSideNavItems>
           </SideNavItems>
