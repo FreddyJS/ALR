@@ -19,7 +19,7 @@ const defaultTextProps = {
   y: 100,
   text: 'Hello World',
   fontSize: 15,
-  fill: "white",
+  fill: "black",
 };
 
 const DashboardDev = () => {
@@ -49,16 +49,23 @@ const DashboardDev = () => {
     const layers = stageLayers.map((layer, index) => {
       const layerElements = layer.children;
       const layerElementsAttrs = layerElements.filter(element => element.className !== "Transformer").map(element => {
-        return {
-          type: element.className,
-          attrs: element.className === "Text" ? element.attrs : {
-            x: Math.round(element.x()),
-            y: Math.round(element.y()),
-            width: Math.round(element.width()),
-            height: Math.round(element.height()),
+        if (element.className === "Rect") {
+          return {
+            x: element.x(),
+            y: element.y(),
+            width: element.width(),
+            height: element.height(),
             fill: element.fill(),
           }
-        };
+        } else if (element.className === "Text") {
+          return {
+            x: element.x(),
+            y: element.y(),
+            text: element.text(),
+            fontSize: element.fontSize(),
+            fill: element.fill(),
+          }
+        }
       });
 
       return {
