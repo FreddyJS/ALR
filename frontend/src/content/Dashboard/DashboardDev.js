@@ -97,8 +97,6 @@ const DashboardDev = () => {
   };
 
   function appendShape(type) {
-    console.log(stageRef.current);
-
     if (type === 'room') {
       const newRect = {
         id: "room" + shapes.length,
