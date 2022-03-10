@@ -1,12 +1,14 @@
 import React from 'react';
+import './dashboard.scss';
 
-import { Button } from 'carbon-components-react';
+import { Button, TextInput } from 'carbon-components-react';
 
 import { Stage, Layer, Text } from 'react-konva';
 import Rectangle from './Rectangle';
 
 
 const defaultRectProps = {
+  type: "Rect",
   x: 100,
   y: 100,
   width: 100,
@@ -15,6 +17,7 @@ const defaultRectProps = {
 };
 
 const defaultTextProps = {
+  type: "Text",
   x: 100,
   y: 100,
   text: 'Hello World',
@@ -29,6 +32,7 @@ const DashboardDev = () => {
   // List of shapes in the stage and selected shape id
   const [shapes, setShapes] = React.useState([]);
   const [selectedShape, selectShape] = React.useState(null);
+  const [newTextData, setNewTextData] = React.useState('');
 
   function downloadJSON(object, name) {
     var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(object, null, 2));
@@ -50,19 +54,27 @@ const DashboardDev = () => {
       const layerElementsAttrs = layerElements.filter(element => element.className !== "Transformer").map(element => {
         if (element.className === "Rect") {
           return {
-            x: element.x(),
-            y: element.y(),
-            width: element.width(),
-            height: element.height(),
-            fill: element.fill(),
+            type: element.className,
+            attrs: {
+              id: element.id(),
+              x: element.x(),
+              y: element.y(),
+              width: element.width(),
+              height: element.height(),
+              fill: element.fill(),
+            }
           }
         } else if (element.className === "Text") {
           return {
-            x: element.x(),
-            y: element.y(),
-            text: element.text(),
-            fontSize: element.fontSize(),
-            fill: element.fill(),
+            type: element.className,
+            attrs: {
+              id: element.id(),
+              x: element.x(),
+              y: element.y(),
+              text: element.text(),
+              fontSize: element.fontSize(),
+              fill: element.fill(),
+            }
           }
         }
 
@@ -87,11 +99,12 @@ const DashboardDev = () => {
   function appendShape(type) {
     console.log(stageRef.current);
 
-    if (type === 'rect') {
+    if (type === 'room') {
       const newRect = {
-        id: "rect" + shapes.length,
+        id: "room" + shapes.length,
         ...defaultRectProps,
       };
+      newRect.fill = "purple";
 
       setShapes([...shapes, newRect]);
     } else if (type === 'text') {
@@ -101,15 +114,33 @@ const DashboardDev = () => {
         ...defaultTextProps,
       };
 
+      if (newTextData !== '') {
+        newText.text = newTextData;
+        setNewTextData('');
+      }
+
       setShapes([...shapes, newText]);
+    } else if (type === 'hall') {
+      const newRect = {
+        id: "hall" + shapes.length,
+        ...defaultRectProps,
+      };
+      newRect.fill = "black";
+      newRect.width = newRect.height / 2;
+
+      setShapes([...shapes, newRect]);
     }
   }
 
   return (
     <div style={{ display: "flex", flexDirection: "row", marginTop: "1rem" }}>
       <div style={{ display: "flex", flexDirection: "column" }}>
-        <Button onClick={() => appendShape("rect")} style={{margin: "1px"}}>New Rect</Button>
+        <Button onClick={() => appendShape("room")} style={{margin: "1px"}}>New Room</Button>
+        <Button onClick={() => appendShape("hall")} style={{margin: "1px"}}>New Hall</Button>
         <Button onClick={() => appendShape("text")} style={{margin: "1px"}}>New Text</Button>
+        <div>
+          <TextInput id="text-input" labelText="" placeholder="Hello World" onChange={(e) => setNewTextData(e.target.value)} value={newTextData}/>
+        </div>
         <Button onClick={() => setShapes(shapes.slice(0, shapes.length-1))} style={{margin: "1px"}}>Del Last</Button>
         <Button onClick={() => exportCanvasToJSON()} style={{margin: "1px"}}>Export</Button>
         {stageRef.current &&
@@ -125,7 +156,7 @@ const DashboardDev = () => {
           <Layer>
             {shapes.map((shape, index) => {
               const isSelected = selectedShape === shape.id;
-              if (shape.id.startsWith("rect")) {
+              if (shape.type === "Rect") {
                 return (
                   <Rectangle
                     key={shape.id}
@@ -148,7 +179,7 @@ const DashboardDev = () => {
                     isSelected={isSelected}
                   />
                 );
-              } else if (shape.id.startsWith("text")) {
+              } else if (shape.type === "Text") {
                 return (
                   <Text
                     key={shape.id}
