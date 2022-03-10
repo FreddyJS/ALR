@@ -109,7 +109,6 @@ class Mapa:
 
 def get_ruta(mapa, inicio, fin):
 
-    mapa = Mapa(mapa)
     visitados = ListaNodos()
     frontera = ListaNodos()
     direcciones = []
@@ -147,8 +146,19 @@ def get_ruta(mapa, inicio, fin):
                 frontera.push(nodo_hijo)
 
 
+def color(mapa,ruta):
+
+    aux = []
+    for elemento in ruta:
+        if (mapa.esCruce(elemento)):
+            aux.append("_ROJO.")
+        else:
+            aux.append("_AZUL.")
+    
+    return (aux)
+
 def get_direcciones(mapa, ruta):
-    mapa = Mapa(mapa)
+
     i = 0
     direcciones = []
     try:
@@ -193,8 +203,12 @@ if __name__ == "__main__":
         print("Ruta de " + sys.argv[2] + " a " + sys.argv[3] + " ya calculada anteriormente.\n")
         exit(-2)
 
+    mapa = Mapa(sys.argv[1])
     #print(str(get_direcciones(sys.argv[1], get_ruta(sys.argv[1], sys.argv[2], sys.argv[3]))))
-    ruta = get_direcciones(sys.argv[1], get_ruta(sys.argv[1], sys.argv[2], sys.argv[3]))
+    ruta_nodos = get_ruta(mapa, sys.argv[2], sys.argv[3])
+    ruta_absoluta = get_direcciones(mapa, ruta_nodos)
+
+    colores = color(mapa, ruta_nodos)
 
     grados = int(sys.argv[4])
     giros = []
@@ -202,7 +216,7 @@ if __name__ == "__main__":
 
 
 
-    for d in ruta:
+    for d in ruta_absoluta:
        grados = grados % 360
 
        if (grados == 0):
@@ -321,16 +335,31 @@ if __name__ == "__main__":
                else:
                    giros.append("Recto. Llegando al último cruce")
 
-    giros.append(grados)               
+    giros.append(grados)
+
+    counter = 0
+    while True:
+        if giros[counter] == int("360"):
+            giros[counter] = 0
+            break
+        counter += 1
+
+    counter = 0
+    giros_final = []
+    
+
     try:
-        outputFile = open ("./rutas/" + sys.argv[2] + "_" +  sys.argv[3] + ".txt", "w")
-    except:
-        os.system("mkdir rutas")
-        outputFile = open ("./rutas/" + sys.argv[2] + "_" +  sys.argv[3] + ".txt", "w")
+        while True:
+            giros_final.append(str(giros[counter]) + str(colores[counter+1]))
+            counter +=  1
     finally:
-        for cruce in giros:
-            if cruce == int("360"):
-                outputFile.write(str(cruce-360) + "\n")
-            else:
+        giros_final.append(giros.pop())
+        try:
+            outputFile = open ("./rutas/" + sys.argv[2] + "_" +  sys.argv[3] + ".txt", "w")
+        except:
+            os.system("mkdir rutas")
+            outputFile = open ("./rutas/" + sys.argv[2] + "_" +  sys.argv[3] + ".txt", "w")
+        finally:
+            for cruce in giros_final:
                 outputFile.write(str(cruce) + "\n")
-        exit(0)
+            exit(0)
