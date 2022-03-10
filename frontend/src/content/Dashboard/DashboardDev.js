@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Button } from 'carbon-components-react';
 
-import { Stage, Layer, Rect, Text } from 'react-konva';
+import { Stage, Layer, Text } from 'react-konva';
 import Rectangle from './Rectangle';
 
 
@@ -29,7 +29,6 @@ const DashboardDev = () => {
   // List of shapes in the stage and selected shape id
   const [shapes, setShapes] = React.useState([]);
   const [selectedShape, selectShape] = React.useState(null);
-  const pasillo = 1;
 
   function downloadJSON(object, name) {
     var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(object, null, 2));
@@ -66,6 +65,8 @@ const DashboardDev = () => {
             fill: element.fill(),
           }
         }
+
+        return null;
       });
 
       return {
@@ -105,16 +106,21 @@ const DashboardDev = () => {
   }
 
   return (
-    <div>
-      <div style={{ display: "flex", flexDirection: "row", justifyContent: "center"}}>
+    <div style={{ display: "flex", flexDirection: "row", marginTop: "1rem" }}>
+      <div style={{ display: "flex", flexDirection: "column" }}>
         <Button onClick={() => appendShape("rect")} style={{margin: "1px"}}>New Rect</Button>
         <Button onClick={() => appendShape("text")} style={{margin: "1px"}}>New Text</Button>
-        <Button onClick={() => setShapes(shapes.slice(0, shapes.length-1))} style={{margin: "1px"}}>Delete Last</Button>
+        <Button onClick={() => setShapes(shapes.slice(0, shapes.length-1))} style={{margin: "1px"}}>Del Last</Button>
         <Button onClick={() => exportCanvasToJSON()} style={{margin: "1px"}}>Export</Button>
+        {stageRef.current &&
+          <>
+            <div>Stage width: {stageRef.current.width()}</div>
+            <div>Stage height: {stageRef.current.height()}</div>
+          </>
+        }
       </div>
-      <p>To change a shape color double click, click to select and drag or resize</p>
 
-      <div>
+      <div style={{ border: "1px solid" }}>
         <Stage width={window.innerWidth} height={window.innerHeight} ref={stageRef}>
           <Layer>
             {shapes.map((shape, index) => {
@@ -164,6 +170,8 @@ const DashboardDev = () => {
                   />
                 );
               }
+
+              return null;
             })}
           </Layer>
         </Stage>

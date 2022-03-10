@@ -23,6 +23,8 @@ const Dashboard = () => {
               } else if (element.type === "Text") {
                 return <Text key={index} {...element.attrs} />
               }
+
+              return null;
             })}
           </Layer>
         );
