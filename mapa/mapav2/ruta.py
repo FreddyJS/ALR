@@ -329,5 +329,8 @@ if __name__ == "__main__":
         outputFile = open ("./rutas/" + sys.argv[2] + "_" +  sys.argv[3] + ".txt", "w")
     finally:
         for cruce in giros:
-            outputFile.write(str(cruce) + "\n")
+            if cruce == int("360"):
+                outputFile.write(str(cruce-360) + "\n")
+            else:
+                outputFile.write(str(cruce) + "\n")
         exit(0)
