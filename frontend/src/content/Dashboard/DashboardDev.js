@@ -109,6 +109,7 @@ const DashboardDev = () => {
       <div style={{ display: "flex", flexDirection: "row", justifyContent: "center"}}>
         <Button onClick={() => appendShape("rect")} style={{margin: "1px"}}>New Rect</Button>
         <Button onClick={() => appendShape("text")} style={{margin: "1px"}}>New Text</Button>
+        <Button onClick={() => setShapes(shapes.slice(0, shapes.length-1))} style={{margin: "1px"}}>Delete Last</Button>
         <Button onClick={() => exportCanvasToJSON()} style={{margin: "1px"}}>Export</Button>
       </div>
       <p>To change a shape color double click, click to select and drag or resize</p>
