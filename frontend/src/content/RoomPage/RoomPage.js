@@ -1,13 +1,32 @@
 import React from 'react';
 
+import { RobotSocket, UISocket } from '../../sockets';
 import { Button, Tile, Modal } from 'carbon-components-react';
 
 const RoomPage = () => {
   const [roomNumber, setRoomNumber] = React.useState('');
   const [isModalOpen, setIsModalOpen] = React.useState(false);
 
+  const sendHelllo = (from) => {
+    const data = {
+      type: from === 'UI' ? 'to.robot' : 'to.ui',
+      message: "Hello from " + from,
+    };
+
+    if (from === "UI") {
+      UISocket.send(JSON.stringify(data));
+    } else {
+      RobotSocket.send(JSON.stringify(data));
+    }
+  };
+
   return(
     <div className="room-page">
+      <div style={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center"}}>
+        <Button style={{margin: "0.1rem"}} onClick={() => sendHelllo("UI")}> Client Message </Button>
+        <Button style={{margin: "0.1rem"}} onClick={() => sendHelllo("Robot")}> Robot Message </Button>    
+      </div>
+
       {isModalOpen && (
         <Modal
           open={isModalOpen}
@@ -21,10 +40,6 @@ const RoomPage = () => {
           </div>
         </Modal>
       )}
-      <div className="room-page__header">
-        <h1>guiaMe: Automated Guiding Robot</h1>
-        <p>Un guía de confianza para gente de todo tipo</p>
-      </div>
 
       <Tile className="room-page__content">
         {roomNumber === "" ? <h3>Introduce el número de habitación</h3> : <h3>Habitación: {roomNumber}</h3>}        
