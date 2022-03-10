@@ -9,7 +9,9 @@ import { Content, Button } from 'carbon-components-react';
 
 import RoomPage from './content/RoomPage';
 import { RobotSocket, UISocket } from './sockets';
-import Dashboard from './content/Dashboard/Dashboard';
+
+import Dashboard from './content/Dashboard';
+import DashboardDev from './content/Dashboard/DashboardDev';
 
 function App() {
   const sendHelllo = (from) => {
@@ -36,6 +38,7 @@ function App() {
 
         <Switch>
           <Route exact path="/" component={Dashboard} />
+          <Route exact path="/mapdev" component={DashboardDev} />
           <Route exact path="/room" component={RoomPage} />
         </Switch>
       </Content>

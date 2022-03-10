@@ -1,0 +1,139 @@
+{
+  "stageWidth": 821,
+  "stageHeight": 683,
+  "layers": [
+    {
+      "layer": "Layer 0",
+      "elements": [
+        {
+          "type": "Rect",
+          "attrs": {
+            "x": 0,
+            "y": 0,
+            "width": 150,
+            "height": 150,
+            "fill": "purple"
+          }
+        },
+        {
+          "type": "Text",
+          "attrs": {
+            "text": "Room 1",
+            "fill": "white",
+            "fontSize": 15
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "x": 200,
+            "y": 0,
+            "width": 150,
+            "height": 150,
+            "fill": "purple"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "x": 165,
+            "y": 0,
+            "width": 20,
+            "height": 400,
+            "fill": "yellow"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "x": 165,
+            "y": 60,
+            "width": 20,
+            "height": 20,
+            "fill": "green"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "x": 0,
+            "y": 200,
+            "width": 350,
+            "height": 20,
+            "fill": "black"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "x": 165,
+            "y": 200,
+            "width": 20,
+            "height": 20,
+            "fill": "red"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "x": 65,
+            "y": 200,
+            "width": 20,
+            "height": 20,
+            "fill": "green"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "x": 255,
+            "y": 200,
+            "width": 20,
+            "height": 20,
+            "fill": "green"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "x": 0,
+            "y": 250,
+            "width": 150,
+            "height": 150,
+            "fill": "purple"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "x": 200,
+            "y": 250,
+            "width": 150,
+            "height": 150,
+            "fill": "purple"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "x": 150,
+            "y": 400,
+            "width": 50,
+            "height": 50,
+            "fill": "cyan"
+          }
+        },
+        {
+          "type": "Text",
+          "attrs": {
+            "x": 150,
+            "y": 400,
+            "text": "Hall",
+            "fill": "black",
+            "fontSize": 15
+          }
+        }
+      ]
+    }
+  ]
+}
