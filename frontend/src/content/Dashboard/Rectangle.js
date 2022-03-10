@@ -24,8 +24,8 @@ const Rectangle = ({ shapeProps, isSelected, onSelect, onChange }) => {
         onDragEnd={(e) => {
           onChange({
             ...shapeProps,
-            x: e.target.x(),
-            y: e.target.y(),
+            x: e.target.x() > 0 ? e.target.x() : 0,
+            y: e.target.y() > 0 ? e.target.y() : 0,
           });
         }}
         onTransformEnd={(e) => {

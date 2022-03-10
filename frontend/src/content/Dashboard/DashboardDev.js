@@ -27,11 +27,11 @@ const defaultTextProps = {
 
 const DashboardDev = () => {
   // Stage refence to export map to JSON
-  const stageRef = React.useRef(null);
+  const stageRef = React.useRef();
 
   // List of shapes in the stage and selected shape id
   const [shapes, setShapes] = React.useState([]);
-  const [selectedShape, selectShape] = React.useState(null);
+  const [selectedShape, selectShape] = React.useState();
   const [newTextData, setNewTextData] = React.useState('');
 
   function downloadJSON(object, name) {
@@ -77,12 +77,11 @@ const DashboardDev = () => {
             }
           }
         }
-
         return null;
       });
 
       return {
-        layer: "Layer " + index,
+        layer: "layer" + index,
         elements: layerElementsAttrs
       }
     });
@@ -99,7 +98,7 @@ const DashboardDev = () => {
   function appendShape(type) {
     if (type === 'room') {
       const newRect = {
-        id: "room" + shapes.length,
+        id: "room" + shapes.filter(shape => shape.id.startsWith('room')).length,
         ...defaultRectProps,
       };
       newRect.fill = "purple";
@@ -107,8 +106,7 @@ const DashboardDev = () => {
       setShapes([...shapes, newRect]);
     } else if (type === 'text') {
       const newText = {
-        id: "text" + shapes.length,
-        text: "Text " + shapes.length,
+        id: "text" + shapes.filter(shape => shape.id.startsWith('text')).length,
         ...defaultTextProps,
       };
 
@@ -120,11 +118,18 @@ const DashboardDev = () => {
       setShapes([...shapes, newText]);
     } else if (type === 'hall') {
       const newRect = {
-        id: "hall" + shapes.length,
+        id: "hall" + shapes.filter(shape => shape.id.startsWith('hall')).length,
         ...defaultRectProps,
       };
       newRect.fill = "black";
       newRect.width = newRect.height / 2;
+
+      setShapes([...shapes, newRect]);
+    } else if (type === 'rect') {
+      const newRect = {
+        id: "rect" + shapes.filter(shape => shape.id.startsWith('rect')).length,
+        ...defaultRectProps,
+      };
 
       setShapes([...shapes, newRect]);
     }
@@ -135,6 +140,7 @@ const DashboardDev = () => {
       <div style={{ display: "flex", flexDirection: "column" }}>
         <Button onClick={() => appendShape("room")} style={{margin: "1px"}}>New Room</Button>
         <Button onClick={() => appendShape("hall")} style={{margin: "1px"}}>New Hall</Button>
+        <Button onClick={() => appendShape("rect")} style={{margin: "1px"}}>New Rect</Button>
         <Button onClick={() => appendShape("text")} style={{margin: "1px"}}>New Text</Button>
         <div>
           <TextInput id="text-input" labelText="" placeholder="Hello World" onChange={(e) => setNewTextData(e.target.value)} value={newTextData}/>
@@ -177,10 +183,19 @@ const DashboardDev = () => {
                     isSelected={isSelected}
                   />
                 );
-              } else if (shape.type === "Text") {
+              }
+              return null;
+            })}
+          </Layer>
+
+          <Layer>
+            {shapes.map((shape, index) => {
+              const isSelected = selectedShape === shape.id;
+              if (shape.type === "Text") {
                 return (
                   <Text
                     key={shape.id}
+                    draggable
                     {...shape}
                     isSelected={isSelected}
                     onClick={() => {
@@ -195,11 +210,9 @@ const DashboardDev = () => {
                         selectShape(shape.id);
                       }
                     }}
-                    draggable
                   />
                 );
               }
-
               return null;
             })}
           </Layer>

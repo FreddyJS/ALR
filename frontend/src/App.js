@@ -18,7 +18,7 @@ function App() {
       <PageHeader/>
       <Content>
         <div className="room-page__header">
-          <h1>guiaMe: Automated Guiding Robot</h1>
+          <h1>GuiaMe: Automated Guiding Robot</h1>
           <p>Un guía de confianza para gente de todo tipo</p>
         </div>
         <Switch>
