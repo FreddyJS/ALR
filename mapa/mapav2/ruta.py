@@ -338,20 +338,16 @@ if __name__ == "__main__":
     giros.append(grados)
 
     counter = 0
-    while True:
-        if giros[counter] == int("360"):
-            giros[counter] = 0
-            break
-        counter += 1
 
+    if(giros[len(giros)-1] >=360):
+        giros[len(giros)-1] = giros[len(giros)-1] % 360
+   
     counter = 0
     giros_final = []
-    
-
     try:
         while True:
             giros_final.append(str(giros[counter]) + str(colores[counter+1]))
-            counter +=  1
+            counter +=  1 
     finally:
         giros_final.append(giros.pop())
         try:
