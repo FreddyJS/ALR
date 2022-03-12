@@ -6,5 +6,6 @@ from .serializers import RouteSerializer
 
 # ViewSets define the view behavior.
 class RoutesViewSet(viewsets.ModelViewSet):
+    lookup_field = 'room'
     queryset = Route.objects.all()
     serializer_class = RouteSerializer
