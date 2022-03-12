@@ -1,136 +1,431 @@
 {
-  "stageWidth": 821,
-  "stageHeight": 683,
+  "stageWidth": 1280,
+  "stageHeight": 720,
   "layers": [
     {
-      "layer": "Layer 0",
+      "layer": "layer0",
       "elements": [
         {
           "type": "Rect",
           "attrs": {
-            "x": 0,
-            "y": 0,
-            "width": 150,
-            "height": 150,
-            "fill": "purple"
-          }
-        },
-        {
-          "type": "Text",
-          "attrs": {
-            "text": "Room 1",
-            "fill": "white",
-            "fontSize": 15
-          }
-        },
-        {
-          "type": "Rect",
-          "attrs": {
-            "x": 200,
-            "y": 0,
-            "width": 150,
-            "height": 150,
-            "fill": "purple"
-          }
-        },
-        {
-          "type": "Rect",
-          "attrs": {
-            "x": 165,
-            "y": 0,
-            "width": 20,
-            "height": 400,
-            "fill": "yellow"
-          }
-        },
-        {
-          "type": "Rect",
-          "attrs": {
-            "x": 165,
-            "y": 60,
-            "width": 20,
-            "height": 20,
-            "fill": "green"
-          }
-        },
-        {
-          "type": "Rect",
-          "attrs": {
-            "x": 0,
-            "y": 200,
-            "width": 350,
-            "height": 20,
+            "id": "hall0",
+            "x": 163.00000000000009,
+            "y": 117.99999999999989,
+            "width": 263.99999999999994,
+            "height": 29.99999999999997,
             "fill": "black"
           }
         },
         {
           "type": "Rect",
           "attrs": {
-            "x": 165,
-            "y": 200,
-            "width": 20,
-            "height": 20,
+            "id": "room0",
+            "x": 243,
+            "y": 13,
+            "width": 100,
+            "height": 100,
+            "fill": "purple"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "id": "room1",
+            "x": 243,
+            "y": 151,
+            "width": 100,
+            "height": 100,
+            "fill": "purple"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "id": "sticker0",
+            "x": 277,
+            "y": 118,
+            "width": 30,
+            "height": 30,
+            "fill": "blue"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "id": "sticker1",
+            "x": 133,
+            "y": 118,
+            "width": 30,
+            "height": 30,
             "fill": "red"
           }
         },
         {
           "type": "Rect",
           "attrs": {
-            "x": 65,
-            "y": 200,
-            "width": 20,
-            "height": 20,
-            "fill": "green"
+            "id": "sticker2",
+            "x": 427,
+            "y": 118,
+            "width": 30,
+            "height": 30,
+            "fill": "red"
           }
         },
         {
           "type": "Rect",
           "attrs": {
-            "x": 255,
-            "y": 200,
-            "width": 20,
-            "height": 20,
-            "fill": "green"
+            "id": "hall1",
+            "x": 457.0000000000001,
+            "y": 118.00000000000003,
+            "width": 263.99999999999994,
+            "height": 30.00000000000002,
+            "fill": "black"
           }
         },
         {
           "type": "Rect",
           "attrs": {
-            "x": 0,
-            "y": 250,
-            "width": 150,
-            "height": 150,
+            "id": "sticker3",
+            "x": 721,
+            "y": 118,
+            "width": 30,
+            "height": 30,
+            "fill": "red"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "id": "hall2",
+            "x": 133.00000000000003,
+            "y": 147.00000000000003,
+            "width": 30.000000000000014,
+            "height": 315.99999999999994,
+            "fill": "black"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "id": "sticker4",
+            "x": 133,
+            "y": 463,
+            "width": 30,
+            "height": 30,
+            "fill": "red"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "id": "hall3",
+            "x": 427.00000000000114,
+            "y": 147.9999999999999,
+            "width": 30.00000000000002,
+            "height": 314.00000000000006,
+            "fill": "black"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "id": "hall4",
+            "x": 163.0000000000001,
+            "y": 462.0000000000004,
+            "width": 263.9999999999999,
+            "height": 30.000000000000032,
+            "fill": "black"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "id": "sticker5",
+            "x": 427,
+            "y": 462,
+            "width": 30,
+            "height": 30,
+            "fill": "red"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "id": "room2",
+            "x": 315,
+            "y": 326,
+            "width": 100,
+            "height": 100,
             "fill": "purple"
           }
         },
         {
           "type": "Rect",
           "attrs": {
-            "x": 200,
-            "y": 250,
-            "width": 150,
-            "height": 150,
+            "id": "room3",
+            "x": 467,
+            "y": 326,
+            "width": 100,
+            "height": 100,
             "fill": "purple"
           }
         },
         {
           "type": "Rect",
           "attrs": {
-            "x": 150,
-            "y": 400,
-            "width": 50,
-            "height": 50,
+            "id": "room4",
+            "x": 467,
+            "y": 163,
+            "width": 100,
+            "height": 100,
+            "fill": "purple"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "id": "sticker6",
+            "x": 427,
+            "y": 356,
+            "width": 30,
+            "height": 30,
+            "fill": "blue"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "id": "sticker7",
+            "x": 427,
+            "y": 191,
+            "width": 30,
+            "height": 30,
+            "fill": "blue"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "id": "hall5",
+            "x": 721.0000000000009,
+            "y": 147,
+            "width": 30.000000000000075,
+            "height": 314.99999999999994,
+            "fill": "black"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "id": "hall6",
+            "x": 457.0000000000001,
+            "y": 461.00000000000034,
+            "width": 263.9999999999999,
+            "height": 30.00000000000003,
+            "fill": "black"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "id": "sticker8",
+            "x": 721,
+            "y": 461,
+            "width": 30,
+            "height": 30,
+            "fill": "red"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "id": "room5",
+            "x": 613,
+            "y": 167,
+            "width": 100,
+            "height": 100,
+            "fill": "purple"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "id": "room6",
+            "x": 759,
+            "y": 166,
+            "width": 100,
+            "height": 100,
+            "fill": "purple"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "id": "sticker9",
+            "x": 721,
+            "y": 201,
+            "width": 30,
+            "height": 30,
+            "fill": "blue"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "id": "room7",
+            "x": 616,
+            "y": 324,
+            "width": 100,
+            "height": 100,
+            "fill": "purple"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "id": "room8",
+            "x": 758,
+            "y": 327,
+            "width": 100,
+            "height": 100,
+            "fill": "purple"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "id": "hall7",
+            "x": 427,
+            "y": 492,
+            "width": 30,
+            "height": 100,
+            "fill": "black"
+          }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "id": "room9",
+            "x": 392,
+            "y": 591,
+            "width": 100,
+            "height": 100,
             "fill": "cyan"
+          }
+        }
+      ]
+    },
+    {
+      "layer": "layer1",
+      "elements": [
+        {
+          "type": "Text",
+          "attrs": {
+            "id": "text0",
+            "x": 265,
+            "y": 37,
+            "text": "Room 1",
+            "fontSize": 16,
+            "fill": "white"
           }
         },
         {
           "type": "Text",
           "attrs": {
-            "x": 150,
-            "y": 400,
-            "text": "Hall",
-            "fill": "black",
-            "fontSize": 15
+            "id": "text1",
+            "x": 263,
+            "y": 172,
+            "text": "Room 2",
+            "fontSize": 16,
+            "fill": "white"
+          }
+        },
+        {
+          "type": "Text",
+          "attrs": {
+            "id": "text2",
+            "x": 333,
+            "y": 338,
+            "text": "Room 3",
+            "fontSize": 16,
+            "fill": "white"
+          }
+        },
+        {
+          "type": "Text",
+          "attrs": {
+            "id": "text3",
+            "x": 487,
+            "y": 340,
+            "text": "Room 4",
+            "fontSize": 16,
+            "fill": "white"
+          }
+        },
+        {
+          "type": "Text",
+          "attrs": {
+            "id": "text4",
+            "x": 490,
+            "y": 180,
+            "text": "Room 5",
+            "fontSize": 16,
+            "fill": "white"
+          }
+        },
+        {
+          "type": "Text",
+          "attrs": {
+            "id": "text5",
+            "x": 635,
+            "y": 185,
+            "text": "Room 6",
+            "fontSize": 16,
+            "fill": "white"
+          }
+        },
+        {
+          "type": "Text",
+          "attrs": {
+            "id": "text6",
+            "x": 780,
+            "y": 185,
+            "text": "Room 7",
+            "fontSize": 16,
+            "fill": "white"
+          }
+        },
+        {
+          "type": "Text",
+          "attrs": {
+            "id": "text7",
+            "x": 637,
+            "y": 339,
+            "text": "Room 8",
+            "fontSize": 16,
+            "fill": "white"
+          }
+        },
+        {
+          "type": "Text",
+          "attrs": {
+            "id": "text8",
+            "x": 775,
+            "y": 340,
+            "text": "Room 9",
+            "fontSize": 16,
+            "fill": "white"
+          }
+        },
+        {
+          "type": "Text",
+          "attrs": {
+            "id": "text9",
+            "x": 420,
+            "y": 630,
+            "text": "HALL",
+            "fontSize": 16,
+            "fill": "black"
           }
         }
       ]

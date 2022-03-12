@@ -1,28 +1,46 @@
 import React from 'react';
 import './dashboard.scss';
 
-import { Button, TextInput } from 'carbon-components-react';
+import { Button, Checkbox, TextInput } from 'carbon-components-react';
 
 import { Stage, Layer, Text } from 'react-konva';
 import Rectangle from './Rectangle';
 
-
-const defaultRectProps = {
-  type: "Rect",
-  x: 100,
-  y: 100,
-  width: 100,
-  height: 100,
-  fill: 'red',
-};
 
 const defaultTextProps = {
   type: "Text",
   x: 100,
   y: 100,
   text: 'Hello World',
-  fontSize: 15,
+  fontSize: 16,
   fill: "black",
+};
+
+const defaultRoomProps = {
+  type: "Rect",
+  x: 100,
+  y: 100,
+  width: 100,
+  height: 100,
+  fill: 'purple',
+};
+
+const defaultHallProps = {
+  type: "Rect",
+  x: 100,
+  y: 100,
+  width: 30,
+  height: 100,
+  fill: 'black',
+};
+
+const defaultStickerProps = {
+  type: "Rect",
+  x: 100,
+  y: 100,
+  width: 30,
+  height: 30,
+  fill: 'blue',
 };
 
 const DashboardDev = () => {
@@ -33,6 +51,8 @@ const DashboardDev = () => {
   const [shapes, setShapes] = React.useState([]);
   const [selectedShape, selectShape] = React.useState();
   const [newTextData, setNewTextData] = React.useState('');
+  const [stickerColor, setStickerColor] = React.useState('blue');
+  const [hallOrientation, setHallOrientation] = React.useState('vertical');
 
   function downloadJSON(object, name) {
     var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(object, null, 2));
@@ -99,9 +119,8 @@ const DashboardDev = () => {
     if (type === 'room') {
       const newRect = {
         id: "room" + shapes.filter(shape => shape.id.startsWith('room')).length,
-        ...defaultRectProps,
+        ...defaultRoomProps,
       };
-      newRect.fill = "purple";
 
       setShapes([...shapes, newRect]);
     } else if (type === 'text') {
@@ -119,17 +138,24 @@ const DashboardDev = () => {
     } else if (type === 'hall') {
       const newRect = {
         id: "hall" + shapes.filter(shape => shape.id.startsWith('hall')).length,
-        ...defaultRectProps,
+        ...defaultHallProps,
       };
-      newRect.fill = "black";
-      newRect.width = newRect.height / 2;
+      if (hallOrientation === 'vertical') {
+        // Default vertical hall
+      } else {
+        // Default horizontal hall
+        const width = newRect.width;
+        newRect.width = newRect.height;
+        newRect.height = width;
+      }
 
       setShapes([...shapes, newRect]);
-    } else if (type === 'rect') {
+    } else if (type === 'sticker') {
       const newRect = {
-        id: "rect" + shapes.filter(shape => shape.id.startsWith('rect')).length,
-        ...defaultRectProps,
+        id: "sticker" + shapes.filter(shape => shape.id.startsWith('sticker')).length,
+        ...defaultStickerProps,
       };
+      newRect.fill = stickerColor;
 
       setShapes([...shapes, newRect]);
     }
@@ -137,10 +163,18 @@ const DashboardDev = () => {
 
   return (
     <div style={{ display: "flex", flexDirection: "row", marginTop: "1rem" }}>
-      <div style={{ display: "flex", flexDirection: "column" }}>
+      <div style={{ display: "flex", flexDirection: "column", marginRight: "1rem" }}>
         <Button onClick={() => appendShape("room")} style={{margin: "1px"}}>New Room</Button>
         <Button onClick={() => appendShape("hall")} style={{margin: "1px"}}>New Hall</Button>
-        <Button onClick={() => appendShape("rect")} style={{margin: "1px"}}>New Rect</Button>
+        <div>
+          <Checkbox id="cb-vertical" labelText="Vertical" onChange={() => setHallOrientation("vertical")} checked={hallOrientation === "vertical"} />
+          <Checkbox id="cb-horizontal" labelText="Horizontal" onChange={() => setHallOrientation("horizontal")} checked={hallOrientation === "horizontal"} />
+        </div>
+        <Button onClick={() => appendShape("sticker")} style={{margin: "1px"}}>New Sticker</Button>
+        <div>
+          <Checkbox id="cb-blue" labelText="Blue" onClick={() => setStickerColor("blue")} checked={stickerColor === "blue"} />
+          <Checkbox id="cb-red" labelText="Red" onClick={() => setStickerColor("red")} checked={stickerColor === "red"} />
+        </div>
         <Button onClick={() => appendShape("text")} style={{margin: "1px"}}>New Text</Button>
         <div>
           <TextInput id="text-input" labelText="" placeholder="Hello World" onChange={(e) => setNewTextData(e.target.value)} value={newTextData}/>
@@ -156,7 +190,7 @@ const DashboardDev = () => {
       </div>
 
       <div style={{ border: "1px solid" }}>
-        <Stage width={window.innerWidth} height={window.innerHeight} ref={stageRef}>
+        <Stage width={1280} height={720} ref={stageRef}>
           <Layer>
             {shapes.map((shape, index) => {
               const isSelected = selectedShape === shape.id;
@@ -167,11 +201,6 @@ const DashboardDev = () => {
                     shapeProps={shape}
                     onSelect={() => {
                       if (selectedShape === shape.id) {
-                        // Change color of the selected shape
-                        const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'black'];
-                        const current = colors.indexOf(shape.fill);
-                        const next = (current + 1) % colors.length;
-                        shape.fill = colors[next];
                         selectShape(null);
                       } else {
                         selectShape(shape.id);
@@ -201,7 +230,7 @@ const DashboardDev = () => {
                     onClick={() => {
                       if (selectedShape === shape.id) {
                         // Change color of the selected shape
-                        const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'black', 'white'];
+                        const colors = ['red', 'black', 'white'];
                         const current = colors.indexOf(shape.fill);
                         const next = (current + 1) % colors.length;
                         shape.fill = colors[next];
