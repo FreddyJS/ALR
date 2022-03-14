@@ -19,7 +19,7 @@ export default function Stats() {
 
   return (
     <div className="container">
-      {/* Apply the table props */}
+      {/* Aplicamos las propiedades de la tanña */}
       <table {...getTableProps()}>
         <thead>
           {headerGroups.map((headerGroup) => (
@@ -42,20 +42,20 @@ export default function Stats() {
             </tr>
           ))}
         </thead>
-        {/* Apply the table body props */}
+        {/* Aplicamos las propiedades de la tabla */}
         <tbody {...getTableBodyProps()}>
           {
-            // Loop over the table rows
+            // Bucle sobre las filas
             rows.map((row) => {
-              // Prepare the row for display
+              // Prepara la fila para mostrar
               prepareRow(row);
               return (
-                // Apply the row props
+                // Aplicamos las propiedades de las columnas
                 <tr {...row.getRowProps()}>
                   {
-                    // Loop over the rows cells
+                    // Bucle sobre las celdas
                     row.cells.map((cell) => {
-                      // Apply the cell props
+                      // Aplicamos las propiedades de las celdas
                       return (
                         <td {...cell.getCellProps()}>
                           {
