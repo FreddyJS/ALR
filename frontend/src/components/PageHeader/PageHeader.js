@@ -37,6 +37,7 @@ const PageHeader = () => (
         <HeaderNavigation aria-label="guiaMe">
           <HeaderMenuItem element={Link} to="/room">Room Page</HeaderMenuItem>
           <HeaderMenuItem element={Link} to="/mapdev">Map Editor</HeaderMenuItem>
+          <HeaderMenuItem element={Link} to="/stats">Estadísticas</HeaderMenuItem>
         </HeaderNavigation>
         <SideNav
           aria-label="Side navigation"
@@ -49,6 +50,9 @@ const PageHeader = () => (
                 </HeaderMenuItem>
                 <HeaderMenuItem element={Link} to="/mapdev">
                     Map Editor
+                </HeaderMenuItem>
+                <HeaderMenuItem element={Link} to="/stats">
+                    Estadísticas
                 </HeaderMenuItem>
             </HeaderSideNavItems>
           </SideNavItems>

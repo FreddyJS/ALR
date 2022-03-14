@@ -11,6 +11,7 @@ import RoomPage from './content/RoomPage';
 
 import Dashboard from './content/Dashboard';
 import DashboardDev from './content/Dashboard/DashboardDev';
+import Stats from './content/Stats/Stats';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route exact path="/" component={Dashboard} />
           <Route exact path="/mapdev" component={DashboardDev} />
           <Route exact path="/room" component={RoomPage} />
+          <Route exact path="/stats" component={Stats} />
         </Switch>
       </Content>
     </>
