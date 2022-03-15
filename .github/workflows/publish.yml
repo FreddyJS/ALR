@@ -1,0 +1,26 @@
+name: Github Pages
+on:
+  push:
+    branches:
+      - master
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@master
+
+      - name: Install dependencies  🔧 
+        run: yarn install
+      
+      - name: Build  🔧 
+        run: PUBLIC_URL=/guiaMe/ yarn build
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4.2.5
+        with:
+          branch: gh-pages # The branch the action should deploy to.
+          folder: ./frontend/build # The folder the action should deploy.
