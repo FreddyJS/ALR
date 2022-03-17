@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">guiaMe</string>
     <string name="ble_uuid">2350ea70-05ef-469f-8fc5-b3d2a2851456</string>
+    <string name="channel_name">guiaMe Notifications</string>
+    <string name="channel_description">Notificatios for the guiaMe app</string>
 </resources>

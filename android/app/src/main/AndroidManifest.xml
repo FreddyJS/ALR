@@ -16,6 +16,13 @@
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.GuiaMe">
 
+        <receiver android:name=".NotificationReceiver"  android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.INPUT_METHOD_CHANGED" />
+            </intent-filter>
+        </receiver>
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
