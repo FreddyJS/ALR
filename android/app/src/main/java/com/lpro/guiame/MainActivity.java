@@ -13,10 +13,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import java.lang.ref.WeakReference;
+
 public class MainActivity extends AppCompatActivity {
-    private final String CHANNEL_ID = "guiaMeNotificationsChannel";
+    public static String CHANNEL_ID = "guiaMeNotificationsChannel";
     public static int BLUETOOTH_NOTIFICATION_ID = 1;
-    private BluetoothAdvertiser advertiser;
+    public static BluetoothAdvertiser advertiser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +33,11 @@ public class MainActivity extends AppCompatActivity {
         webView.loadUrl("https://freddyjs.github.io/guiaMe/#/room");
 
         // Start Bluetooth Advertiser
-        advertiser = new BluetoothAdvertiser(this);
+        if (advertiser != null) {
+            advertiser.stopAdvertising();
+        }
+
+        advertiser = new BluetoothAdvertiser(this.getApplicationContext());
         if (advertiser.startAdvertising()) {
             this.pushBluetoothNotification();
         } else {
@@ -63,8 +69,13 @@ public class MainActivity extends AppCompatActivity {
         Intent closeIntent = new Intent(this, NotificationReceiver.class);
         closeIntent.setAction("close");
 
+        Intent advertiserIntent = new Intent(this, NotificationReceiver.class);
+        advertiserIntent.setAction("stop");
+
         PendingIntent closePendingIntent = PendingIntent.getBroadcast(this, 0, closeIntent, PendingIntent.FLAG_MUTABLE);
+        PendingIntent advertiserPendingIntent = PendingIntent.getBroadcast(this, 0, advertiserIntent, PendingIntent.FLAG_MUTABLE);
         NotificationCompat.Action closeAction = new NotificationCompat.Action.Builder(R.mipmap.ic_launcher, "Close", closePendingIntent).build();
+        NotificationCompat.Action advertiserAction = new NotificationCompat.Action.Builder(R.mipmap.ic_launcher, "Stop", advertiserPendingIntent).build();
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.mipmap.ic_launcher)
@@ -75,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
                 )
                 .setContentIntent(closePendingIntent)
                 .addAction(closeAction)
+                .addAction(advertiserAction)
                 .setOngoing(true);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);

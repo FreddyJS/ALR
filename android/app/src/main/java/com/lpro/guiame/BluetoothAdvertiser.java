@@ -22,9 +22,10 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class BluetoothAdvertiser {
+public class BluetoothAdvertiser implements Serializable {
     private final ParcelUuid dataUuid = new ParcelUuid(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
     private final AdvertisingSetParameters parameters;
     private final BluetoothLeAdvertiser advertiser;
