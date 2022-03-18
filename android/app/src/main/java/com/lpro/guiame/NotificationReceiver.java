@@ -1,5 +1,6 @@
 package com.lpro.guiame;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -14,11 +15,36 @@ public class NotificationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        BluetoothAdvertiser advertiser = MainActivity.advertiser;
-
+        BluetoothAdvertiser advertiser = BluetoothAdvertiser.getInstance(context);
         String action = intent.getAction();
 
         // Prepare the updated notification
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+        Notification updatedNotification = this.createNotification(context, action);
+
+        switch (action) {
+            case "close":
+                Log.d("NotificationReceiver", "Closed app notification");
+                manager.cancel(MainActivity.BLUETOOTH_NOTIFICATION_ID);
+
+                advertiser.stopAdvertising();
+                break;
+            case "stop":
+                Log.d("NotificationReceiver", "Stopping ble advertising");
+                advertiser.stopAdvertising();
+
+                notificationManager.notify(MainActivity.BLUETOOTH_NOTIFICATION_ID, updatedNotification);
+                break;
+            case "start":
+                Log.d("NotificationReceiver", "Starting ble advertising");
+                advertiser.startAdvertising();
+
+                notificationManager.notify(MainActivity.BLUETOOTH_NOTIFICATION_ID, updatedNotification);
+                break;
+        }
+    }
+
+    private Notification createNotification(Context context, String action) {
         Intent closeIntent = new Intent(context, NotificationReceiver.class);
         closeIntent.setAction("close");
         Intent advertiserIntent = new Intent(context, NotificationReceiver.class);
@@ -41,23 +67,6 @@ public class NotificationReceiver extends BroadcastReceiver {
                 .addAction(advertiserAction)
                 .setOngoing(true);
 
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-
-        if(action.equals("close")){
-            Log.d("NotificationReceiver", "Closed app notification");
-            manager.cancel(MainActivity.BLUETOOTH_NOTIFICATION_ID);
-
-            advertiser.stopAdvertising();
-        } else if (action.equals("stop")) {
-            Log.d("NotificationReceiver", "Stopping ble advertising");
-            advertiser.stopAdvertising();
-
-            notificationManager.notify(MainActivity.BLUETOOTH_NOTIFICATION_ID, builder.build());
-        } else  if (action.equals("start")) {
-            Log.d("NotificationReceiver", "Starting ble advertising");
-            advertiser.startAdvertising();
-
-            notificationManager.notify(MainActivity.BLUETOOTH_NOTIFICATION_ID, builder.build());
-        }
+        return builder.build();
     }
 }

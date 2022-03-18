@@ -13,12 +13,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
-import java.lang.ref.WeakReference;
-
 public class MainActivity extends AppCompatActivity {
     public static String CHANNEL_ID = "guiaMeNotificationsChannel";
     public static int BLUETOOTH_NOTIFICATION_ID = 1;
-    public static BluetoothAdvertiser advertiser;
+    private BluetoothAdvertiser advertiser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,10 +32,11 @@ public class MainActivity extends AppCompatActivity {
 
         // Start Bluetooth Advertiser
         if (advertiser != null) {
+            // Stop the avertiser if it's already running
             advertiser.stopAdvertising();
         }
 
-        advertiser = new BluetoothAdvertiser(this.getApplicationContext());
+        advertiser = BluetoothAdvertiser.getInstance(this);
         if (advertiser.startAdvertising()) {
             this.pushBluetoothNotification();
         } else {
