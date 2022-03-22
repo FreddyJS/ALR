@@ -1,3 +1,5 @@
+// For compiling: cc scanner.c -lbluetooh -o scanner
+// Executing: sudo ./scanner -h bluetoothDeviceName
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,7 +17,7 @@
 #define WINDOWSIZE BUFFER - 1
 
 int compare(const void *a, const void *b);
-void calcularMediana(); // Actualiza el array de medianas con el nuevo valor de mediana
+void calcularMediana();     // Actualiza el array de medianas con el nuevo valor de mediana
 int calcularValorMediano(); // Retorna el valor mediano de las muestras que tenga el array buffer en ese momento
 int calcularMedia();
 int calcularValorReferencia(int rssi, int flagMode);
@@ -46,10 +48,10 @@ struct hci_request ble_hci_request(uint16_t ocf, int clen, void *status, void *c
     rq.rlen = 1;
     return rq;
 }
-int main()
+int main(int argc, char *argv[])
 {
     int ret, status;
-
+    printf("Device name: %s\n",argv[2]);
     // Get HCI device.
 
     int device = hci_open_dev(1);
@@ -155,11 +157,12 @@ int main()
     char addr2[18];
     char name[248] = {0};
     ba2str(&addr3, addr2);
-    printf("%s\n", addr2);
+    // printf("%s\n", addr2);
     // hci_le_add_white_list(device,)
     // hci_le_clear_white_list(device,1000);
     // Keep scanning until we see nothing for 10 secs or we have seen lots of advertisements.  Then exit.
     // We exit in this case because the scan may have failed or stopped. Higher level code can restart
+    printf("Starting scanning.....\n");
     while (1)
     {
         len = read(device, buf, sizeof(buf));
@@ -176,13 +179,15 @@ int main()
                     char addr[18];
                     ba2str(&(info->bdaddr), addr);
                     int8_t rssi = (int8_t)info->data[info->length];
-                    int flag = strncmp(&info->data[2], "HP30L", 5);
+                    int flag = strncmp(&info->data[2], argv[2], 5); // El nombre del dispositivo se encuentra en la posición 2
+
 
                     if (!flag)
                     {
                         // printf("Printing useful data:\n");
-                        printf("%s %d", addr, (int8_t)info->data[info->length]);
+                        // printf("%s %d\n", addr, (int8_t)info->data[info->length]);
                         // printf("%.5s %d %s %i\n", &info->data[2], rssi, addr, info->bdaddr_type);
+                        printf("RSSI received: %d\n", rssi);
                         count++;
                         last_detection_time = (unsigned)time(NULL);
 
@@ -296,7 +301,7 @@ int calcularValorReferencia(int rssi, int flagMode)
         else
         {
             valorAuxiliarRetorno = calcularValorMediano();
-            printf("\nValor mediano calculado: %i\n",valorAuxiliarRetorno);
+            printf("\nValor mediano calculado: %i\n", valorAuxiliarRetorno);
             // printf("\nValor de referencia: %i\n", valorRef);
             memcpy(buffer, arrayVacio, sizeof(buffer));
             contBufferRef = 0;
@@ -334,12 +339,12 @@ int calcularValorReferencia(int rssi, int flagMode)
         else
         {
             valorAuxiliarRetorno = calcularMedia();
-            printf("\nValor de referencia: %i\n",valorAuxiliarRetorno);
+            printf("\nValor de referencia: %i\n", valorAuxiliarRetorno);
             contBufferRef = 0;
             contMuestraRef = 0;
             contMedians = 0;
             memcpy(buffer, arrayVacio, sizeof(buffer));
-            memcpy(medians,arrayVacio,sizeof(medians));
+            memcpy(medians, arrayVacio, sizeof(medians));
             // flagRefCalculada = 0;
         }
         break;
