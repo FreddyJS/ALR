@@ -2,7 +2,6 @@ package com.lpro.guiame;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.AdvertiseData;
 import android.bluetooth.le.AdvertisingSet;
@@ -15,28 +14,37 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.ParcelUuid;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import java.io.Serializable;
 import java.util.UUID;
 
-public class BluetoothAdvertiser implements Serializable {
+public class BluetoothAdvertiser {
+    private static BluetoothAdvertiser instance;
+
     private final ParcelUuid dataUuid = new ParcelUuid(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
+    private final String TAG = this.getClass().getSimpleName();
+
     private final AdvertisingSetParameters parameters;
-    private final BluetoothLeAdvertiser advertiser;
     private final AdvertisingSetCallback callback;
     private final AdvertiseData data;
-    private final Context context;
+    private final Context appContext;
 
-    BluetoothAdvertiser(Context context) {
+    private BluetoothLeAdvertiser advertiser;
+    private boolean advertising = false;
+
+    /**
+     *
+     * @param activity: To turn on bluetooth if needed and to get the appContext
+     */
+    BluetoothAdvertiser(Activity activity) {
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-        this.context = context;
-        this.setupBluetooth(adapter);
+        this.appContext = activity.getApplicationContext();
+        this.setupBluetooth(adapter, activity);
 
         advertiser = adapter.getBluetoothLeAdvertiser();
         parameters = (new AdvertisingSetParameters.Builder())
@@ -55,57 +63,46 @@ public class BluetoothAdvertiser implements Serializable {
         callback = new AdvertisingSetCallback() {
             @Override
             public void onAdvertisingSetStarted(AdvertisingSet advertisingSet, int txPower, int status) {
-                Log.i("ADV/CALLBACK", "onAdvertisingSetStarted(): txPower:" + txPower + " , status: " + status);
+                Log.d(TAG, "onAdvertisingSetStarted(): txPower:" + txPower + " , status: " + status);
+                advertising = true;
             }
 
             @Override
             public void onAdvertisingDataSet(AdvertisingSet advertisingSet, int status) {
-                Log.i("ADV/CALLBACK", "onAdvertisingDataSet() :status:" + status);
+                Log.d(TAG, "onAdvertisingDataSet() :status:" + status);
             }
 
             @Override
             public void onScanResponseDataSet(AdvertisingSet advertisingSet, int status) {
-                Log.i("ADV/CALLBACK", "onScanResponseDataSet(): status:" + status);
+                Log.d(TAG, "onScanResponseDataSet(): status:" + status);
             }
 
             @Override
             public void onAdvertisingSetStopped(AdvertisingSet advertisingSet) {
-                Log.i("ADV/CALLBACK", "onAdvertisingSetStopped():");
+                Log.d(TAG, "onAdvertisingSetStopped():");
+                advertising = false;
             }
         };
     }
 
-    private void setupBluetooth(BluetoothAdapter adapter) {
+    private void setupBluetooth(BluetoothAdapter adapter, Context activityContext) {
         // Permissions check, needed for bluetooth advertiser in SDK >= 31
-        int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_ADVERTISE);
-        if (Build.VERSION.SDK_INT >= 31 && permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(context, "Requesting permissions", Toast.LENGTH_LONG).show();
-            if (ActivityCompat.shouldShowRequestPermissionRationale(((MainActivity) context), Manifest.permission.BLUETOOTH_ADVERTISE)) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle("Permission Needed")
-                        .setMessage("Please grant bluetooth permissions")
-                        .setPositiveButton(android.R.string.ok, (dialog, id) -> ActivityCompat.requestPermissions(((MainActivity) context), new String[]{Manifest.permission.BLUETOOTH_ADVERTISE}, 0));
-                builder.create().show();
-            } else {
-                ActivityCompat.requestPermissions(((MainActivity) context), new String[]{Manifest.permission.BLUETOOTH_ADVERTISE}, 0);
+        if (Build.VERSION.SDK_INT >= 31) {
+            if (ContextCompat.checkSelfPermission(activityContext, Manifest.permission.BLUETOOTH_ADVERTISE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(((MainActivity) activityContext), new String[]{Manifest.permission.BLUETOOTH_ADVERTISE}, 0);
             }
-        } else {
-            Toast.makeText(context, "Bluetooth permissions already granted", Toast.LENGTH_LONG).show();
         }
 
         // Turn on bluetooth adapter if it's not
         if (!adapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            ActivityResultLauncher<Intent> registerForResult = ((MainActivity) context).registerForActivityResult(
+            ActivityResultLauncher<Intent> registerForResult = ((MainActivity) activityContext).registerForActivityResult(
                     new ActivityResultContracts.StartActivityForResult(),
                     result -> {
                         if (result.getResultCode() == Activity.RESULT_OK) {
-                            // There are no request codes
-                            // Intent data = result.getData();
-                            Toast.makeText(context, "Bluetooth permissions granted", Toast.LENGTH_LONG).show();
+                            Log.d(TAG, "Bluetooth enabled correctly");
                         } else {
-                            // TODO: Show message to user saying we need the bluetooth and close the app
-                            Toast.makeText(context, "This app needs Bluetooth to properly work!", Toast.LENGTH_LONG).show();
+                            Log.d(TAG, "Could not enable bluetooth adapter");
                         }
                     });
 
@@ -114,7 +111,9 @@ public class BluetoothAdvertiser implements Serializable {
     }
 
     public boolean startAdvertising() {
-        if (Build.VERSION.SDK_INT >= 31 && ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_ADVERTISE) != PackageManager.PERMISSION_GRANTED) {
+        if (Build.VERSION.SDK_INT >= 31 && ContextCompat.checkSelfPermission(appContext, Manifest.permission.BLUETOOTH_ADVERTISE) != PackageManager.PERMISSION_GRANTED) {
+            return false;
+        } else if (advertiser == null) {
             return false;
         }
 
@@ -124,10 +123,34 @@ public class BluetoothAdvertiser implements Serializable {
     }
 
     public void stopAdvertising() {
-        if (Build.VERSION.SDK_INT >= 31 && ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_ADVERTISE) != PackageManager.PERMISSION_GRANTED) {
+        if (Build.VERSION.SDK_INT >= 31 && ContextCompat.checkSelfPermission(appContext, Manifest.permission.BLUETOOTH_ADVERTISE) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        } else if (advertiser == null) {
             return;
         }
 
         advertiser.stopAdvertisingSet(callback);
+    }
+
+    public void updateAdvertiser() {
+        this.stopAdvertising();
+        advertiser = BluetoothAdapter.getDefaultAdapter().getBluetoothLeAdvertiser();
+    }
+
+    public boolean isAdvertising() {
+        return advertising;
+    }
+
+    /**
+     *
+     * @param activity: To turn on bluetooth if needed and to get the appContext (first time only)
+     * @return BluetoothAdvertiser instance
+     */
+    public static BluetoothAdvertiser getInstance(@Nullable Activity activity) {
+        if (instance == null && activity != null) {
+            instance = new BluetoothAdvertiser(activity);
+        }
+
+        return  instance;
     }
 }
