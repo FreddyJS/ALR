@@ -4,40 +4,14 @@ import time
 import socket
 
 
-
-'''
-
-randomlist = []
-for i in range(0,10):
-    n = random.randint(1,100)
-    randomlist.append(n)
-
-
-randomlist.clear()
-#randomlist = [23, 96, 40, 53, 85, 86, 76, 85, 55, 96]
-randomlist = [23, 35, 50, 55, 40, 75, 80, 20, 50, 50, 50]
-print(randomlist)
-
-
-for element in randomlist:
-    control = pid(element)
-    print (control)
-    time.sleep(0.25)	
-
-'''
-
 # next create a socket object
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.settimeout(2)
-
-
-# reserve a port on your computer in our
-# case it is 12345 but it can be anything
 port = 12345			
-
 server_address = ('0.0.0.0', port)
 sock.bind(server_address)
-sock.setblocking(1)
+sock.setblocking(1)#Se pone el socket como bloqueante
+
 print('starting up on {} port {}'.format(*server_address))
 	
 data, address = sock.recvfrom(1500)
@@ -60,8 +34,8 @@ while True:
         break
     dato = int(data.decode())
     
-    control = pid(dato)
-    lista.append(control)
+    control = pid(dato)/20 #Divido entre 20 para tener valores más comprensibles (de -5 a 5)
+    lista.append(control)# Se guarda en una lista para las pruebas, en realidad tendría que ir modificando la velocidad del robot
     #time.sleep(0.25)
 
 print(lista)
