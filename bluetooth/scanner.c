@@ -181,7 +181,8 @@ int main()
                     if (!flag)
                     {
                         // printf("Printing useful data:\n");
-                        printf("%.5s %d %s %i\n", &info->data[2], rssi, addr, info->bdaddr_type);
+                        printf("%s %d", addr, (int8_t)info->data[info->length]);
+                        // printf("%.5s %d %s %i\n", &info->data[2], rssi, addr, info->bdaddr_type);
                         count++;
                         last_detection_time = (unsigned)time(NULL);
 
