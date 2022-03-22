@@ -4,3 +4,6 @@
 # Ignore Django files
 __pycache__
 db.sqlite3
+
+# Ignore executable files
+scanner

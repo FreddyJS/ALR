@@ -1,16 +1,22 @@
 // For compiling: cc scanner.c -lbluetooh -o scanner
 // Executing: sudo ./scanner -h bluetoothDeviceName
+#include <time.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/hci.h>
 #include <bluetooth/hci_lib.h>
-#include <time.h>
+
+#define SERVER_PORT 12345
+#define SERVER_ADDR "localhost"
 
 #define MUESTRASREF 20 // Muestras totales deseadas para calcular valor de referencia
 #define BUFFER 10
@@ -36,6 +42,33 @@ int contBufferRef = 0;  // Para rellenar buffer
 int contMuestraRef = 0; // Contador de muestras: 0<x<=MUESTRASREF
 int flagRefCalculada = 1;
 
+// Socket global variables
+struct sockaddr_in server;
+int socketfd = -1;
+
+int init_socket()
+{
+    if ((socketfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+    {
+        printf("Error opening socket");
+        exit(EXIT_FAILURE);
+    }
+
+    server.sin_family = AF_INET;
+    server.sin_port = htons(SERVER_PORT);
+    server.sin_addr.s_addr = inet_addr(SERVER_ADDR);
+
+    printf("Socket created\n");
+}
+
+int socket_send(int value)
+{
+    char buffer[64];
+    sprintf(buffer, "%i", value);
+    printf("socket_send(): %s\n", buffer);
+    return sendto(socketfd, buffer, (strlen(buffer) + 1), 0, (struct sockaddr *)&server, sizeof(server));
+}
+
 struct hci_request ble_hci_request(uint16_t ocf, int clen, void *status, void *cparam)
 {
     struct hci_request rq;
@@ -48,9 +81,11 @@ struct hci_request ble_hci_request(uint16_t ocf, int clen, void *status, void *c
     rq.rlen = 1;
     return rq;
 }
+
 int main(int argc, char *argv[])
 {
     int ret, status;
+    const char* device_name = argv[2];
     printf("Device name: %s\n",argv[2]);
     // Get HCI device.
 
@@ -73,6 +108,9 @@ int main(int argc, char *argv[])
         perror("Failed to open HCI device.");
         return 0;
     }
+
+    // Init socket
+    init_socket();
 
     // ADDRESS TO FILTER: 4C:03:85:4A:65:53
     // Set BLE scan parameters.
@@ -179,8 +217,7 @@ int main(int argc, char *argv[])
                     char addr[18];
                     ba2str(&(info->bdaddr), addr);
                     int8_t rssi = (int8_t)info->data[info->length];
-                    int flag = strncmp(&info->data[2], argv[2], 5); // El nombre del dispositivo se encuentra en la posición 2
-
+                    int flag = strncmp(&info->data[2], device_name, strlen(device_name)); // El nombre del dispositivo se encuentra en la posición 2
 
                     if (!flag)
                     {
@@ -195,6 +232,7 @@ int main(int argc, char *argv[])
                         if (valorRef == 0)
                         {
                             valorRef = calcularValorReferencia(rssi, 1);
+                            if (valorRef != 0) socket_send(valorRef);
                         }
                         // Una vez el valor de referencia está calculado siempre entraremos en el siguiente else, para calcular la mediana con las muestras entrantes
                         else
@@ -205,6 +243,7 @@ int main(int argc, char *argv[])
                             if (mediana != 0)
                             {
                                 // printf("Mediana calculada con 10 muestras: %i\n",mediana);
+                                socket_send(mediana);
                             }
                         }
                     }
@@ -233,6 +272,7 @@ int main(int argc, char *argv[])
     }
 
     hci_close_dev(device);
+    close(socketfd);
 
     return 0;
 }
@@ -253,6 +293,7 @@ void calcularMediana()
 
     contMedians++;
 }
+
 int calcularValorMediano()
 {
     int valorMediana = 0;
