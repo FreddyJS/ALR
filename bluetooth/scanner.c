@@ -1,6 +1,7 @@
 // For compiling: cc scanner.c -lbluetooh -o scanner
 // Executing: sudo ./scanner -h bluetoothDeviceName
 #include <time.h>
+#include <sys/time.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,6 +28,7 @@ void calcularMediana();     // Actualiza el array de medianas con el nuevo valor
 int calcularValorMediano(); // Retorna el valor mediano de las muestras que tenga el array buffer en ese momento
 int calcularMedia();
 int calcularValorReferencia(int rssi, int flagMode);
+int init_BLE(le_set_scan_enable_cp *scan_cp); // Código necesario para iniciar escaneo
 // Tamanho del buffer que se utilizara para calcular el valor de referencia
 //  int muestras[MUESTRASREF] = {-28, -34, -29, -29, -30, -29, -33, -28, -90, -90, -30, -89, -28, -31, -28, -30, -93, -32, -30, -30};
 //  int muestras[MUESTRASREF]={0}; // Buffer entrante de muestras para calcular valor referencia
@@ -84,104 +86,15 @@ struct hci_request ble_hci_request(uint16_t ocf, int clen, void *status, void *c
 
 int main(int argc, char *argv[])
 {
-    int ret, status;
-    const char* device_name = argv[2];
-    printf("Device name: %s\n",argv[2]);
-    // Get HCI device.
-
-    int device = hci_open_dev(1);
-    if (device < 0)
-    {
-        device = hci_open_dev(0);
-        if (device >= 0)
-        {
-            printf("Using hci0\n");
-        }
-    }
-    else
-    {
-        printf("Using hci1\n");
-    }
-
-    if (device < 0)
-    {
-        perror("Failed to open HCI device.");
-        return 0;
-    }
+    const char *device_name = argv[2];
+    printf("Device name: %s\n", argv[2]);
+    struct timeval timestamp,start;
+    gettimeofday(&start,NULL);
 
     // Init socket
     init_socket();
-
-    // ADDRESS TO FILTER: 4C:03:85:4A:65:53
-    // Set BLE scan parameters.
-
-    le_set_scan_parameters_cp scan_params_cp;
-    memset(&scan_params_cp, 0, sizeof(scan_params_cp));
-    scan_params_cp.type = 0x00;
-    scan_params_cp.interval = htobs(0x0010);
-    scan_params_cp.window = htobs(0x0010);
-    scan_params_cp.own_bdaddr_type = 0x00; // Public Device Address (default).
-    scan_params_cp.filter = 0x00;          // Accept all.
-
-    struct hci_request scan_params_rq = ble_hci_request(OCF_LE_SET_SCAN_PARAMETERS, LE_SET_SCAN_PARAMETERS_CP_SIZE, &status, &scan_params_cp);
-    // hci_le_add_white_list(device,&addrFILTER,LE_RANDOM_ADDRESS,1000);
-
-    ret = hci_send_req(device, &scan_params_rq, 1000);
-    if (ret < 0)
-    {
-        hci_close_dev(device);
-        perror("Failed to set scan parameters data.");
-        return 0;
-    }
-
-    // Set BLE events report mask.
-
-    le_set_event_mask_cp event_mask_cp;
-    memset(&event_mask_cp, 0, sizeof(le_set_event_mask_cp));
-    int i = 0;
-    for (i = 0; i < 8; i++)
-        event_mask_cp.mask[i] = 0xFF;
-
-    struct hci_request set_mask_rq = ble_hci_request(OCF_LE_SET_EVENT_MASK, LE_SET_EVENT_MASK_CP_SIZE, &status, &event_mask_cp);
-    ret = hci_send_req(device, &set_mask_rq, 1000);
-    if (ret < 0)
-    {
-        hci_close_dev(device);
-        perror("Failed to set event mask.");
-        return 0;
-    }
-
-    // Enable scanning.
-
     le_set_scan_enable_cp scan_cp;
-    memset(&scan_cp, 0, sizeof(scan_cp));
-    scan_cp.enable = 0x01;     // Enable flag.
-    scan_cp.filter_dup = 0x00; // Filtering disabled.
-
-    struct hci_request enable_adv_rq = ble_hci_request(OCF_LE_SET_SCAN_ENABLE, LE_SET_SCAN_ENABLE_CP_SIZE, &status, &scan_cp);
-
-    ret = hci_send_req(device, &enable_adv_rq, 1000);
-    if (ret < 0)
-    {
-        hci_close_dev(device);
-        perror("Failed to enable scan.");
-        return 0;
-    }
-
-    // Get Results.
-
-    struct hci_filter nf;
-    hci_filter_clear(&nf);
-    hci_filter_set_ptype(HCI_EVENT_PKT, &nf);
-    hci_filter_set_event(EVT_LE_META_EVENT, &nf);
-    const bdaddr_t addrFILTER = {0xFF, 0xB1, 0xB0, 0x17, 0xD7, 0x60};
-
-    if (setsockopt(device, SOL_HCI, HCI_FILTER, &nf, sizeof(nf)) < 0)
-    {
-        hci_close_dev(device);
-        perror("Could not set socket options\n");
-        return 0;
-    }
+    int device = init_BLE(&scan_cp);
 
     uint8_t buf[HCI_MAX_EVENT_SIZE];
     evt_le_meta_event *meta_event;
@@ -191,13 +104,7 @@ int main(int argc, char *argv[])
     int count = 0;
     unsigned now = (unsigned)time(NULL);
     unsigned last_detection_time = now;
-    const bdaddr_t addr3 = {{0xc6, 0x5e, 0x48, 0x6c, 0x4a, 0x04}};
-    char addr2[18];
-    char name[248] = {0};
-    ba2str(&addr3, addr2);
-    // printf("%s\n", addr2);
-    // hci_le_add_white_list(device,)
-    // hci_le_clear_white_list(device,1000);
+
     // Keep scanning until we see nothing for 10 secs or we have seen lots of advertisements.  Then exit.
     // We exit in this case because the scan may have failed or stopped. Higher level code can restart
     printf("Starting scanning.....\n");
@@ -224,7 +131,9 @@ int main(int argc, char *argv[])
                         // printf("Printing useful data:\n");
                         // printf("%s %d\n", addr, (int8_t)info->data[info->length]);
                         // printf("%.5s %d %s %i\n", &info->data[2], rssi, addr, info->bdaddr_type);
-                        printf("RSSI received: %d\n", rssi);
+                        gettimeofday(&timestamp, NULL);
+                        unsigned long timest = (timestamp.tv_sec-start.tv_sec) * 1000000 + (timestamp.tv_usec-start.tv_usec);
+                        printf("RSSI received: %d %lu\n", rssi,timest);
                         count++;
                         last_detection_time = (unsigned)time(NULL);
 
@@ -232,7 +141,8 @@ int main(int argc, char *argv[])
                         if (valorRef == 0)
                         {
                             valorRef = calcularValorReferencia(rssi, 1);
-                            if (valorRef != 0) socket_send(valorRef);
+                            if (valorRef != 0)
+                                socket_send(valorRef);
                         }
                         // Una vez el valor de referencia está calculado siempre entraremos en el siguiente else, para calcular la mediana con las muestras entrantes
                         else
@@ -249,10 +159,6 @@ int main(int argc, char *argv[])
                     }
                     offset = info->data + info->length + 2;
                 }
-                if (flagRefCalculada == 0)
-                {
-                    break;
-                }
             }
         }
         now = (unsigned)time(NULL);
@@ -261,7 +167,7 @@ int main(int argc, char *argv[])
 
     memset(&scan_cp, 0, sizeof(scan_cp));
     scan_cp.enable = 0x00; // Disable flag.
-
+    int ret, status;
     struct hci_request disable_adv_rq = ble_hci_request(OCF_LE_SET_SCAN_ENABLE, LE_SET_SCAN_ENABLE_CP_SIZE, &status, &scan_cp);
     ret = hci_send_req(device, &disable_adv_rq, 1000);
     if (ret < 0)
@@ -275,6 +181,86 @@ int main(int argc, char *argv[])
     close(socketfd);
 
     return 0;
+}
+
+int init_BLE(le_set_scan_enable_cp *scan_cp)
+{
+    int ret, status;
+    // Get HCI device.
+
+    int device = hci_open_dev(0);
+    if (device < 0)
+    {
+        perror("Failed to open HCI device.");
+        exit(1);
+    }
+
+    le_set_scan_parameters_cp scan_params_cp;
+    memset(&scan_params_cp, 0, sizeof(scan_params_cp));
+    scan_params_cp.type = 0x00;
+    scan_params_cp.interval = htobs(0x0010);
+    scan_params_cp.window = htobs(0x0010);
+    scan_params_cp.own_bdaddr_type = 0x00; // Public Device Address (default).
+    scan_params_cp.filter = 0x00;          // Accept all.
+
+    // Construimos una struc hci_request mediante el método ble_hci_request()
+    struct hci_request scan_params_rq = ble_hci_request(OCF_LE_SET_SCAN_PARAMETERS, LE_SET_SCAN_PARAMETERS_CP_SIZE, &status, &scan_params_cp);
+
+    ret = hci_send_req(device, &scan_params_rq, 1000);
+    if (ret < 0)
+    {
+        hci_close_dev(device);
+        perror("Failed to set scan parameters data.");
+        exit(1);
+    }
+    // Set BLE events report mask.
+
+    le_set_event_mask_cp event_mask_cp;
+    memset(&event_mask_cp, 0, sizeof(le_set_event_mask_cp));
+    int i = 0;
+    for (i = 0; i < 8; i++)
+        event_mask_cp.mask[i] = 0xFF;
+
+    struct hci_request set_mask_rq = ble_hci_request(OCF_LE_SET_EVENT_MASK, LE_SET_EVENT_MASK_CP_SIZE, &status, &event_mask_cp);
+    ret = hci_send_req(device, &set_mask_rq, 1000);
+    if (ret < 0)
+    {
+        hci_close_dev(device);
+        perror("Failed to set event mask.");
+        exit(1);
+    }
+
+    // Enable scanning.
+
+    memset(scan_cp, 0, sizeof(scan_cp));
+    scan_cp->enable = 0x01;     // Enable flag.
+    scan_cp->filter_dup = 0x00; // Filtering disabled.
+
+    struct hci_request enable_adv_rq = ble_hci_request(OCF_LE_SET_SCAN_ENABLE, LE_SET_SCAN_ENABLE_CP_SIZE, &status, scan_cp);
+
+    ret = hci_send_req(device, &enable_adv_rq, 1000);
+    if (ret < 0)
+    {
+        hci_close_dev(device);
+        perror("Failed to enable scan.");
+        exit(1);
+    }
+
+    // Get Results.
+
+    struct hci_filter nf;
+    hci_filter_clear(&nf);
+    hci_filter_set_ptype(HCI_EVENT_PKT, &nf);
+    hci_filter_set_event(EVT_LE_META_EVENT, &nf);
+
+    if (setsockopt(device, SOL_HCI, HCI_FILTER, &nf, sizeof(nf)) < 0)
+    {
+        hci_close_dev(device);
+        perror("Could not set socket options\n");
+        exit(1);
+    }
+
+    return device;
 }
 
 int compare(const void *a, const void *b)
