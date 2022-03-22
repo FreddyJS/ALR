@@ -1,7 +1,3 @@
-# CURRENT FILES :
-# deviceOntop.txt : 230 samples of rssi received when beacon emitting at 0dbm
-#  deviceOntop_-7dbm.txt: 190 samples of rssi received when beacon emitting at -7dbm (the package is defined for -7dbm but when we click on transmit it sets to 0)
-# deviceOntopMeasureTime.txt: 10 samples over 1 second when transmitting at 0dbm
 import numpy as np
 import matplotlib.pyplot as plt
 
