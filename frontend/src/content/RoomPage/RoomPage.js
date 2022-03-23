@@ -3,9 +3,17 @@ import React from 'react';
 import { RobotSocket, UISocket } from '../../sockets';
 import { Button, Tile, Modal } from 'carbon-components-react';
 
+import { getRoutes } from '../../services/routes';
+import RoomInput from '../../components/RoomInput';
+import { AiOutlineArrowUp, AiOutlineArrowRight, AiOutlineArrowDown, AiOutlineArrowLeft } from "react-icons/ai";
+
 const RoomPage = () => {
   const [roomNumber, setRoomNumber] = React.useState('');
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [wrongRoomNumber, setWrongRoomNumber] = React.useState(false);
+
+  const [inPath, setInPath] = React.useState(false);
+  const [nextDirection, setNextDirection] = React.useState('');
 
   const sendHelllo = (from) => {
     const data = {
@@ -20,9 +28,25 @@ const RoomPage = () => {
     }
   };
 
+  const onSubmit = async () => {
+    const routes = await getRoutes();    
+    const route = routes.find(r => r.room === roomNumber);
+    
+    if (route) {
+      console.log("Route:", route);
+      setWrongRoomNumber(false);
+      setInPath(true);
+      setNextDirection(route.route[0]);
+    } else {
+      setWrongRoomNumber(true);
+    }
+
+    setIsModalOpen(false);
+  };
+
   return(
     <div className="room-page">
-      <div style={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center"}}>
+      <div style={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", marginBottom: "10px"}}>
         <Button style={{margin: "0.1rem"}} onClick={() => sendHelllo("UI")}> Client Message </Button>
         <Button style={{margin: "0.1rem"}} onClick={() => sendHelllo("Robot")}> Robot Message </Button>    
       </div>
@@ -31,6 +55,7 @@ const RoomPage = () => {
         <Modal
           open={isModalOpen}
           onRequestClose={() => setIsModalOpen(false)}
+          onRequestSubmit={() => onSubmit()}
           modalHeading="Confirmar destino"
           primaryButtonText="Submit"
         >
@@ -42,31 +67,21 @@ const RoomPage = () => {
       )}
 
       <Tile className="room-page__content">
-        {roomNumber === "" ? <h3>Introduce el número de habitación</h3> : <h3>Habitación: {roomNumber}</h3>}        
+        {roomNumber === "" ? <h3>Introduce el número de habitación</h3> : <h3>Habitación: {roomNumber}</h3>}
+        {wrongRoomNumber && <h3>No existe la habitación</h3>}
         {/* <TextInput id="room-number" type="text" value={roomNumber} placeholder="Nº de habitación" disabled/> */}
 
-        <div className="room-page__keyboard">
-          <div className="room-page__keyboard-row">
-            <Button className="room-page__keyboard-button" onClick={() => setRoomNumber(roomNumber + "1")}>1</Button>
-            <Button className="room-page__keyboard-button" onClick={() => setRoomNumber(roomNumber + "2")}>2</Button>
-            <Button className="room-page__keyboard-button" onClick={() => setRoomNumber(roomNumber + "3")}>3</Button>
+        {!inPath ?
+          <RoomInput onSubmit={() => setIsModalOpen(true)} onChange={(room) => {setRoomNumber(room); setWrongRoomNumber(false);}} value={roomNumber} />
+        :
+          <div>
+            <h4>En el próximo cruce gire a la {nextDirection}</h4>
+            {nextDirection === 'up' && <AiOutlineArrowUp style={{ width: "75%", height: "75%", fill: "green"}}/>}
+            {nextDirection === 'right' && <AiOutlineArrowRight style={{ width: "75%", height: "75%", fill: "green"}}/>}
+            {nextDirection === 'down' && <AiOutlineArrowDown style={{ width: "75%", height: "75%", fill: "green"}}/>}
+            {nextDirection === 'left' && <AiOutlineArrowLeft style={{ width: "75%", height: "75%", fill: "green"}}/>}
           </div>
-          <div className="room-page__keyboard-row">
-            <Button className="room-page__keyboard-button" onClick={() => setRoomNumber(roomNumber + "4")}>4</Button>
-            <Button className="room-page__keyboard-button" onClick={() => setRoomNumber(roomNumber + "5")}>5</Button>
-            <Button className="room-page__keyboard-button" onClick={() => setRoomNumber(roomNumber + "6")}>6</Button>
-          </div>
-          <div className="room-page__keyboard-row">
-            <Button className="room-page__keyboard-button" onClick={() => setRoomNumber(roomNumber + "7")}>7</Button>
-            <Button className="room-page__keyboard-button" onClick={() => setRoomNumber(roomNumber + "8")}>8</Button>
-            <Button className="room-page__keyboard-button" onClick={() => setRoomNumber(roomNumber + "9")}>9</Button>
-          </div>
-          <div className="room-page__keyboard-row">
-            <Button className="room-page__keyboard-button" onClick={() => setRoomNumber("")}>Reset</Button>
-            <Button className="room-page__keyboard-button" onClick={() => setRoomNumber(roomNumber + "0")}>0</Button>
-            <Button className="room-page__keyboard-button" onClick={() => setIsModalOpen(true)}>OK</Button>
-          </div>
-        </div>
+        }
       </Tile>
     </div>
   )
