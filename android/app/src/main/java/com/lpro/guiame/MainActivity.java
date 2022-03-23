@@ -1,24 +1,24 @@
 package com.lpro.guiame;
 
+import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
-import java.lang.ref.WeakReference;
-
+@SuppressLint("SetJavaScriptEnabled")
 public class MainActivity extends AppCompatActivity {
     public static String CHANNEL_ID = "guiaMeNotificationsChannel";
     public static int BLUETOOTH_NOTIFICATION_ID = 1;
-    public static BluetoothAdvertiser advertiser;
+    private BluetoothAdvertiser advertiser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,16 +33,20 @@ public class MainActivity extends AppCompatActivity {
         webView.loadUrl("https://freddyjs.github.io/guiaMe/#/room");
 
         // Start Bluetooth Advertiser
-        if (advertiser != null) {
-            advertiser.stopAdvertising();
-        }
-
-        advertiser = new BluetoothAdvertiser(this.getApplicationContext());
-        if (advertiser.startAdvertising()) {
-            this.pushBluetoothNotification();
+        advertiser = BluetoothAdvertiser.getInstance(this);
+        if (!advertiser.isAdvertising()) {
+            if (advertiser.startAdvertising()) {
+                pushBluetoothNotification();
+            }
         } else {
-            Toast.makeText(this, "The bluetooth advertiser failed to start", Toast.LENGTH_LONG).show();
+            pushBluetoothNotification();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d("MainActivity", "onDestroy(): Cleaning resources");
+        super.onDestroy();
     }
 
     private void createNotificationChannel() {
@@ -72,8 +76,8 @@ public class MainActivity extends AppCompatActivity {
         Intent advertiserIntent = new Intent(this, NotificationReceiver.class);
         advertiserIntent.setAction("stop");
 
-        PendingIntent closePendingIntent = PendingIntent.getBroadcast(this, 0, closeIntent, PendingIntent.FLAG_MUTABLE);
-        PendingIntent advertiserPendingIntent = PendingIntent.getBroadcast(this, 0, advertiserIntent, PendingIntent.FLAG_MUTABLE);
+        PendingIntent closePendingIntent = PendingIntent.getBroadcast(this, 0, closeIntent, 0);
+        PendingIntent advertiserPendingIntent = PendingIntent.getBroadcast(this, 0, advertiserIntent, 0);
         NotificationCompat.Action closeAction = new NotificationCompat.Action.Builder(R.mipmap.ic_launcher, "Close", closePendingIntent).build();
         NotificationCompat.Action advertiserAction = new NotificationCompat.Action.Builder(R.mipmap.ic_launcher, "Stop", advertiserPendingIntent).build();
 
