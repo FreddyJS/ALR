@@ -41,7 +41,14 @@ class RobotsViewSet(viewsets.ModelViewSet):
         robot.save()
 
         # TODO: Update the UI with the new hall
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.send)(robot.ui_channel, {
+                'type': 'to.ui',
+                'hall': robot.hall
+            })
         return self.retrieve(request, *args, **kwargs)
+
+        
 
     @action(detail=True, methods=['put'])
     def active(self, request, *args, **kwargs):
