@@ -85,18 +85,18 @@ public class BluetoothAdvertiser {
         };
     }
 
-    private void setupBluetooth(BluetoothAdapter adapter, Context activityContext) {
+    private void setupBluetooth(BluetoothAdapter adapter, Activity activity) {
         // Permissions check, needed for bluetooth advertiser in SDK >= 31
         if (Build.VERSION.SDK_INT >= 31) {
-            if (ContextCompat.checkSelfPermission(activityContext, Manifest.permission.BLUETOOTH_ADVERTISE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(((MainActivity) activityContext), new String[]{Manifest.permission.BLUETOOTH_ADVERTISE}, 0);
+            if (ContextCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_ADVERTISE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.BLUETOOTH_ADVERTISE}, 0);
             }
         }
 
         // Turn on bluetooth adapter if it's not
         if (!adapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            ActivityResultLauncher<Intent> registerForResult = ((MainActivity) activityContext).registerForActivityResult(
+            ActivityResultLauncher<Intent> registerForResult = ((MainActivity) activity).registerForActivityResult(
                     new ActivityResultContracts.StartActivityForResult(),
                     result -> {
                         if (result.getResultCode() == Activity.RESULT_OK) {
