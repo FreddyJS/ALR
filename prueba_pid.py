@@ -17,32 +17,43 @@ print('starting up on {} port {}'.format(*server_address))
 	
 data, address = sock.recvfrom(1500)
 
-velocidad_objetivo = data[:-1].decode()
+asd = data[:-1].decode()
+datos = asd.split(":")
+velocidad_objetivo = datos[0]
+inicio = int(datos[1])
 print("Velocidad objetivo = " + str(velocidad_objetivo))
 
-pid = PID(0.01, 0.01, 0.01, setpoint=int(velocidad_objetivo))
+pid = PID(1, 0.1, 0.05, setpoint=int(velocidad_objetivo))
 pid.output_limits = (-100, 100)
 pid.sample_time = (0.1) # por defecto 0.01
+
 lista = []
+lista_tiempos = []
 
 cont = 0
 while True:
     cont += 1
     data, address = sock.recvfrom(1500)
-    data = data [:-1]
+    asd = data[:-1].decode()
+    datos = asd.split(":")
+    nuevo_dato = datos[0]
     print("Dato recibido:" + str(data.decode()))
     if("Hello" in data.decode()):
         print("Fin de la transmisión.")
         break
-    dato = int(data.decode())
-    
-    control = pid(dato) #Divido entre 20 para tener valores más comprensibles (de -5 a 5)
+    dato = int(nuevo_dato)
+    lista_tiempos.append(datos[1])
+    control = pid(dato)/10 #Divido entre 20 para tener valores más comprensibles (de -5 a 5)
     lista.append(control)# Se guarda en una lista para las pruebas, en realidad tendría que ir modificando la velocidad del robot
     #time.sleep(0.25)
-    if cont==20:
+    if cont==100:
         break
 
 print(lista)
+#lista_tiempos.insert(0, inicio)
 fig,ax = plt.subplots()
-ax.plot(lista)
+parsed = [(int(x)-inicio)/1000000 for x in lista_tiempos]
+ax.plot(parsed, lista)
 plt.show()
+
+
