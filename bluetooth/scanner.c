@@ -17,7 +17,7 @@
 #include <bluetooth/hci_lib.h>
 
 #define SERVER_PORT 12345
-#define SERVER_ADDR "localhost"
+#define SERVER_ADDR "127.0.0.1"
 
 #define MUESTRASREF 20 // Muestras totales deseadas para calcular valor de referencia
 #define BUFFER 10
@@ -28,7 +28,7 @@ void calcularMediana();     // Actualiza el array de medianas con el nuevo valor
 int calcularValorMediano(); // Retorna el valor mediano de las muestras que tenga el array buffer en ese momento
 int calcularMedia();
 int calcularValorReferencia(int rssi, int flagMode);
-int init_BLE(le_set_scan_enable_cp *scan_cp); // Código necesario para iniciar escaneo
+int init_ble(le_set_scan_enable_cp *scan_cp); // Código necesario para iniciar escaneo
 // Tamanho del buffer que se utilizara para calcular el valor de referencia
 //  int muestras[MUESTRASREF] = {-28, -34, -29, -29, -30, -29, -33, -28, -90, -90, -30, -89, -28, -31, -28, -30, -93, -32, -30, -30};
 //  int muestras[MUESTRASREF]={0}; // Buffer entrante de muestras para calcular valor referencia
@@ -86,15 +86,22 @@ struct hci_request ble_hci_request(uint16_t ocf, int clen, void *status, void *c
 
 int main(int argc, char *argv[])
 {
+    if (argc != 2)
+    {
+        printf("Usage: -h bluetoothDeviceName\n");
+        exit(EXIT_FAILURE);
+    }
+
     const char *device_name = argv[2];
-    printf("Device name: %s\n", argv[2]);
+    printf("Device name: %s\n", device_name);
+
     struct timeval timestamp,start;
     gettimeofday(&start,NULL);
 
     // Init socket
     init_socket();
     le_set_scan_enable_cp scan_cp;
-    int device = init_BLE(&scan_cp);
+    int device = init_ble(&scan_cp);
 
     uint8_t buf[HCI_MAX_EVENT_SIZE];
     evt_le_meta_event *meta_event;
@@ -183,7 +190,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-int init_BLE(le_set_scan_enable_cp *scan_cp)
+int init_ble(le_set_scan_enable_cp *scan_cp)
 {
     int ret, status;
     // Get HCI device.
