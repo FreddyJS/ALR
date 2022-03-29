@@ -38,8 +38,6 @@ int medians[BUFFER + 1] = {0}; // Para guardar las diferentes medianas que vamos
 int valorRef = 0;              // Media de las medianas calculadas
 int contMedians = 0;           // Contador auxiliar para controlar en que posicion guardamos las medianas
 
-int arrayVacio[WINDOWSIZE] = {0}; // Array para vaciar otro array
-
 int contBufferRef = 0;  // Para rellenar buffer
 int contMuestraRef = 0; // Contador de muestras: 0<x<=MUESTRASREF
 int flagRefCalculada = 1;
@@ -108,9 +106,9 @@ int main(int argc, char *argv[])
     le_advertising_info *info;
     int len;
 
-    int count = 0;
     unsigned now = (unsigned)time(NULL);
     unsigned last_detection_time = now;
+    int count = 0;
 
     // Keep scanning until we see nothing for 10 secs or we have seen lots of advertisements.  Then exit.
     // We exit in this case because the scan may have failed or stopped. Higher level code can restart
@@ -193,8 +191,8 @@ int main(int argc, char *argv[])
 int init_ble(le_set_scan_enable_cp *scan_cp)
 {
     int ret, status;
-    // Get HCI device.
 
+    // Get HCI device.
     int device = hci_open_dev(0);
     if (device < 0)
     {
@@ -207,8 +205,8 @@ int init_ble(le_set_scan_enable_cp *scan_cp)
     scan_params_cp.type = 0x00;
     scan_params_cp.interval = htobs(0x0010);
     scan_params_cp.window = htobs(0x0010);
-    scan_params_cp.own_bdaddr_type = 0x00; // Public Device Address (default).
-    scan_params_cp.filter = 0x00;          // Accept all.
+    scan_params_cp.own_bdaddr_type = 0x00;    // Public Device Address (default).
+    scan_params_cp.filter = 0x00;             // Accept all.
 
     // Construimos una struc hci_request mediante el método ble_hci_request()
     struct hci_request scan_params_rq = ble_hci_request(OCF_LE_SET_SCAN_PARAMETERS, LE_SET_SCAN_PARAMETERS_CP_SIZE, &status, &scan_params_cp);
@@ -220,8 +218,8 @@ int init_ble(le_set_scan_enable_cp *scan_cp)
         perror("Failed to set scan parameters data.");
         exit(1);
     }
-    // Set BLE events report mask.
 
+    // Set BLE events report mask.
     le_set_event_mask_cp event_mask_cp;
     memset(&event_mask_cp, 0, sizeof(le_set_event_mask_cp));
     int i = 0;
@@ -238,7 +236,6 @@ int init_ble(le_set_scan_enable_cp *scan_cp)
     }
 
     // Enable scanning.
-
     memset(scan_cp, 0, sizeof(scan_cp));
     scan_cp->enable = 0x01;     // Enable flag.
     scan_cp->filter_dup = 0x00; // Filtering disabled.
@@ -254,7 +251,6 @@ int init_ble(le_set_scan_enable_cp *scan_cp)
     }
 
     // Get Results.
-
     struct hci_filter nf;
     hci_filter_clear(&nf);
     hci_filter_set_ptype(HCI_EVENT_PKT, &nf);
@@ -337,7 +333,7 @@ int calcularValorReferencia(int rssi, int flagMode)
             valorAuxiliarRetorno = calcularValorMediano();
             printf("\nValor mediano calculado: %i\n", valorAuxiliarRetorno);
             // printf("\nValor de referencia: %i\n", valorRef);
-            memcpy(buffer, arrayVacio, sizeof(buffer));
+            memset(buffer, 0, sizeof(buffer));
             contBufferRef = 0;
             contMuestraRef = 0;
             // flagRefCalculada = 0;
@@ -377,8 +373,8 @@ int calcularValorReferencia(int rssi, int flagMode)
             contBufferRef = 0;
             contMuestraRef = 0;
             contMedians = 0;
-            memcpy(buffer, arrayVacio, sizeof(buffer));
-            memcpy(medians, arrayVacio, sizeof(medians));
+            memset(buffer, 0, sizeof(medians));
+            memset(medians, 0, sizeof(medians));
             // flagRefCalculada = 0;
         }
         break;
