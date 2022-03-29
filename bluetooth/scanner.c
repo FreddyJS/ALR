@@ -373,7 +373,7 @@ int calcularValorReferencia(int rssi, int flagMode)
             contBufferRef = 0;
             contMuestraRef = 0;
             contMedians = 0;
-            memset(buffer, 0, sizeof(medians));
+            memset(buffer, 0, sizeof(buffer));
             memset(medians, 0, sizeof(medians));
             // flagRefCalculada = 0;
         }
