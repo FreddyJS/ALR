@@ -9,7 +9,7 @@ from picar import back_wheels
 import comms
 
 
-REFERENCES = [200, 200, 200, 200, 200]
+REFERENCES = [100, 100, 100, 100, 100]
 rssi_reference = 0
 forward_speed = 100
 backward_speed = 70
@@ -82,9 +82,9 @@ def main():
 	bw.speed = forward_speed
 
 	a_step = 3
-	b_step = 10
-	c_step = 30
-	d_step = 45
+	b_step = 5
+	c_step = 10
+	d_step = 20
 	bw.forward()
 	while True:
 		lf_status = lf.read_digital()
