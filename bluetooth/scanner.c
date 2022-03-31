@@ -84,9 +84,9 @@ struct hci_request ble_hci_request(uint16_t ocf, int clen, void *status, void *c
 
 int main(int argc, char *argv[])
 {
-    if (argc != 2)
+    if (argc != 3)
     {
-        printf("Usage: -h bluetoothDeviceName\n");
+        printf("Usage: sudo ./scanner -h bluetoothDeviceName\n");
         exit(EXIT_FAILURE);
     }
 
