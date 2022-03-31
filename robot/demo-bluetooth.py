@@ -8,6 +8,12 @@ from LineFollower import LineFollower
 import bluetooth.scanner as scanner
 
 
+# TODO: get device name from command line argument
+DEVICE_NAME = "HuaweiAP"
+
+# TODO: create flag --no-robot to test connection without robot
+NO_ROBOT = False
+
 REFERENCES = [100, 100, 100, 100, 100]
 rssi_reference = 0
 forward_speed = 100
@@ -47,19 +53,23 @@ def processSample(message: str):
             forward_speed = 0
 
 
-scanner.start("HuaweiAP", processSample)
+
 
 # To test when no robot connected
-# while True:
-# 	try:
-# 		print("forward_speed: " + str(forward_speed))
-# 		time.sleep(0.5)
-# 	except KeyboardInterrupt:
-# 		print("Exiting program...")
-# 		scanner.stop()
-# 		exit(0)
+if NO_ROBOT:
+    print("No robot connected, starting only bluetooth scanner")
+    scanner.start(DEVICE_NAME, processSample)
+    while True:
+        try:
+            print("forward_speed: " + str(forward_speed))
+            time.sleep(0.5)
+        except KeyboardInterrupt:
+            print("Exiting program...")
+            scanner.stop()
+            quit()
 
 picar.setup()
+scanner.start(DEVICE_NAME, processSample)
 
 fw = front_wheels.Front_Wheels(db='config')
 bw = back_wheels.Back_Wheels(db='config')
