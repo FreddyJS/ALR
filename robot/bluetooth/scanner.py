@@ -90,7 +90,7 @@ def start(deviceName, onReceive):
 
     time.sleep(0.1)
     if not bluetoothScanner.is_alive():
-        err: bytes = bluetoothScanner.stderr.readline()
+        err: bytes = bluetoothScanner.process.stderr.readline()
         print("BluetoothScanner failed: " + err.decode("utf-8")[0:-1])
         socketScanner.kill()
         socketScanner.join()
