@@ -10,6 +10,8 @@ from picar import front_wheels
 from picar import back_wheels
 from LineFollower import LineFollower
 
+import api
+
 # picar.setup()
 azul = 20000
 rojo = 3100
@@ -644,6 +646,10 @@ def cruce(nCruceCount, direccion):
 
 
 time.sleep(2)
+
+data = api.get_route_by_room("1")
+route = data["route"]
+print(route)
 
 try:
     while(True):
