@@ -109,54 +109,20 @@ def stopVehicle(fin):
     bw.stop()
 
 
-def turnLeftAngle(angle):
-    fw.turning_angle(angle)
+def selectStep(lf_status, step_a, step_b, step_c, step_d):
+    step = None
+    if lf_status == [0, 0, 1, 0, 0]:
+        step = 0
+    elif lf_status == [0, 1, 1, 0, 0] or lf_status == [0, 0, 1, 1, 0]:
+        step = step_a
+    elif lf_status == [0, 1, 0, 0, 0] or lf_status == [0, 0, 0, 1, 0]:
+        step = step_b
+    elif lf_status == [1, 1, 0, 0, 0] or lf_status == [0, 0, 0, 1, 1]:
+        step = step_c
+    elif lf_status == [1, 0, 0, 0, 0] or lf_status == [0, 0, 0, 0, 1]:
+        step = step_d
 
-
-def straight_run():
-    bw.speed = 70
-    bw.forward()
-    fw.turn_straight()
-
-
-def setup():
-    if calibrate:
-        cali()
-
-
-def cali():
-    references = [0, 0, 0, 0, 0]
-    print("cali for module:\n  first put all sensors on white, then put all sensors on black")
-    mount = 100
-    fw.turn(70)
-    print("\n cali white")
-    time.sleep(4)
-    fw.turn(90)
-    white_references = lf.get_average(mount)
-    fw.turn(95)
-    time.sleep(0.5)
-    fw.turn(85)
-    time.sleep(0.5)
-    fw.turn(90)
-    time.sleep(1)
-
-    fw.turn(110)
-    print("\n cali black")
-    time.sleep(4)
-    fw.turn(90)
-    black_references = lf.get_average(mount)
-    fw.turn(95)
-    time.sleep(0.5)
-    fw.turn(85)
-    time.sleep(0.5)
-    fw.turn(90)
-    time.sleep(1)
-
-    for i in range(0, 5):
-        references[i] = (white_references[i] + black_references[i]) / 2
-    lf.references = references
-    print("Middle references =", references)
-    time.sleep(1)
+    return step
 
 
 def recorrido(x):
@@ -215,18 +181,7 @@ def recorrido(x):
 
         firstDetectRed = False
         lt_status_now = lf.read_digital()
-
-        # print(lt_status_now)
-        if lt_status_now == [0, 0, 1, 0, 0]:
-            step = 0
-        elif lt_status_now == [0, 1, 1, 0, 0] or lt_status_now == [0, 0, 1, 1, 0]:
-            step = a_step
-        elif lt_status_now == [0, 1, 0, 0, 0] or lt_status_now == [0, 0, 0, 1, 0]:
-            step = b_step
-        elif lt_status_now == [1, 1, 0, 0, 0] or lt_status_now == [0, 0, 0, 1, 1]:
-            step = c_step
-        elif lt_status_now == [1, 0, 0, 0, 0] or lt_status_now == [0, 0, 0, 0, 1]:
-            step = d_step
+        step = selectStep(lt_status_now, a_step, b_step, c_step, d_step)
 
         # Direction calculate
         if lt_status_now == [0, 0, 1, 0, 0]:
@@ -281,18 +236,7 @@ def cruce(nCruceCount, direccion):
             print("Avanzando por el pasillo... sobre el primer rojo")
 
             lt_status_now = lf.read_digital()
-            # print(lt_status_now)
-
-            if lt_status_now == [0, 0, 1, 0, 0]:
-                step = 0
-            elif lt_status_now == [0, 1, 1, 0, 0] or lt_status_now == [0, 0, 1, 1, 0]:
-                step = a_step
-            elif lt_status_now == [0, 1, 0, 0, 0] or lt_status_now == [0, 0, 0, 1, 0]:
-                step = b_step
-            elif lt_status_now == [1, 1, 0, 0, 0] or lt_status_now == [0, 0, 0, 1, 1]:
-                step = c_step
-            elif lt_status_now == [1, 0, 0, 0, 0] or lt_status_now == [0, 0, 0, 0, 1]:
-                step = d_step
+            step = selectStep(lt_status_now, a_step, b_step, c_step, d_step)
 
             # Direction calculate
             if lt_status_now == [0, 0, 1, 0, 0]:
@@ -342,17 +286,8 @@ def cruce(nCruceCount, direccion):
                     #print("El robot esta avanzando por el cruce, ha atravesado el primer rojo")
                     time.sleep(0.0005)
                     lt_status_now = lf.read_digital()
-                    # print(lt_status_now)
-                    if lt_status_now == [0, 0, 1, 0, 0]:
-                        step = 0
-                    elif lt_status_now == [0, 1, 1, 0, 0] or lt_status_now == [0, 0, 1, 1, 0]:
-                        step = a_step
-                    elif lt_status_now == [0, 1, 0, 0, 0] or lt_status_now == [0, 0, 0, 1, 0]:
-                        step = b_step
-                    elif lt_status_now == [1, 1, 0, 0, 0] or lt_status_now == [0, 0, 0, 1, 1]:
-                        step = c_step
-                    elif lt_status_now == [1, 0, 0, 0, 0] or lt_status_now == [0, 0, 0, 0, 1]:
-                        step = d_step
+                    step = selectStep(lt_status_now, a_step,
+                                      b_step, c_step, d_step)
 
                     # Direction calculate
                     if lt_status_now == [0, 0, 1, 0, 0]:
@@ -468,17 +403,7 @@ def cruce(nCruceCount, direccion):
 
         while(True):
             lt_status_now = lf.read_digital()
-
-            if lt_status_now == [0, 0, 1, 0, 0]:
-                step = 0
-            elif lt_status_now == [0, 1, 1, 0, 0] or lt_status_now == [0, 0, 1, 1, 0]:
-                step = a_step
-            elif lt_status_now == [0, 1, 0, 0, 0] or lt_status_now == [0, 0, 0, 1, 0]:
-                step = b_step
-            elif lt_status_now == [1, 1, 0, 0, 0] or lt_status_now == [0, 0, 0, 1, 1]:
-                step = c_step
-            elif lt_status_now == [1, 0, 0, 0, 0] or lt_status_now == [0, 0, 0, 0, 1]:
-                step = d_step
+            step = selectStep(lt_status_now, a_step, b_step, c_step, d_step)
 
             # Direction calculate
             if lt_status_now == [0, 0, 1, 0, 0]:
@@ -531,16 +456,7 @@ def cruce(nCruceCount, direccion):
         flagAux = False
         while(True):
             lt_status_now = lf.read_digital()
-            if lt_status_now == [0, 0, 1, 0, 0]:
-                step = 0
-            elif lt_status_now == [0, 1, 1, 0, 0] or lt_status_now == [0, 0, 1, 1, 0]:
-                step = a_step
-            elif lt_status_now == [0, 1, 0, 0, 0] or lt_status_now == [0, 0, 0, 1, 0]:
-                step = b_step
-            elif lt_status_now == [1, 1, 0, 0, 0] or lt_status_now == [0, 0, 0, 1, 1]:
-                step = c_step
-            elif lt_status_now == [1, 0, 0, 0, 0] or lt_status_now == [0, 0, 0, 0, 1]:
-                step = d_step
+            step = selectStep(lt_status_now, a_step, b_step, c_step, d_step)
 
             # Direction calculate
             if lt_status_now == [0, 0, 1, 0, 0]:
@@ -667,18 +583,7 @@ def cruce(nCruceCount, direccion):
         while(True):
             time.sleep(0.0005)
             lt_status_now = lf.read_digital()
-            # print(lt_status_now)
-
-            if lt_status_now == [0, 0, 1, 0, 0]:
-                step = 0
-            elif lt_status_now == [0, 1, 1, 0, 0] or lt_status_now == [0, 0, 1, 1, 0]:
-                step = a_step
-            elif lt_status_now == [0, 1, 0, 0, 0] or lt_status_now == [0, 0, 0, 1, 0]:
-                step = b_step
-            elif lt_status_now == [1, 1, 0, 0, 0] or lt_status_now == [0, 0, 0, 1, 1]:
-                step = c_step
-            elif lt_status_now == [1, 0, 0, 0, 0] or lt_status_now == [0, 0, 0, 0, 1]:
-                step = d_step
+            step = selectStep(lt_status_now, a_step, b_step, c_step, d_step)
 
             # Direction calculate
             if lt_status_now == [0, 0, 1, 0, 0]:
