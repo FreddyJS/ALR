@@ -645,9 +645,12 @@ def cruce(nCruceCount, direccion):
 
 time.sleep(2)
 
-data = api.get_route_by_room("1")
-route = data["route"]
-print(route)
+try:
+    data = api.get_route_by_room("1")
+    route = data["route"]
+    print(route)
+except Exception:
+    print("Error fetching route, the backend is probably down")
 
 try:
     while(True):
