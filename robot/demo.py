@@ -11,24 +11,22 @@ from picar import back_wheels
 from LineFollower import LineFollower
 
 import api
+import config
 
 # picar.setup()
-azul = 20000
-rojo = 3100
+azul = config.COLOR_SENSOR_BLUE_VALUE
+rojo = config.COLOR_SENSOR_RED_VALUE
 
 i2c = board.I2C()  # uses board.SCL and board.SDA
 sensor = adafruit_tcs34725.TCS34725(i2c)
 off_track_count = 0
 
+LF_REFERENCES = config.LINE_FOLLOWER_REFERENCES
 # Change sensor integration time to values between 2.4 and 614.4 milliseconds
-sensor.integration_time = 2.4
-
+sensor.integration_time = config.COLOR_SENSOR_INTEGRATION_TIME
 # Change sensor gain to 1, 4, 16, or 60
-sensor.gain = 60
-#REFERENCES = [150, 150, 150, 150, 150]
-REFERENCES = [60, 60, 60, 60, 60]
-# calibrate = True
-calibrate = False
+sensor.gain = config.COLOR_SENSOR_GAIN
+
 
 forward_speed = 96
 backward_speed = 38
@@ -85,7 +83,7 @@ fw = front_wheels.Front_Wheels(db='config')
 bw = back_wheels.Back_Wheels(db='config')
 lf = LineFollower()
 
-lf.references = REFERENCES
+lf.references = LF_REFERENCES
 fw.ready()
 bw.ready()
 fw.turning_max = 45

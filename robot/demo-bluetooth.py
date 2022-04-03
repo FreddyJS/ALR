@@ -5,6 +5,7 @@ from picar import front_wheels
 from picar import back_wheels
 from LineFollower import LineFollower
 
+import config
 import bluetooth.scanner as scanner
 
 
@@ -14,12 +15,10 @@ DEVICE_NAME = "HuaweiAP"
 # TODO: create flag --no-robot to test connection without robot
 NO_ROBOT = False
 
-REFERENCES = [100, 100, 100, 100, 100]
+LF_REFERENCES = config.LINE_FOLLOWER_REFERENCES
 rssi_reference = 0
-forward_speed = 100
+forward_speed = config.PICAR_MAX_SPEED
 backward_speed = 70
-
-calibrate = False  # Change to True to start calibration on initialization
 turning_angle = 40
 
 max_off_track_count = 40
@@ -53,8 +52,6 @@ def processSample(message: str):
             forward_speed = 0
 
 
-
-
 # To test when no robot connected
 if NO_ROBOT:
     print("No robot connected, starting only bluetooth scanner")
@@ -75,15 +72,10 @@ fw = front_wheels.Front_Wheels(db='config')
 bw = back_wheels.Back_Wheels(db='config')
 lf = LineFollower()
 
-lf.references = REFERENCES
+lf.references = LF_REFERENCES
 fw.ready()
 bw.ready()
 fw.turning_max = 45
-
-
-def setup():
-    if calibrate:
-        cali()
 
 
 def updateSpeed():
@@ -157,41 +149,6 @@ def main():
         time.sleep(delay)
 
 
-def cali():
-    references = [0, 0, 0, 0, 0]
-    print("cali for module:\n  first put all sensors on white, then put all sensors on black")
-    mount = 100
-    fw.turn(70)
-    print("\n cali white")
-    time.sleep(4)
-    fw.turn(90)
-    white_references = lf.get_average(mount)
-    fw.turn(95)
-    time.sleep(0.5)
-    fw.turn(85)
-    time.sleep(0.5)
-    fw.turn(90)
-    time.sleep(1)
-
-    fw.turn(110)
-    print("\n cali black")
-    time.sleep(4)
-    fw.turn(90)
-    black_references = lf.get_average(mount)
-    fw.turn(95)
-    time.sleep(0.5)
-    fw.turn(85)
-    time.sleep(0.5)
-    fw.turn(90)
-    time.sleep(1)
-
-    for i in range(0, 5):
-        references[i] = (white_references[i] + black_references[i]) / 2
-    lf.references = references
-    print("Middle references =", references)
-    time.sleep(1)
-
-
 def destroy():
     bw.stop()
     fw.turn(90)
@@ -199,16 +156,8 @@ def destroy():
 
 if __name__ == '__main__':
     try:
-        try:
-            while True:
-                setup()
-                main()
-        except Exception as e:
-            print(e)
-            print('error try again in 5')
-            destroy()
-            scanner.stop()
-            time.sleep(5)
+        while True:
+            main()
     except KeyboardInterrupt:
-        scanner.stop()
         destroy()
+        scanner.stop()
