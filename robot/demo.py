@@ -194,7 +194,7 @@ def recorrido(x):
         #print(temp)
         #print(temp)
         if(str(temp)=="None"):
-         	  temp=5500
+            temp=5500
         if(temp < rojo):
             print('CRUCE INMINENTE!')
             if(not firstDetectRed):
@@ -206,7 +206,7 @@ def recorrido(x):
                 bw.forward()
                 nCruces -=1
                 if(cruce(nCruces,direccAux)):
-                         return True
+                    return True
 
         firstDetectRed= False
         lt_status_now = lf.read_digital()
@@ -327,7 +327,7 @@ def cruce(nCruceCount,direccion):
 
             temp = sensor.color_temperature
             if(str(temp)=="None"):
-                       	  temp=5500
+                temp=5500
        
             if(temp > rojo):
             #vuelvo a estar en blanco
