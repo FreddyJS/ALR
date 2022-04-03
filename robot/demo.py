@@ -3,22 +3,22 @@
 #!/usr/bin/env python
 
 import sys
-import time 
+import time
 
-import picar 
-import board 
-import adafruit_tcs34725 
-from picar import front_wheels 
-from picar import back_wheels 
-from LineFollower import LineFollower 
+import picar
+import board
+import adafruit_tcs34725
+from picar import front_wheels
+from picar import back_wheels
+from LineFollower import LineFollower
 
-#picar.setup()
-azul= 20000
-rojo=3100
+# picar.setup()
+azul = 20000
+rojo = 3100
 
-i2c = board.I2C() # uses board.SCL and board.SDA 
+i2c = board.I2C()  # uses board.SCL and board.SDA
 sensor = adafruit_tcs34725.TCS34725(i2c)
-off_track_count=0
+off_track_count = 0
 
 # Change sensor integration time to values between 2.4 and 614.4 milliseconds
 sensor.integration_time = 2.4
@@ -26,13 +26,13 @@ sensor.integration_time = 2.4
 # Change sensor gain to 1, 4, 16, or 60
 sensor.gain = 60
 #REFERENCES = [150, 150, 150, 150, 150]
-REFERENCES=[60, 60, 60, 60, 60]
+REFERENCES = [60, 60, 60, 60, 60]
 # calibrate = True
 calibrate = False
 
 forward_speed = 96
 backward_speed = 38
-velocidadGiro=33
+velocidadGiro = 33
 turning_angle = 86
 '''
 a_step = 4
@@ -47,38 +47,37 @@ c_step = 15
 d_step = 45
 
 
+aDos = 8
+bDos = 12
+cTres = 16
+dTres = 20
 
-aDos=8
-bDos=12
-cTres=16
-dTres=20
 
-
-giroCruce=46
-velocidadCruce=46
-direccAux=""
-dir2="" 
-firstDetectRed=False
+giroCruce = 46
+velocidadCruce = 46
+direccAux = ""
+dir2 = ""
+firstDetectRed = False
 max_off_track_count = 70
 
 delay = 0.0005
-#recto,derecha,derecha
-#derecha,izquierda
-#izquierda,izquierda
+# recto,derecha,derecha
+# derecha,izquierda
+# izquierda,izquierda
 # CONTADOR RUTAS
 
 #rutas = ["recto","derecha","derecha"]
 
-#rutas=["derecha","izquierda"]
+# rutas=["derecha","izquierda"]
 
-#rutas=["recto","izquierda","izquierda"]
+# rutas=["recto","izquierda","izquierda"]
 
-#rutas=["izquierda","derecha"]
-#rutas=["izquierda","recto","derecha"]
+# rutas=["izquierda","derecha"]
+# rutas=["izquierda","recto","derecha"]
 
-#rutas=["derecha","izquierda"]
-#for i in argsk
-rutas=["recto","recto","recto","recto"]
+# rutas=["derecha","izquierda"]
+# for i in argsk
+rutas = ["recto", "recto", "recto", "recto"]
 
 nCruces = len(rutas)
 
@@ -100,6 +99,7 @@ def destroy():
     fw.turn(90)
     sys.exit(1)
 
+
 def stopVehicle(fin):
     if(fin):
         bw.stop()
@@ -108,17 +108,21 @@ def stopVehicle(fin):
         return
     bw.stop()
 
+
 def turnLeftAngle(angle):
     fw.turning_angle(angle)
+
 
 def straight_run():
     bw.speed = 70
     bw.forward()
     fw.turn_straight()
 
+
 def setup():
     if calibrate:
         cali()
+
 
 def cali():
     references = [0, 0, 0, 0, 0]
@@ -154,6 +158,7 @@ def cali():
     print("Middle references =", references)
     time.sleep(1)
 
+
 def recorrido(x):
     global turning_angle
     global a_step
@@ -166,52 +171,52 @@ def recorrido(x):
     global dir2
     global rutas
 
-    if(x==0):
-       print('Iniciando ruta a la estacion base')
-       rutas=["derecha"]
-       nCruces=len(rutas)
-       bw.speed=forward_speed
-       bw.forward()
-    if(x==2):
-       print('VUELtA!!!')
-       rutas=["derecha","derecha","recto","recto"]
-       nCruces=len(rutas)
-       bw.speed=forward_speed
-       bw.forward()    
-    if(x==1):
-       rutas=["recto","recto","recto","recto"]
-       nCruces = len(rutas)
+    if(x == 0):
+        print('Iniciando ruta a la estacion base')
+        rutas = ["derecha"]
+        nCruces = len(rutas)
+        bw.speed = forward_speed
+        bw.forward()
+    if(x == 2):
+        print('VUELtA!!!')
+        rutas = ["derecha", "derecha", "recto", "recto"]
+        nCruces = len(rutas)
+        bw.speed = forward_speed
+        bw.forward()
+    if(x == 1):
+        rutas = ["recto", "recto", "recto", "recto"]
+        nCruces = len(rutas)
 
     print('iniciorecorrido')
     off_track_count = 0
     bw.speed = forward_speed
-    dir2=""
+    dir2 = ""
     bw.forward()
-    global firstDetectRed 
-  
+    global firstDetectRed
+
     while True:
         temp = sensor.color_temperature
-        #print(temp)
-        #print(temp)
-        if(str(temp)=="None"):
-            temp=5500
+        # print(temp)
+        # print(temp)
+        if(str(temp) == "None"):
+            temp = 5500
         if(temp < rojo):
             print('CRUCE INMINENTE!')
             if(not firstDetectRed):
                 firstDetectRed = not firstDetectRed
-                direccAux=rutas.pop(0)
+                direccAux = rutas.pop(0)
                 print('direccion a tomar: '+direccAux)
-                dir2=direccAux
+                dir2 = direccAux
                 bw.speed = forward_speed - 29  # reduce velocidad por llegar a un cruce
                 bw.forward()
-                nCruces -=1
-                if(cruce(nCruces,direccAux)):
+                nCruces -= 1
+                if(cruce(nCruces, direccAux)):
                     return True
 
-        firstDetectRed= False
+        firstDetectRed = False
         lt_status_now = lf.read_digital()
 
-        #print(lt_status_now)
+        # print(lt_status_now)
         if lt_status_now == [0, 0, 1, 0, 0]:
             step = 0
         elif lt_status_now == [0, 1, 1, 0, 0] or lt_status_now == [0, 0, 1, 1, 0]:
@@ -226,9 +231,9 @@ def recorrido(x):
         # Direction calculate
         if lt_status_now == [0, 0, 1, 0, 0]:
             off_track_count = 0
-            #fw.turn(86)
-            turning_angle=87
-            #turning_angle=0
+            # fw.turn(86)
+            turning_angle = 87
+            # turning_angle=0
         # turn right
         elif lt_status_now in ([0, 1, 1, 0, 0], [0, 1, 0, 0, 0], [1, 1, 0, 0, 0], [1, 0, 0, 0, 0]):
             off_track_count = 0
@@ -258,9 +263,10 @@ def recorrido(x):
         fw.turn(turning_angle)
         time.sleep(delay)
 
-def cruce(nCruceCount,direccion):
-    #solo para seguir recto?
-    segundaCruceta=False
+
+def cruce(nCruceCount, direccion):
+    # solo para seguir recto?
+    segundaCruceta = False
     global firstDetectRed
     salirAux = False
     global turning_angle
@@ -268,14 +274,14 @@ def cruce(nCruceCount,direccion):
 
     if("recto" in direccion):
         print("Avanzando por el pasillo... direccion a seguir=recto")
-        primeraCrucetaRecto=False
-        flagAux=False
+        primeraCrucetaRecto = False
+        flagAux = False
         while not salirAux:
-            #siguiendo linea, atravesando rojo
+            # siguiendo linea, atravesando rojo
             print("Avanzando por el pasillo... sobre el primer rojo")
 
             lt_status_now = lf.read_digital()
-            #print(lt_status_now)
+            # print(lt_status_now)
 
             if lt_status_now == [0, 0, 1, 0, 0]:
                 step = 0
@@ -303,41 +309,40 @@ def cruce(nCruceCount,direccion):
            # elif lt_status_now == [0, 0, 0, 0, 0]:
             #    off_track_count += 1
              #   if off_track_count > max_off_track_count:
-                    # tmp_angle = -(turning_angle - 90) + 90
+                # tmp_angle = -(turning_angle - 90) + 90
               #      tmp_angle = (turning_angle-90)/abs(90-turning_angle)
                #     tmp_angle *= fw.turning_max
                 #    bw.speed = backward_speed
-                 #   bw.backward()
-                  #  fw.turn(tmp_angle)
-                   # lf.wait_tile_center()
-                    #bw.stop()
-                    #fw.turn(turning_angle)
-                    #time.sleep(0.2)
-                    #bw.speed = forward_speed
-                    #bw.forward()
-                    #time.sleep(0.2)
-            #elif lt_status_now == [1 1 1 1 1]:
-                 #primeraCrucetaReccto=True
-                
+                #   bw.backward()
+                #  fw.turn(tmp_angle)
+                # lf.wait_tile_center()
+                # bw.stop()
+                # fw.turn(turning_angle)
+                # time.sleep(0.2)
+                #bw.speed = forward_speed
+                # bw.forward()
+                # time.sleep(0.2)
+            # elif lt_status_now == [1 1 1 1 1]:
+                # primeraCrucetaReccto=True
+
             else:
                 off_track_count = 0
             fw.turn(turning_angle)
             time.sleep(delay)
 
-
             temp = sensor.color_temperature
-            if(str(temp)=="None"):
-                temp=5500
-       
+            if(str(temp) == "None"):
+                temp = 5500
+
             if(temp > rojo):
-            #vuelvo a estar en blanco
-                bw.speed=velocidadCruce
+                # vuelvo a estar en blanco
+                bw.speed = velocidadCruce
                 bw.forward()
                 while True:
                     #print("El robot esta avanzando por el cruce, ha atravesado el primer rojo")
                     time.sleep(0.0005)
                     lt_status_now = lf.read_digital()
-                    #print(lt_status_now)
+                    # print(lt_status_now)
                     if lt_status_now == [0, 0, 1, 0, 0]:
                         step = 0
                     elif lt_status_now == [0, 1, 1, 0, 0] or lt_status_now == [0, 0, 1, 1, 0]:
@@ -362,22 +367,22 @@ def cruce(nCruceCount,direccion):
                         off_track_count = 0
                         turning_angle = int(90 + step)
 
-                    #elif lt_status_now == [0, 0, 0, 0, 0]:
+                    # elif lt_status_now == [0, 0, 0, 0, 0]:
                      #   off_track_count += 1
                       #  if off_track_count > max_off_track_count:
                        #     # tmp_angle = -(turning_angle - 90) + 90
                         #    tmp_angle = (turning_angle-90)/abs(90-turning_angle)
-                         #   tmp_angle *= fw.turning_max
-                          #  bw.speed = backward_speed
-                           # bw.backward()
-                           # fw.turn(tmp_angle)
-                            #lf.wait_tile_center()
-                            #bw.stop()
-                            #fw.turn(turning_angle)
-                            #time.sleep(0.2)
-                            #bw.speed = forward_speed
-                            #bw.forward()
-                            #time.sleep(0.2)
+                        #   tmp_angle *= fw.turning_max
+                        #  bw.speed = backward_speed
+                        # bw.backward()
+                        # fw.turn(tmp_angle)
+                        # lf.wait_tile_center()
+                        # bw.stop()
+                        # fw.turn(turning_angle)
+                        # time.sleep(0.2)
+                        #bw.speed = forward_speed
+                        # bw.forward()
+                        # time.sleep(0.2)
 
                     elif lt_status_now == [1, 1, 1, 1, 1]:
                         off_track_count = 0
@@ -388,31 +393,31 @@ def cruce(nCruceCount,direccion):
                             if lt_status_now == [0, 0, 1, 0, 0]:
                                # print('sali de la cruceta')
                                 step = 0
-                                flagAux=True #he salido de la primera cruceta
+                                flagAux = True  # he salido de la primera cruceta
                             elif lt_status_now == [0, 1, 1, 0, 0] or lt_status_now == [0, 0, 1, 1, 0]:
                                 #print('sali de la cruceta')
                                 step = a_step
-                                flagAux=True
+                                flagAux = True
 
                             elif lt_status_now == [0, 1, 0, 0, 0] or lt_status_now == [0, 0, 0, 1, 0]:
                                 #print('sali de la cruceta')
                                 step = b_step
-                                flagAux=True
+                                flagAux = True
 
                             elif lt_status_now == [1, 1, 0, 0, 0] or lt_status_now == [0, 0, 0, 1, 1]:
                                 #print('sali de la cruceta')
                                 step = c_step
-                                flagAux=True
+                                flagAux = True
 
                             elif lt_status_now == [1, 0, 0, 0, 0] or lt_status_now == [0, 0, 0, 0, 1]:
                                 #print('sali de la cruceta')
                                 step = d_step
-                                flagAux=True
+                                flagAux = True
 
                             # Direction calculate
                             if lt_status_now == [0, 0, 1, 0, 0]:
                                 off_track_count = 0
-                                turning_angle=86
+                                turning_angle = 86
                             # turn right
                             elif lt_status_now in ([0, 1, 1, 0, 0], [0, 1, 0, 0, 0], [1, 1, 0, 0, 0], [1, 0, 0, 0, 0]):
                                 off_track_count = 0
@@ -425,7 +430,8 @@ def cruce(nCruceCount,direccion):
                                 off_track_count += 1
                                 if off_track_count > max_off_track_count:
                                     # tmp_angle = -(turning_angle - 90) + 90
-                                    tmp_angle = (turning_angle-90)/abs(90-turning_angle+1)
+                                    tmp_angle = (turning_angle-90) / \
+                                        abs(90-turning_angle+1)
                                     tmp_angle *= fw.turning_max
                                     bw.speed = backward_speed
                                     bw.backward()
@@ -444,7 +450,7 @@ def cruce(nCruceCount,direccion):
                             time.sleep(delay)
                             if(flagAux):
                                 if(lt_status_now == [1, 1, 1, 1, 1]):
-                                    salirAux=True
+                                    salirAux = True
                                     break
                     else:
                         off_track_count = 0
@@ -455,14 +461,14 @@ def cruce(nCruceCount,direccion):
                         break
 
     if("derecha" in direccion):
-        #ya hemos reducido la velocidad antes de escoger direccion
-        #en caso de ir a la derecha: hemos detectado rojo, se redujo velocidad, buscamos cruceta y giramos derecha
-        #para reenganchar la linea de nuevo
+        # ya hemos reducido la velocidad antes de escoger direccion
+        # en caso de ir a la derecha: hemos detectado rojo, se redujo velocidad, buscamos cruceta y giramos derecha
+        # para reenganchar la linea de nuevo
         print('SE ACERCA GIRO DERECha')
 
         while(True):
             lt_status_now = lf.read_digital()
-            
+
             if lt_status_now == [0, 0, 1, 0, 0]:
                 step = 0
             elif lt_status_now == [0, 1, 1, 0, 0] or lt_status_now == [0, 0, 1, 1, 0]:
@@ -477,7 +483,7 @@ def cruce(nCruceCount,direccion):
             # Direction calculate
             if lt_status_now == [0, 0, 1, 0, 0]:
                 off_track_count = 0
-                turning_angle=86
+                turning_angle = 86
             # turn right
             elif lt_status_now in ([0, 1, 1, 0, 0], [0, 1, 0, 0, 0], [1, 1, 0, 0, 0], [1, 0, 0, 0, 0]):
                 off_track_count = 0
@@ -503,25 +509,26 @@ def cruce(nCruceCount,direccion):
                     bw.forward()
                     time.sleep(0.2)
 
-            elif lt_status_now == [1, 1, 1, 1, 1]: #cruceta, es el momento de realizar el giro a la derecha
+            # cruceta, es el momento de realizar el giro a la derecha
+            elif lt_status_now == [1, 1, 1, 1, 1]:
                 off_track_count = 0
                 print('CRUCETA!')
-                #time.sleep(2)
-                #time.sleep(0.5)
+                # time.sleep(2)
+                # time.sleep(0.5)
                 bw.speed = velocidadGiro
                 bw.forward()
-                step=giroCruce
-                fw.turn(int(86+step+10+5)) # - izquierda + derecha
-                time.sleep(3.28) #tiempo para que gire y reenganche la linea
+                step = giroCruce
+                fw.turn(int(86+step+10+5))  # - izquierda + derecha
+                time.sleep(3.28)  # tiempo para que gire y reenganche la linea
                 break
             else:
                 off_track_count = 0
             fw.turn(turning_angle)
             time.sleep(delay)
     if("izquierda" in direccion):
-        bw.speed=velocidadCruce
+        bw.speed = velocidadCruce
         bw.forward()
-        flagAux=False
+        flagAux = False
         while(True):
             lt_status_now = lf.read_digital()
             if lt_status_now == [0, 0, 1, 0, 0]:
@@ -538,7 +545,7 @@ def cruce(nCruceCount,direccion):
             # Direction calculate
             if lt_status_now == [0, 0, 1, 0, 0]:
                 off_track_count = 0
-                turning_angle=86
+                turning_angle = 86
             # turn right
             elif lt_status_now in ([0, 1, 1, 0, 0], [0, 1, 0, 0, 0], [1, 1, 0, 0, 0], [1, 0, 0, 0, 0]):
                 off_track_count = 0
@@ -564,90 +571,93 @@ def cruce(nCruceCount,direccion):
                     bw.forward()
                     time.sleep(0.2)
 
-            elif lt_status_now == [1, 1, 1, 1, 1]: #cruceta, es el momento de realizar el giro a la derecha
+            # cruceta, es el momento de realizar el giro a la derecha
+            elif lt_status_now == [1, 1, 1, 1, 1]:
                 off_track_count = 0
                 while(True):
-                        time.sleep(delay)
-                        lt_status_now = lf.read_digital()
-                        print(lt_status_now)
-                        if lt_status_now == [0, 0, 1, 0, 0]:
-                            #print('sali de la cruceta')
-                            step = 0
-                            flagAux=True #he salido de la primera cruceta
-                        elif lt_status_now == [0, 1, 1, 0, 0] or lt_status_now == [0, 0, 1, 1, 0]:
-                            #print('sali de la cruceta')
-                            step = a_step
-                            flagAux=True
+                    time.sleep(delay)
+                    lt_status_now = lf.read_digital()
+                    print(lt_status_now)
+                    if lt_status_now == [0, 0, 1, 0, 0]:
+                        #print('sali de la cruceta')
+                        step = 0
+                        flagAux = True  # he salido de la primera cruceta
+                    elif lt_status_now == [0, 1, 1, 0, 0] or lt_status_now == [0, 0, 1, 1, 0]:
+                        #print('sali de la cruceta')
+                        step = a_step
+                        flagAux = True
 
-                        elif lt_status_now == [0, 1, 0, 0, 0] or lt_status_now == [0, 0, 0, 1, 0]:
-                            #print('sali de la cruceta')
-                            step = b_step
-                            flagAux=True
+                    elif lt_status_now == [0, 1, 0, 0, 0] or lt_status_now == [0, 0, 0, 1, 0]:
+                        #print('sali de la cruceta')
+                        step = b_step
+                        flagAux = True
 
-                        elif lt_status_now == [1, 1, 0, 0, 0] or lt_status_now == [0, 0, 0, 1, 1]:
-                            #print('sali de la cruceta')
-                            step = c_step
-                            flagAux=True
+                    elif lt_status_now == [1, 1, 0, 0, 0] or lt_status_now == [0, 0, 0, 1, 1]:
+                        #print('sali de la cruceta')
+                        step = c_step
+                        flagAux = True
 
-                        elif lt_status_now == [1, 0, 0, 0, 0] or lt_status_now == [0, 0, 0, 0, 1]:
-                            #print('sali de la cruceta')
-                            step = d_step
-                            flagAux=True
+                    elif lt_status_now == [1, 0, 0, 0, 0] or lt_status_now == [0, 0, 0, 0, 1]:
+                        #print('sali de la cruceta')
+                        step = d_step
+                        flagAux = True
 
-                        # Direction calculate
-                        if lt_status_now == [0, 0, 1, 0, 0]:
-                            off_track_count = 0
-                            turning_angle=86
-                        # turn right
-                        elif lt_status_now in ([0, 1, 1, 0, 0], [0, 1, 0, 0, 0], [1, 1, 0, 0, 0], [1, 0, 0, 0, 0]):
-                            off_track_count = 0
-                            turning_angle = int(86 - step)
-                        # turn left
-                        elif lt_status_now in ([0, 0, 1, 1, 0], [0, 0, 0, 1, 0], [0, 0, 0, 1, 1], [0, 0, 0, 0, 1]):
-                            off_track_count = 0
-                            turning_angle = int(86 + step)
-                        elif lt_status_now == [0, 0, 0, 0, 0]:
-                            off_track_count += 1
-                            if off_track_count > max_off_track_count:
-                                # tmp_angle = -(turning_angle - 90) + 90
-                                tmp_angle = (turning_angle-90)/abs(90-turning_angle+1)
-                                tmp_angle *= fw.turning_max
-                                bw.speed = backward_speed
-                                bw.backward()
-                                fw.turn(tmp_angle)
-                                lf.wait_tile_center()
-                                bw.stop()
-                                fw.turn(turning_angle)
-                                time.sleep(0.2)
-                                bw.speed = forward_speed
-                                bw.forward()
-                                time.sleep(0.2)
+                    # Direction calculate
+                    if lt_status_now == [0, 0, 1, 0, 0]:
+                        off_track_count = 0
+                        turning_angle = 86
+                    # turn right
+                    elif lt_status_now in ([0, 1, 1, 0, 0], [0, 1, 0, 0, 0], [1, 1, 0, 0, 0], [1, 0, 0, 0, 0]):
+                        off_track_count = 0
+                        turning_angle = int(86 - step)
+                    # turn left
+                    elif lt_status_now in ([0, 0, 1, 1, 0], [0, 0, 0, 1, 0], [0, 0, 0, 1, 1], [0, 0, 0, 0, 1]):
+                        off_track_count = 0
+                        turning_angle = int(86 + step)
+                    elif lt_status_now == [0, 0, 0, 0, 0]:
+                        off_track_count += 1
+                        if off_track_count > max_off_track_count:
+                            # tmp_angle = -(turning_angle - 90) + 90
+                            tmp_angle = (turning_angle-90) / \
+                                abs(90-turning_angle+1)
+                            tmp_angle *= fw.turning_max
+                            bw.speed = backward_speed
+                            bw.backward()
+                            fw.turn(tmp_angle)
+                            lf.wait_tile_center()
+                            bw.stop()
+                            fw.turn(turning_angle)
+                            time.sleep(0.2)
+                            bw.speed = forward_speed
+                            bw.forward()
+                            time.sleep(0.2)
 
-                        else:
-                            off_track_count = 0
-                        fw.turn(turning_angle)
-                        time.sleep(delay)
-                        if(flagAux):
-                            if(lt_status_now == [1, 1, 1, 1, 1]):
-                                bw.speed = velocidadGiro
-                                bw.forward()
-                                step=giroCruce
-                                fw.turn(int(86-step-10)) # - izquierda + derecha
-                                time.sleep(2.05) #tiempo para que gire y reenganche la linea
-                                break
+                    else:
+                        off_track_count = 0
+                    fw.turn(turning_angle)
+                    time.sleep(delay)
+                    if(flagAux):
+                        if(lt_status_now == [1, 1, 1, 1, 1]):
+                            bw.speed = velocidadGiro
+                            bw.forward()
+                            step = giroCruce
+                            fw.turn(int(86-step-10))  # - izquierda + derecha
+                            # tiempo para que gire y reenganche la linea
+                            time.sleep(2.05)
+                            break
                 break
             else:
                 off_track_count = 0
             fw.turn(turning_angle)
             time.sleep(delay)
 
-    primeraCruceta=False
+    primeraCruceta = False
     bw.speed = forward_speed
     bw.forward()
     print('NUEVO PASILLO')
-    firstDetectRed=False
+    firstDetectRed = False
 
-    if(nCruceCount==0):
+    if(nCruceCount == 0):
         print('ULTIMO PASILLO')
         contador = 1  # contador de habitaciones; numero de azules atravesados
         fff = False  # flag transicion azul suelo
@@ -657,7 +667,7 @@ def cruce(nCruceCount,direccion):
         while(True):
             time.sleep(0.0005)
             lt_status_now = lf.read_digital()
-            #print(lt_status_now)
+            # print(lt_status_now)
 
             if lt_status_now == [0, 0, 1, 0, 0]:
                 step = 0
@@ -705,11 +715,11 @@ def cruce(nCruceCount,direccion):
             time.sleep(delay)
 
             temp = sensor.color_temperature
-            #print(temp)
+            # print(temp)
             if (temp < rojo):
                 if(not firstDetect):
                     print('Aproximandonos a una habitacion, reduciendo la velocidad.')
-                    if(contador == habitacion ):
+                    if(contador == habitacion):
                         # va a finalizar el programa, gracias al True
                         stopVehicle(True)
                         return True
@@ -720,24 +730,26 @@ def cruce(nCruceCount,direccion):
                         fff = True
             else:
                 if(fff):
-                    print('Hemos pasado por una habitacion que no es el destino todavia')
+                    print(
+                        'Hemos pasado por una habitacion que no es el destino todavia')
                     bw.speed = forward_speed
                     bw.forward()
                     contador += 1
                     firstDetect = not firstDetect
                     fff = False
-    #return False
+    # return False
+
 
 time.sleep(2)
 
 try:
     while(True):
-      if(recorrido(0)):
-          time.sleep(6)     
-          if(recorrido(1)):
-               print('Sali del primer main')
-               recorrido(2)
-               sys.exit(1)
+        if(recorrido(0)):
+            time.sleep(6)
+            if(recorrido(1)):
+                print('Sali del primer main')
+                recorrido(2)
+                sys.exit(1)
 
 except KeyboardInterrupt:
-			destroy()
+    destroy()
