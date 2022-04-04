@@ -11,6 +11,7 @@ const RoomPage = () => {
   const [roomNumber, setRoomNumber] = React.useState('');
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [wrongRoomNumber, setWrongRoomNumber] = React.useState(false);
+  const [route, setRoute] = React.useState([]);
 
   const [inPath, setInPath] = React.useState(false);
   const [nextDirection, setNextDirection] = React.useState('');
@@ -28,19 +29,33 @@ const RoomPage = () => {
     }
   };
 
-  const onSubmit = async () => {
+  const onRoomSubmit = async () => {
     const routes = await getRoutes();    
     const route = routes.find(r => r.room === roomNumber);
-    
+
     if (route) {
       console.log("Route:", route);
-      setWrongRoomNumber(false);
-      setInPath(true);
-      setNextDirection(route.route[0]);
+      setRoute(route.route);
+      setIsModalOpen(true);
     } else {
       setWrongRoomNumber(true);
     }
+  };
 
+  const onModalSubmit = () => {
+    setInPath(true);
+    setNextDirection(route[0]);
+
+    const data = {
+      type: 'to.robot',
+      message: {
+        type: 'start',
+        room: roomNumber,
+        route: route,
+      }
+    };
+    
+    UISocket.send(JSON.stringify(data));
     setIsModalOpen(false);
   };
 
@@ -55,7 +70,7 @@ const RoomPage = () => {
         <Modal
           open={isModalOpen}
           onRequestClose={() => setIsModalOpen(false)}
-          onRequestSubmit={() => onSubmit()}
+          onRequestSubmit={() => onModalSubmit()}
           modalHeading="Confirmar destino"
           primaryButtonText="Submit"
         >
@@ -68,11 +83,11 @@ const RoomPage = () => {
 
       <Tile className="room-page__content">
         {roomNumber === "" ? <h3>Introduce el número de habitación</h3> : <h3>Habitación: {roomNumber}</h3>}
-        {wrongRoomNumber && <h3>No existe la habitación</h3>}
+        {wrongRoomNumber && <h3 style={{color: "red"}}>No existe la habitación</h3>}
         {/* <TextInput id="room-number" type="text" value={roomNumber} placeholder="Nº de habitación" disabled/> */}
 
         {!inPath ?
-          <RoomInput onSubmit={() => setIsModalOpen(true)} onChange={(room) => {setRoomNumber(room); setWrongRoomNumber(false);}} value={roomNumber} />
+          <RoomInput onSubmit={() => onRoomSubmit()} onChange={(room) => {setRoomNumber(room); setWrongRoomNumber(false);}} value={roomNumber} />
         :
           <div>
             <h4>En el próximo cruce gire a la {nextDirection}</h4>
