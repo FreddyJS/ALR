@@ -27,7 +27,6 @@ sensor.integration_time = config.COLOR_SENSOR_INTEGRATION_TIME
 # Change sensor gain to 1, 4, 16, or 60
 sensor.gain = config.COLOR_SENSOR_GAIN
 
-
 forward_speed = 96
 backward_speed = 38
 velocidadGiro = 33
@@ -643,23 +642,58 @@ def cruce(nCruceCount, direccion):
     # return False
 
 
-time.sleep(2)
+class RobotState:
+    IDLE = 0
+    GUIDING = 1
+    RETURNING = 2
 
-try:
-    data = api.get_route_by_room("1")
-    route = data["route"]
-    print(route)
-except Exception:
-    print("Error fetching route, the backend is probably down")
+
+current_state = RobotState.IDLE
+current_route = None
+dest_room = None
+
+
+def processMessage(message: object):
+    global current_state, current_route, dest_room
+    print("Received message: " + str(message))
+
+    if "type" not in message:
+        # Ignore message if it does not have a type, probably debug message
+        return
+
+    if message["type"] == "start":
+        dest_room = message["room"]
+        current_route = message["route"]
+        current_state = RobotState.GUIDING
+
+
+# Start websocket client to receive updates from the backend
+api.start_ws(processMessage)
 
 try:
     while(True):
-        if(recorrido(0)):
-            time.sleep(6)
-            if(recorrido(1)):
-                print('Sali del primer main')
-                recorrido(2)
-                sys.exit(1)
+        # Wait for a new route to be sent from the backend to start navigating
+        if current_state == RobotState.IDLE:
+            time.sleep(0.1)
+
+        # Navigate to the room using the current_route
+        elif current_state == RobotState.GUIDING:
+            print("Navigating to room `{}`".format(dest_room))
+            recorrido(1)
+
+            # Set the state to returning to the docking station
+            current_state = RobotState.RETURNING
+
+        # Return to the docking station
+        elif current_state == RobotState.RETURNING:
+            print("Returning to docking station")
+            recorrido(2)
+
+            # We should wait in IDLE state until the backend sends a new route
+            current_state = RobotState.IDLE
+            # for now just exit the program
+            sys.exit(0)
 
 except KeyboardInterrupt:
+    api.close_ws()
     destroy()

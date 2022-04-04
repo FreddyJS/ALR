@@ -2,6 +2,7 @@ import json
 import requests
 import websocket
 from threading import Thread
+from typing import Any, Callable
 
 WS_URL = "ws://localhost:8000/ws/robot/PiCar/"
 API_URL = "http://localhost:8000/api/"
@@ -22,8 +23,9 @@ class ServerWebSocket(Thread):
     def on_message(self, ws, message):
         data = json.loads(message)
         if data["type"] == "to.robot":
-            print(data)
-            self.on_message_callback(data)
+            self.on_message_callback(data["message"])
+        else:
+            print("Unknown message type: {}".format(data["type"]))
 
     def on_error(self, ws, error):
         print("ServerWebSocket error: {}".format(error))
@@ -45,7 +47,7 @@ class ServerWebSocket(Thread):
         self.ws.send(json.dumps(data))
 
 
-def start_ws(on_message_callback):
+def start_ws(on_message_callback: Callable[[object], Any]):
     global ws
     ws = ServerWebSocket(on_message_callback)
     ws.start()
