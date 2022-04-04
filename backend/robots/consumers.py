@@ -76,7 +76,7 @@ class RobotConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         data = json.loads(text_data)
         message_type: string = data['type']
-        print("Message Received: " + data['message'] + " (type: " + message_type + ")")
+        print("Message Received: " + str(data['message']) + " (type: " + message_type + ")")
 
         if (message_type == "to.robot"):
             # Received message from UI, forward it to the robot
