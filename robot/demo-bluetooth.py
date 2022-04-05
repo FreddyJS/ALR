@@ -157,6 +157,10 @@ def destroy():
 if __name__ == '__main__':
     try:
         while True:
+            while rssi_reference == 0:
+                time.sleep(0.1)
+                continue
+
             main()
     except KeyboardInterrupt:
         destroy()
