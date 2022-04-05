@@ -30,8 +30,8 @@ const RoomPage = () => {
   };
 
   const onRoomSubmit = async () => {
-    const routes = await getRoutes();    
-    const route = routes.find(r => r.room === roomNumber);
+    const routes = await getRoutes();
+    const route = routes.find(r => r.dest_room === roomNumber && r.origin_room === 'hall');
 
     if (route) {
       console.log("Route:", route);
@@ -90,11 +90,11 @@ const RoomPage = () => {
           <RoomInput onSubmit={() => onRoomSubmit()} onChange={(room) => {setRoomNumber(room); setWrongRoomNumber(false);}} value={roomNumber} />
         :
           <div>
-            <h4>En el próximo cruce gire a la {nextDirection}</h4>
-            {nextDirection === 'up' && <AiOutlineArrowUp style={{ width: "75%", height: "75%", fill: "green"}}/>}
-            {nextDirection === 'right' && <AiOutlineArrowRight style={{ width: "75%", height: "75%", fill: "green"}}/>}
-            {nextDirection === 'down' && <AiOutlineArrowDown style={{ width: "75%", height: "75%", fill: "green"}}/>}
-            {nextDirection === 'left' && <AiOutlineArrowLeft style={{ width: "75%", height: "75%", fill: "green"}}/>}
+            <h4>En el próximo cruce: {nextDirection.split(".")[0]}</h4>
+            {nextDirection.startsWith('recto') && <AiOutlineArrowUp style={{ width: "75%", height: "75%", fill: "green"}}/>}
+            {nextDirection.startsWith('derecha') && <AiOutlineArrowRight style={{ width: "75%", height: "75%", fill: "green"}}/>}
+            {nextDirection.startsWith('atras') && <AiOutlineArrowDown style={{ width: "75%", height: "75%", fill: "green"}}/>}
+            {nextDirection.startsWith('izquierda') && <AiOutlineArrowLeft style={{ width: "75%", height: "75%", fill: "green"}}/>}
           </div>
         }
       </Tile>

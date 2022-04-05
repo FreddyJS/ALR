@@ -7,5 +7,4 @@ const getRoutes = async () => {
   return response.data;
 }
 
-
 export { getRoutes };
