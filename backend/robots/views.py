@@ -6,7 +6,6 @@ from rest_framework.decorators import action
 from .models import Robot
 from .serializers import RobotSerializer
 
-
 class RobotsViewSet(viewsets.ModelViewSet):
     lookup_field = 'robot_id'
     queryset = Robot.objects.all()
@@ -44,10 +43,12 @@ class RobotsViewSet(viewsets.ModelViewSet):
         # TODO: Update the UI with the new hall
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.send)(robot.ui_channel, {
-            'type': 'to.ui',
-            'hall': robot.hall
-        })
+                'type': 'to.ui',
+                'hall': robot.hall
+            })
         return self.retrieve(request, *args, **kwargs)
+
+        
 
     @action(detail=True, methods=['put'])
     def active(self, request, *args, **kwargs):
@@ -55,4 +56,10 @@ class RobotsViewSet(viewsets.ModelViewSet):
         robot.active = request.data['active']
         robot.save()
 
+        # TODO: Update the UI with the new hall
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.send)(robot.ui_channel, {
+                'type': 'to.ui',
+                'active': robot.active
+            })
         return self.retrieve(request, *args, **kwargs)
