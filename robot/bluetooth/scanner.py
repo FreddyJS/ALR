@@ -3,7 +3,6 @@ import time
 import socket
 
 import subprocess
-from signal import SIGKILL
 from threading import Thread
 
 

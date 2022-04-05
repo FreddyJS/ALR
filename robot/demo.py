@@ -691,8 +691,6 @@ try:
 
             # We should wait in IDLE state until the backend sends a new route
             current_state = RobotState.IDLE
-            # for now just exit the program
-            sys.exit(0)
 
 except KeyboardInterrupt:
     api.close_ws()
