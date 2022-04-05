@@ -3,8 +3,10 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from rest_framework.decorators import action
 
+
 from .models import Robot
 from .serializers import RobotSerializer
+from routes.models import Route
 
 class RobotsViewSet(viewsets.ModelViewSet):
     lookup_field = 'robot_id'
@@ -54,12 +56,15 @@ class RobotsViewSet(viewsets.ModelViewSet):
     def active(self, request, *args, **kwargs):
         robot: Robot = self.get_object()
         robot.active = request.data['active']
+        route = request.data['route']
+        robot.route = Route.objects.filter(origin_room=route['origin_room'], dest_room=route['dest_room']).first()
         robot.save()
 
         # TODO: Update the UI with the new hall
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.send)(robot.ui_channel, {
                 'type': 'to.ui',
-                'active': robot.active
+                'active': robot.active,
+                'route': route
             })
         return self.retrieve(request, *args, **kwargs)
