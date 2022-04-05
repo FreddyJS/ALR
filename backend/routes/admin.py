@@ -3,6 +3,6 @@ from .models import Route
 
 # Register your models here.
 class RouteAdmin(admin.ModelAdmin):
-    list_display = ('room', 'route')
+    list_display = ('origin_room', 'dest_room', 'route')
 
 admin.site.register(Route, RouteAdmin)

@@ -1,5 +1,6 @@
 import os
 import json
+from typing import List
 
 
 class Nodo:
@@ -98,7 +99,7 @@ class Mapa:
         return None
 
 
-def get_ruta(mapa, inicio, fin):
+def calculate_route(mapa: Mapa, inicio, fin) -> List[Nodo]:
     visitados = ListaNodos()
     frontera = ListaNodos()
 
@@ -113,7 +114,7 @@ def get_ruta(mapa, inicio, fin):
 
     while (not frontera.vacia()):
         # frontera.imprime()
-        nodo = frontera.pop()
+        nodo: Nodo = frontera.pop()
         if (nodo.id == marca_fin):
             resultado = [nodo.padre, nodo.id]
             paso = nodo.padre
@@ -124,7 +125,7 @@ def get_ruta(mapa, inicio, fin):
             return resultado
 
         visitados.push(nodo)
-        hijos = mapa.enlaces(nodo.id)
+        hijos: list[dict] = mapa.enlaces(nodo.id)
         for hijo in hijos:
             id = hijo.get("id")
             coste_acumulado = nodo.coste_acumulado + hijo.get("distancia")
@@ -133,26 +134,26 @@ def get_ruta(mapa, inicio, fin):
                 frontera.push(nodo_hijo)
 
 
-def color(mapa, ruta):
+def color(mapa: Mapa, ruta):
     aux = []
     for elemento in ruta:
         if (mapa.esCruce(elemento)):
-            aux.append("_CRUCE.")
+            aux.append("_CRUCE")
         else:
-            aux.append("_HABITACION.")
+            aux.append("_HABITACION")
 
     return (aux)
 
 
-def get_direcciones(mapa, ruta):
+def get_direcciones(mapa: Mapa, ruta):
     i = 0
     direcciones = []
     try:
         while True:
-            e = mapa.enlaces(ruta[i])
+            e: list[dict] = mapa.enlaces(ruta[i])
             for enl in e:
                 if(enl.get("id") == ruta[i+1]):
-                    if(mapa.getNodo(ruta[i+1])["tipo"] in "cruce" or mapa.getNodo(ruta[i+1])["tipo"] in "habitaciones"):
+                    if("cruce" in mapa.getNodo(ruta[i+1])["tipo"] or "habitaciones" in mapa.getNodo(ruta[i+1])["tipo"]):
                        # print(ruta[i+1] + " es un: " + mapa.getNodo(ruta[i+1])["tipo"] +  " - ", end="")
                         direcciones.append(enl.get("direccion"))
 
@@ -166,18 +167,22 @@ def get_direcciones(mapa, ruta):
                 direcciones.append(enlace.get("direccion"))
 
         print("Cálculo de ruta finalizado.\n")
-        ctr = 0
-        ult_cruce = -1
+        # ctr = 0
+        # ult_cruce = -1
 
-        for elemento in ruta:
-            if (mapa.esCruce(elemento)):
-                ult_cruce = ctr
-            ctr += 1
+        # for elemento in ruta:
+        #     if (mapa.esCruce(elemento)):
+        #         ult_cruce = ctr
+        #     ctr += 1
 
-        # se le añade esta string a la direccion para saber que es el ultimo cruce
-        direcciones[ult_cruce -
-                    1] = str(direcciones[ult_cruce - 1]) + "-Este es el último cruce."
-        direcciones.pop()  # se quita el ultimo elemento porque se repite
+        # # se le añade esta string a la direccion para saber que es el ultimo cruce
+        # if (ult_cruce != -1):
+        #     direcciones[ult_cruce -
+        #                 1] = str(direcciones[ult_cruce - 1]) + "- Este es el último cruce."
+
+        if (len(direcciones) != 0):
+            direcciones.pop()  # se quita el ultimo elemento porque se repite, si se va a una habitacion estando en ese nodo no hay direcciones
+
     return direcciones
 
 
@@ -190,118 +195,70 @@ def get_giros(ruta_absoluta, grados, colores):
         if (grados == 0):
             if ("norte" in d):
                 grados += 0
-                if("cruce" not in d):
-                    giros.append("Recto.")
-                else:
-                    giros.append("Recto. Llegando al último cruce")
+                giros.append("recto.")
 
             elif ("oeste" in d):
                 grados += 270
-                if("cruce" not in d):
-                    giros.append("Izquierda.")
-                else:
-                    giros.append("Izquierda. Llegando al último cruce")
+                giros.append("izquierda.")
 
             elif ("este" in d):
                 grados += 90
-                if("cruce" not in d):
-                    giros.append("Derecha.")
-                else:
-                    giros.append("Derecha. Llegando al último cruce")
+                giros.append("derecha.")
 
             elif ("sur" in d):
                 grados += 180
-                if("cruce" not in d):
-                    giros.append("Dar vuelta.")
-                else:
-                    giros.append("Dar vuelta. Llegando al último cruce")
+                giros.append("Dar vuelta.")
 
         elif (grados == 90):
             if ("norte" in d):
                 grados += 270
-                if("cruce" not in d):
-                    giros.append("Izquierda.")
-                else:
-                    giros.append("Izquierda. Llegando al último cruce")
+                giros.append("izquierda.")
 
             elif ("oeste" in d):
                 grados += 180
-                if("cruce" not in d):
-                    giros.append("Dar la vuelta.")
-                else:
-                    giros.append("Dar la vuelta. Llegando al último cruce")
+                giros.append("Dar la vuelta.")
 
             elif ("este" in d):
                 grados += 0
-                if("cruce" not in d):
-                    giros.append("Recto.")
-                else:
-                    giros.append("Recto. Llegando al último cruce")
+                giros.append("recto.")
 
             elif ("sur" in d):
                 grados += 90
-                if("cruce" not in d):
-                    giros.append("Derecha.")
-                else:
-                    giros.append("Derecha. Llegando al último cruce")
+                giros.append("derecha.")
 
         elif (grados == 270):
             if ("norte" in d):
                 grados += 90
-                if("cruce" not in d):
-                    giros.append("Derecha.")
-                else:
-                    giros.append("Derecha. Llegando al último cruce")
+                giros.append("derecha.")
 
             elif ("oeste" in d):
                 grados += 0
-                if("cruce" not in d):
-                    giros.append("Recto.")
-                else:
-                    giros.append("Recto. Llegando al último cruce")
+                giros.append("recto.")
 
             elif ("este" in d):
                 grados += 180
-                if("cruce" not in d):
-                    giros.append("Dar la vuelta.")
-                else:
-                    giros.append("Dar la vuelta. Llegando al último cruce")
+                giros.append("Dar la vuelta.")
 
             elif ("sur" in d):
                 grados += 270
-                if("cruce" not in d):
-                    giros.append("Izquierda.")
-                else:
-                    giros.append("Izquierda. Llegando al último cruce")
+                giros.append("izquierda.")
 
         elif (grados == 180):
             if ("norte" in d):
                 grados += 180
-                if("cruce" not in d):
-                    giros.append("Dar la vuelta.")
-                else:
-                    giros.append("Dar la vuelta. Llegando al último cruce")
+                giros.append("Dar la vuelta.")
 
             elif ("oeste" in d):
                 grados += 90
-                if("cruce" not in d):
-                    giros.append("Derecha.")
-                else:
-                    giros.append("Derecha. Llegando al último cruce")
+                giros.append("derecha.")
 
             elif ("este" in d):
                 grados += 270
-                if("cruce" not in d):
-                    giros.append("Izquierda.")
-                else:
-                    giros.append("Izquierda. Llegando al último cruce")
+                giros.append("izquierda.")
 
             elif ("sur" in d):
                 grados += 0
-                if("cruce" not in d):
-                    giros.append("Recto.")
-                else:
-                    giros.append("Recto. Llegando al último cruce")
+                giros.append("recto.")
 
     giros.append(grados)
 
@@ -318,14 +275,24 @@ def get_giros(ruta_absoluta, grados, colores):
         pass
 
     giros_final.append(giros.pop())
-    return giros
+    return giros_final
 
 
-def get_final_route(origin: str, dest: str, grados: int = 0):
+def route_to_room(origin_room: str, dest_room: str, grados: int = 0):
     map_path = os.path.join(os.path.dirname(__file__), 'mapa.json')
     map = Mapa(map_path)
 
-    route = get_ruta(map, origin, dest)
+    # Get the node id of the destiny room, it must be a rooms node
+    destId = map.getMarca(dest_room)
+    if (destId == None or map.getNodo(destId)["tipo"] != "habitaciones"):
+        raise Exception("Destino no encontrado")
+
+    # Get the node id of the origin room, it must be a rooms node
+    originId = map.getMarca(origin_room)
+    if (originId == None or map.getNodo(originId)["tipo"] != "habitaciones"):
+        raise Exception("Origen no encontrado")
+
+    route = calculate_route(map, origin_room, dest_room)
     absolute_route = get_direcciones(map, route)
     colores = color(map, route)
     giros = get_giros(absolute_route, grados, colores)

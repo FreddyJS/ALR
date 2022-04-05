@@ -3,5 +3,9 @@ from django.db import models
 
 # Create your models here.
 class Route(models.Model):
-  room = models.CharField(max_length=5, unique=True)
+  origin_room = models.CharField(max_length=5)
+  dest_room = models.CharField(max_length=5)
   route = ArrayField(models.TextField())
+
+  class Meta:
+    unique_together = [['origin_room', 'dest_room']]
