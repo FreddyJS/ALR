@@ -138,7 +138,7 @@ def color(mapa: Mapa, ruta):
     aux = []
     for elemento in ruta:
         if (mapa.esCruce(elemento)):
-            aux.append("_CRUCE")
+            aux.append("_CRUCE_" + elemento)
         else:
             aux.append("_HABITACION")
 
