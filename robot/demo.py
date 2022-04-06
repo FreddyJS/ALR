@@ -8,7 +8,7 @@ import board
 import adafruit_tcs34725
 from picar import front_wheels
 from picar import back_wheels
-from LineFollower import LineFollower
+from sensors.LineFollower import LineFollower
 
 import api
 import config

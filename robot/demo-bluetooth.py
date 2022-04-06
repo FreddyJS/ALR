@@ -3,8 +3,8 @@ import time
 import picar
 from picar import front_wheels
 from picar import back_wheels
-from LineFollower import LineFollower
-from UltrasonicAvoidance import UltrasonicAvoidance
+from sensors.LineFollower import LineFollower
+from sensors.UltrasonicSensor import UltrasonicSensor
 
 import config
 import bluetooth.scanner as scanner
@@ -16,7 +16,7 @@ DEVICE_NAME = "HuaweiAP"
 # TODO: create flag --no-robot to test connection without robot
 NO_ROBOT = False
 
-UA = UltrasonicAvoidance(16)
+ultrasonicSensor = UltrasonicSensor(16)
 
 LF_REFERENCES = config.LINE_FOLLOWER_REFERENCES
 rssi_reference = 0
@@ -100,7 +100,7 @@ def main():
     d_step = 45
     bw.forward()
     while True:
-        distance = UA.distance()
+        distance = ultrasonicSensor.distance()
         if (distance <= 20 and distance >= 0) or (distance < 0 and obstacle):
             obstacle = True
             forward_speed = 0
