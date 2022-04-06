@@ -74,6 +74,7 @@ fw.turning_max = 45
 
 
 def updateSpeed():
+    global forward_speed
     if new_forward_speed != forward_speed:
         forward_speed = new_forward_speed
         bw.speed = forward_speed
