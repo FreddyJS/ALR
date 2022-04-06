@@ -31,7 +31,7 @@ delay = 0.0005
 
 def processSample(message: str):
     global rssi_reference, new_forward_speed
-    sample = int(message)
+    sample = int(message.split(":")[0])
 
     if rssi_reference == 0:
         rssi_reference = sample
@@ -44,9 +44,13 @@ def processSample(message: str):
             return
 
         diff = abs(diff)
-        if diff > 5:
+        if diff > 0 and diff < 5:
             new_forward_speed = config.PICAR_MED_SPEED
-        elif diff > 10:
+        elif diff >= 5 and diff < 10:
+            new_forward_speed = int(config.PICAR_MED_SPEED/2)
+        elif diff >= 10 and diff < 15:
+            new_forward_speed = int(config.PICAR_MED_SPEED/3)
+        elif diff >= 15:
             new_forward_speed = 0
 
 
@@ -91,9 +95,9 @@ def main():
     obstacle = False
 
     a_step = 3
-    b_step = 5
-    c_step = 10
-    d_step = 20
+    b_step = 6
+    c_step = 15
+    d_step = 45
     bw.forward()
     while True:
         distance = UA.distance()
