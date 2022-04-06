@@ -4,6 +4,7 @@ import picar
 from picar import front_wheels
 from picar import back_wheels
 from LineFollower import LineFollower
+from UltrasonicAvoidance import UltrasonicAvoidance
 
 import config
 import bluetooth.scanner as scanner
@@ -14,6 +15,8 @@ DEVICE_NAME = "HuaweiAP"
 
 # TODO: create flag --no-robot to test connection without robot
 NO_ROBOT = False
+
+UA = UltrasonicAvoidance(16)
 
 LF_REFERENCES = config.LINE_FOLLOWER_REFERENCES
 rssi_reference = 0
@@ -38,12 +41,12 @@ def processSample(message: str):
         diff = sample - rssi_reference
 
         if (diff > 0):
-            if diff > 5:
-                new_forward_speed = config.PICAR_MED_SPEED
             return
 
         diff = abs(diff)
-        if diff > 10:
+        if diff > 5:
+            new_forward_speed = config.PICAR_MED_SPEED
+        elif diff > 10:
             new_forward_speed = 0
 
 
@@ -82,9 +85,10 @@ def updateSpeed():
 
 
 def main():
-    global turning_angle
+    global turning_angle, forward_speed
     off_track_count = 0
     bw.speed = forward_speed
+    obstacle = False
 
     a_step = 3
     b_step = 5
@@ -92,9 +96,18 @@ def main():
     d_step = 20
     bw.forward()
     while True:
-        lf_status = lf.read_digital()
+        distance = UA.distance()
+        if (distance <= 20 and distance >= 0) or (distance < 0 and obstacle):
+            obstacle = True
+            forward_speed = 0
+            bw.stop()
+            continue
+        else:
+            obstacle = False
+
         updateSpeed()
-        print(lf_status)
+        lf_status = lf.read_digital()
+
         # Angle calculate
         if lf_status == [0, 0, 1, 0, 0]:
             step = 0
