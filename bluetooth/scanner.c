@@ -17,7 +17,7 @@
 #include <bluetooth/hci_lib.h>
 
 #define SERVER_PORT 12345
-#define SERVER_ADDR "localhost"
+#define SERVER_ADDR "192.168.82.152"
 
 #define MUESTRASREF 20 // Muestras totales deseadas para calcular valor de referencia
 #define BUFFER 10
@@ -63,10 +63,10 @@ int init_socket()
     printf("Socket created\n");
 }
 
-int socket_send(int value)
+int socket_send(int value,int times)
 {
     char buffer[64];
-    sprintf(buffer, "%i", value);
+    sprintf(buffer, "%i:%i", value,times);
     printf("socket_send(): %s\n", buffer);
     return sendto(socketfd, buffer, (strlen(buffer) + 1), 0, (struct sockaddr *)&server, sizeof(server));
 }
@@ -108,8 +108,9 @@ int main(int argc, char *argv[])
     // Keep scanning until we see nothing for 10 secs or we have seen lots of advertisements.  Then exit.
     // We exit in this case because the scan may have failed or stopped. Higher level code can restart
     printf("Starting scanning.....\n");
-    while (1)
+    while (count < 300)
     {
+        // printf("%i",getc(stdin));
         len = read(device, buf, sizeof(buf));
         if (len >= HCI_EVENT_HDR_SIZE)
         {
@@ -125,7 +126,7 @@ int main(int argc, char *argv[])
                     ba2str(&(info->bdaddr), addr);
                     int8_t rssi = (int8_t)info->data[info->length];
                     int flag = strncmp(&info->data[2], device_name, strlen(device_name)); // El nombre del dispositivo se encuentra en la posición 2
-
+                    // printf("%i %s\n",rssi,&info->data[2]);
                     if (!flag)
                     {
                         // printf("Printing useful data:\n");
@@ -133,7 +134,7 @@ int main(int argc, char *argv[])
                         // printf("%.5s %d %s %i\n", &info->data[2], rssi, addr, info->bdaddr_type);
                         gettimeofday(&timestamp, NULL);
                         unsigned long timest = (timestamp.tv_sec-start.tv_sec) * 1000000 + (timestamp.tv_usec-start.tv_usec);
-                        printf("RSSI received: %d %lu\n", rssi,timest);
+                        printf("\nRSSI received: %d %lu\n", rssi,timest);
                         count++;
                         last_detection_time = (unsigned)time(NULL);
 
@@ -142,7 +143,7 @@ int main(int argc, char *argv[])
                         {
                             valorRef = calcularValorReferencia(rssi, 1);
                             if (valorRef != 0)
-                                socket_send(valorRef);
+                                socket_send(valorRef,timest);
                         }
                         // Una vez el valor de referencia está calculado siempre entraremos en el siguiente else, para calcular la mediana con las muestras entrantes
                         else
@@ -153,7 +154,7 @@ int main(int argc, char *argv[])
                             if (mediana != 0)
                             {
                                 // printf("Mediana calculada con 10 muestras: %i\n",mediana);
-                                socket_send(mediana);
+                                socket_send(mediana,timest);
                             }
                         }
                     }
@@ -316,7 +317,7 @@ int calcularValorReferencia(int rssi, int flagMode)
     case 0:
         // Llenamos buffer con muestras recibidas mientras contMuestrasRef <= WINDOWSIZE - 1,
         //                  Hasta que no recibimos las muestras necesarias (WINDOWSIZE), no calculamos la mediana
-        if (contMuestraRef <= WINDOWSIZE - 1)
+        if (contMuestraRef <= WINDOWSIZE)
         {
             // 1. LLenamos buffer de referencia
             buffer[contBufferRef] = rssi;
@@ -328,11 +329,22 @@ int calcularValorReferencia(int rssi, int flagMode)
         else
         {
             valorAuxiliarRetorno = calcularValorMediano();
-            printf("\nValor mediano calculado: %i\n", valorAuxiliarRetorno);
+            printf("Valor mediano calculado: %i %i\n", valorAuxiliarRetorno,contBufferRef);
+            // int error = contBufferRef - BUFFER; // Compare if buffer is full
+            if(contBufferRef == BUFFER )
+            {
+                contBufferRef = 0;
+            }
+            buffer[contBufferRef] = rssi;
+            // print every element of buffer
+            // for (int i = 0; i <= WINDOWSIZE; i++)
+            // {
+            //     printf("%i ", buffer[i]);
+            // }
+            printf("\n");
+            contBufferRef++;
             // printf("\nValor de referencia: %i\n", valorRef);
-            memcpy(buffer, arrayVacio, sizeof(buffer));
-            contBufferRef = 0;
-            contMuestraRef = 0;
+            // contMuestraRef = 0;
             // flagRefCalculada = 0;
         }
 
