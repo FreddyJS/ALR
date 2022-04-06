@@ -16,7 +16,7 @@ DEVICE_NAME = "HuaweiAP"
 # TODO: create flag --no-robot to test connection without robot
 NO_ROBOT = False
 
-ultrasonicSensor = UltrasonicSensor(16)
+ultrasonicSensor = UltrasonicSensor(config.ULTRASONIC_SENSOR_CHANNEL)
 
 LF_REFERENCES = config.LINE_FOLLOWER_REFERENCES
 rssi_reference = 0
@@ -101,7 +101,7 @@ def main():
     bw.forward()
     while True:
         distance = ultrasonicSensor.distance()
-        if (distance <= 20 and distance >= 0) or (distance < 0 and obstacle):
+        if (distance <= config.ULTRASONIC_SENSOR_MIN_DISTANCE and distance >= 0) or (distance < 0 and obstacle):
             obstacle = True
             forward_speed = 0
             bw.stop()
