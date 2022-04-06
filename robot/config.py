@@ -1,5 +1,6 @@
 # PiCar Configuration
 PICAR_MAX_SPEED = 95
+PICAR_MED_SPEED = 70
 
 # Line Follower Configuration
 LINE_FOLLOWER_REFERENCES = [60, 60, 60, 60, 60]

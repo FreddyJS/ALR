@@ -17,7 +17,8 @@ NO_ROBOT = False
 
 LF_REFERENCES = config.LINE_FOLLOWER_REFERENCES
 rssi_reference = 0
-forward_speed = config.PICAR_MAX_SPEED
+forward_speed = config.PICAR_MED_SPEED
+new_forward_speed = forward_speed
 backward_speed = 70
 turning_angle = 40
 
@@ -26,7 +27,7 @@ delay = 0.0005
 
 
 def processSample(message: str):
-    global forward_speed, rssi_reference
+    global rssi_reference, new_forward_speed
     sample = int(message)
 
     if rssi_reference == 0:
@@ -37,19 +38,13 @@ def processSample(message: str):
         diff = sample - rssi_reference
 
         if (diff > 0):
+            if diff > 5:
+                new_forward_speed = config.PICAR_MED_SPEED
             return
 
         diff = abs(diff)
-        if diff >= 0 and diff <= 10:
-            forward_speed = 100
-        elif diff > 10 and diff <= 25:
-            forward_speed = 80
-        elif diff > 25 and diff <= 50:
-            forward_speed = 60
-        elif diff > 50 and diff <= 75:
-            forward_speed = 40
-        else:
-            forward_speed = 0
+        if diff > 10:
+            new_forward_speed = 0
 
 
 # To test when no robot connected
@@ -79,8 +74,10 @@ fw.turning_max = 45
 
 
 def updateSpeed():
-    bw.speed = forward_speed
-    bw.forward()
+    if new_forward_speed != forward_speed:
+        forward_speed = new_forward_speed
+        bw.speed = forward_speed
+        bw.forward()
 
 
 def main():
@@ -95,6 +92,7 @@ def main():
     bw.forward()
     while True:
         lf_status = lf.read_digital()
+        updateSpeed()
         print(lf_status)
         # Angle calculate
         if lf_status == [0, 0, 1, 0, 0]:
@@ -112,17 +110,14 @@ def main():
         if lf_status == [0, 0, 1, 0, 0]:
             off_track_count = 0
             fw.turn(90)
-            updateSpeed()
         # turn right
         elif lf_status in ([0, 1, 1, 0, 0], [0, 1, 0, 0, 0], [1, 1, 0, 0, 0], [1, 0, 0, 0, 0]):
             off_track_count = 0
             turning_angle = int(90 - step)
-            updateSpeed()
         # turn left
         elif lf_status in ([0, 0, 1, 1, 0], [0, 0, 0, 1, 0], [0, 0, 0, 1, 1], [0, 0, 0, 0, 1]):
             off_track_count = 0
             turning_angle = int(90 + step)
-            updateSpeed()
         elif lf_status == [0, 0, 0, 0, 0]:
             off_track_count += 1
             if off_track_count > max_off_track_count:
