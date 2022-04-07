@@ -62,7 +62,7 @@ class Back_Wheels(back_wheels.Back_Wheels):
 
 
 class Front_Wheels(front_wheels.Front_Wheels):
-    def __init__(self, debug=False, bus_number=1, channel=front_wheels.FRONT_WHEEL_CHANNEL):
+    def __init__(self, debug=False, bus_number=1, channel=0):
         ''' setup channels and basic stuff '''
         self.db = filedb.fileDB()
         self.db.set('turning_offset', config.PICAR_TURNING_OFFSET)
