@@ -1,10 +1,9 @@
 import time
 
 import picar
-from picar import front_wheels
-from picar import back_wheels
-from sensors.LineFollower import LineFollower
-from sensors.UltrasonicSensor import UltrasonicSensor
+import wheels
+from .sensors.LineFollower import LineFollower
+from .sensors.UltrasonicSensor import UltrasonicSensor
 
 import config
 import bluetooth.scanner as scanner
@@ -70,8 +69,8 @@ if NO_ROBOT:
 picar.setup()
 scanner.start(DEVICE_NAME, processSample)
 
-fw = front_wheels.Front_Wheels(db='config')
-bw = back_wheels.Back_Wheels(db='config')
+fw = wheels.Front_Wheels()
+bw = wheels.Back_Wheels()
 lf = LineFollower()
 
 lf.references = LF_REFERENCES
