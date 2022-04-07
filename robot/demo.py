@@ -49,7 +49,7 @@ def is_blue() -> bool:
 
 
 def follow_line() -> Tuple[bool, list]:
-    global forward_speed, off_track_count, obstacle
+    global forward_speed, off_track_count, obstacle, turning_angle
 
     a_step = 3
     b_step = 6
