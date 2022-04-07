@@ -142,8 +142,8 @@ def main():
     bw.forward()
 
     while True:
-        stopped, lf_status = follow_line()
-        if stopped:
+        following, lf_status = follow_line()
+        if not following:
             print("The robot has stopped. Probably cause an obstacle")
         else:
             # Measuring color
