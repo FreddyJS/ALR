@@ -47,16 +47,20 @@ class UltrasonicSensor(object):
         except Exception as e:
             print("Other exception has occurred" + e)
 
-    def get_distance(self, mount=5):
+    def get_distance(self, mount=2):
+        valid = mount
         sum = 0
-        for i in range(mount):
+        for _ in range(mount):
             a = self.distance()
-            #print('    %s' % a)
             if(str(a) == "None"):
-                a = 200
-            sum += a
+                valid -= 1
+            else:
+                sum += a
 
-        return int(sum/mount)
+        if valid == 0:
+            return -1
+
+        return int(sum/valid)
 
     def less_than(self, alarm_gate):
         try:
