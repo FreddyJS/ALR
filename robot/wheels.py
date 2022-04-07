@@ -50,6 +50,14 @@ class Back_Wheels(back_wheels.Back_Wheels):
     def speed(self):
         return self._speed
 
+    @speed.setter
+    def speed(self, speed):
+        self._speed = speed
+        ''' Set moving speeds '''
+        self.left_wheel.speed = self._speed
+        self.right_wheel.speed = self._speed
+        self._debug_('Set speed to %s' % self._speed)
+
     def left(self):
         self.left_wheel.backward()
         self.right_wheel.forward()
