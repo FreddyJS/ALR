@@ -1,6 +1,7 @@
 import time
 from typing import Tuple
 
+import api
 import picar
 import board
 import wheels
@@ -9,33 +10,34 @@ import adafruit_tcs34725
 from sensors.LineFollower import LineFollower
 from sensors.UltrasonicSensor import UltrasonicSensor
 
+# Ultrasonic sensor
 ultrasonicSensor = UltrasonicSensor(config.ULTRASONIC_SENSOR_CHANNEL)
+obstacle = False
 
-i2c = board.I2C()  # uses board.SCL and board.SDA
+# Color sensor
+i2c = board.I2C()
 colorSensor = adafruit_tcs34725.TCS34725(i2c)
 colorSensor.integration_time = config.COLOR_SENSOR_INTEGRATION_TIME
 colorSensor.gain = config.COLOR_SENSOR_GAIN
 
-LF_REFERENCES = config.LINE_FOLLOWER_REFERENCES
+# Line follower
+lf = LineFollower()
+lf.references = config.LINE_FOLLOWER_REFERENCES
+max_off_track_count = config.LINE_FOLLOWER_MAX_OFF_TRACK_COUNT
+off_track_count = 0
+
+# Global variables
 forward_speed = config.PICAR_MED_SPEED
 backward_speed = 70
-turning_angle = 40
-
-max_off_track_count = 40
-off_track_count = 0
-obstacle = False
+turning_angle = 90
 delay = 0.0005
 
+# PiCar Wheels
 picar.setup()
-
 fw = wheels.Front_Wheels()
 bw = wheels.Back_Wheels()
-lf = LineFollower()
-
-lf.references = LF_REFERENCES
 fw.ready()
 bw.ready()
-fw.turning_max = 45
 
 
 def is_red() -> bool:
@@ -45,10 +47,15 @@ def is_red() -> bool:
 
 def is_blue() -> bool:
     color_temp = colorSensor.color_temperature
-    return False if color_temp == None else color_temp < config.COLOR_SENSOR_BLUE_VALUE
+    return False if color_temp == None else color_temp < config.COLOR_SENSOR_BLUE_VALUE and color_temp > config.COLOR_SENSOR_RED_VALUE
 
 
 def follow_line() -> Tuple[bool, list]:
+    """ 
+        Detects the line and turns the wheels to keep the line in the center. 
+        Returns a boolean indicating if the line is being followed and a list with the status of the line follower.
+        Automatically stops the robot in case of an obstacle and restarts it when the obstacle is gone.
+    """
     global forward_speed, off_track_count, obstacle, turning_angle
 
     a_step = 3
@@ -61,7 +68,7 @@ def follow_line() -> Tuple[bool, list]:
     if (distance <= config.ULTRASONIC_SENSOR_MIN_DISTANCE and distance >= 0) or (distance < 0 and obstacle):
         obstacle = True
         bw.stop()
-        return False, []
+        return False, [0, 0, 0, 0, 0]
     else:
         obstacle = False
         bw.speed = forward_speed
@@ -132,7 +139,7 @@ def wait_end_of_crosspath():
         lf_status = lf.read_digital()
 
 
-def main():
+def follow_route(route: list[str] = ["recto._CRUCE_1", "recto._CRUCE_2"]):
     global forward_speed
     current_hall = "pasillo0"
     room_count = 0
@@ -160,10 +167,12 @@ def main():
                 print("Left room " + current_hall)
 
             if lf_status == [1, 1, 1, 1, 1]:
-                route = ["recto._CRUCE_1", "recto._CRUCE_2"]
+                if len(route) == 0:
+                    raise KeyboardInterrupt
+                action = route.pop(0)
+
                 forward_speed = config.PICAR_CROSSPATH_SPEED
                 bw.speed = forward_speed
-                action = route.pop(0)
                 bw.forward()
 
                 print("The robot has reached a crosspath")
@@ -212,15 +221,30 @@ def main():
                 bw.speed = forward_speed
                 bw.forward()
 
+
 def destroy():
     bw.stop()
     fw.turn(90)
 
 
+def processMessage(message: object):
+    print("Received message: " + str(message))
+
+    if "type" not in message:
+        return
+
+    if message["type"] == "start":
+        dest_room = message["room"]
+        current_route = message["route"]
+        print("Starting route to room: " + dest_room)
+        print("Route: " + str(current_route))
+
+
 if __name__ == '__main__':
+    api.start_ws()
     try:
-        while True:
-            time.sleep(1.5)
-            main()
+        time.sleep(1.5)
+        follow_route()
     except KeyboardInterrupt:
+        api.close_ws()
         destroy()
