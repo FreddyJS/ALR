@@ -1,13 +1,35 @@
 import time
 import RPi.GPIO as GPIO
+from threading import Thread
 
 
-class UltrasonicSensor(object):
-    timeout = 0.05
+class UltrasonicSensor(Thread):
+    timeout = 0.025
 
-    def __init__(self, channel):
+    def __init__(self, channel, on_obstacle, min_distance):
+        super().__init__()
         self.channel = channel
+        self.min_distance = min_distance
+        self.on_blocked = on_obstacle
+        self.blocked = False
+        self._running = False
         GPIO.setmode(GPIO.BCM)
+
+    def run(self):
+        self._running = True
+        while self._running:
+            distance = self.distance()
+            if distance >= 0 and distance <= self.min_distance:
+                self.blocked = True
+            elif distance > self.min_distance:
+                self.blocked = False
+
+            self.on_blocked(self.blocked)
+            time.sleep(0.05)
+
+    def kill(self):
+        self._running = False
+        self.join()
 
     def distance(self):
         try:

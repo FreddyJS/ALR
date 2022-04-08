@@ -11,8 +11,18 @@ from sensors.LineFollower import LineFollower
 from sensors.UltrasonicSensor import UltrasonicSensor
 
 # Ultrasonic sensor
-ultrasonicSensor = UltrasonicSensor(config.ULTRASONIC_SENSOR_CHANNEL)
 obstacle = False
+
+
+def on_obstacle(blocked):
+    global obstacle
+    obstacle = blocked
+
+
+ultrasonicSensor = UltrasonicSensor(
+    config.ULTRASONIC_SENSOR_CHANNEL, on_obstacle, config.ULTRASONIC_SENSOR_MIN_DISTANCE)
+ultrasonicSensor.start()
+
 
 # Color sensor
 i2c = board.I2C()
@@ -56,21 +66,18 @@ def follow_line() -> Tuple[bool, list]:
         Returns a boolean indicating if the line is being followed and a list with the status of the line follower.
         Automatically stops the robot in case of an obstacle and restarts it when the obstacle is gone.
     """
-    global forward_speed, off_track_count, obstacle, turning_angle
+    global forward_speed, off_track_count, obstacle, turning_angle, max_off_track_count
 
     a_step = 3
     b_step = 6
-    c_step = 15
+    c_step = 12
     d_step = 45
 
     # Measuring distance
-    distance = ultrasonicSensor.distance()
-    if (distance <= config.ULTRASONIC_SENSOR_MIN_DISTANCE and distance >= 0) or (distance < 0 and obstacle):
-        obstacle = True
+    if obstacle:
         bw.stop()
-        return False, [0, 0, 0, 0, 0]
+        return False, []
     else:
-        obstacle = False
         bw.speed = forward_speed
         bw.forward()
 
@@ -89,9 +96,10 @@ def follow_line() -> Tuple[bool, list]:
         step = d_step
 
     # Direction calculate
+    angle = 89 if turning_angle >= 90 else 91
     if lf_status == [0, 0, 1, 0, 0]:
         off_track_count = 0
-        fw.turn(90)
+        fw.turn(angle)
     # turn right
     elif lf_status in ([0, 1, 1, 0, 0], [0, 1, 0, 0, 0], [1, 1, 0, 0, 0], [1, 0, 0, 0, 0]):
         off_track_count = 0
@@ -103,24 +111,11 @@ def follow_line() -> Tuple[bool, list]:
     elif lf_status == [0, 0, 0, 0, 0]:
         off_track_count += 1
         if off_track_count > max_off_track_count:
-            #tmp_angle = -(turning_angle - 90) + 90
-            tmp_angle = (turning_angle-90)/abs(90-turning_angle)
-            tmp_angle *= fw.turning_max
-            bw.speed = backward_speed
-            bw.backward()
-            fw.turn(tmp_angle)
-
-            lf.wait_tile_center()
-            bw.stop()
-
-            fw.turn(turning_angle)
-            time.sleep(0.2)
-            bw.speed = forward_speed
-            bw.forward()
-            time.sleep(0.2)
-
-        else:
-            off_track_count = 0
+            print("off_track_count:", off_track_count)
+            print("last_status:", lf_status)
+            raise KeyboardInterrupt
+    else:
+        off_track_count = 0
 
     fw.turn(turning_angle)
     return True, lf_status
@@ -134,12 +129,13 @@ def wait_for_crosspath():
 
 
 def wait_end_of_crosspath():
-    lf_status = lf.read_digital()
-    while lf_status == [1, 1, 1, 1, 1]:
-        lf_status = lf.read_digital()
+    while True:
+        _, lf_status = follow_line()
+        if lf_status != [1, 1, 1, 1, 1]:
+            break
 
 
-def follow_route(route: list[str] = ["recto._CRUCE_1", "recto._CRUCE_2"]):
+def follow_route(route: list[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "derecha._CRUCE_3", "izquierda._CRUCE_4"]):
     global forward_speed
     current_hall = "pasillo0"
     room_count = 0
@@ -192,13 +188,10 @@ def follow_route(route: list[str] = ["recto._CRUCE_1", "recto._CRUCE_2"]):
                     wait_end_of_crosspath()
 
                     print("El robot ha pasado el segundo cruce, girando a la izquierda")
-                    fw.turn(90)
-                    bw.speed = 40
-                    bw.left()
+                    
+                    fw.turn(90 - 45)
+                    lf.wait_tile_status(status=[0, 0, 0, 0, 1])
                     lf.wait_tile_center()
-
-                    bw.speed = config.PICAR_CROSSPATH_SPEED
-                    bw.forward()
 
                     print(
                         "El robot ha pasado el segundo cruce. Esperando al tercer cruce...")
@@ -209,17 +202,23 @@ def follow_route(route: list[str] = ["recto._CRUCE_1", "recto._CRUCE_2"]):
 
                 elif action.startswith("derecha"):
                     print("Girando a la derecha")
-                    fw.turn(90)
-                    bw.speed = 40
-                    bw.right()
+                    
+                    fw.turn(90 + 45)
+                    lf.wait_tile_status(status=[1, 0, 0, 0, 0])
                     lf.wait_tile_center()
+                    
                     print("Saliendo del cruce")
 
-                current_hall = "pasillo{}{}".format(action[-1], route[0][-1])
-                print("Continuando recto, nuevo pasillo: " + current_hall)
-                forward_speed = config.PICAR_MED_SPEED
-                bw.speed = forward_speed
-                bw.forward()
+                try:
+                    current_hall = "pasillo{}{}".format(
+                        action[-1], route[0][-1])
+                    print("Continuando recto, nuevo pasillo: " + current_hall)
+                    forward_speed = config.PICAR_MED_SPEED
+                    bw.speed = forward_speed
+                    bw.forward()
+                except Exception:
+                    print("Finished route")
+                    raise KeyboardInterrupt
 
 
 def destroy():
@@ -241,10 +240,11 @@ def processMessage(message: object):
 
 
 if __name__ == '__main__':
-    api.start_ws()
+    api.start_ws(processMessage)
     try:
         time.sleep(1.5)
         follow_route()
     except KeyboardInterrupt:
         api.close_ws()
+        ultrasonicSensor.kill()
         destroy()

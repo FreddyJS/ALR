@@ -4,7 +4,7 @@ import time
 
 
 class LineFollower(object):
-    def __init__(self, address=0x11, references=[125, 125, 125, 125.0, 125.0]):
+    def __init__(self, address=0x11, references=[125, 125, 125, 125, 125]):
         self.bus = smbus.SMBus(1)
         self.address = address
         self._references = references
@@ -83,7 +83,13 @@ class LineFollower(object):
     def wait_tile_status(self, status):
         while True:
             lt_status = self.read_digital()
-            if lt_status in status:
+            if lt_status == status:
+                break
+    
+    def wait_no_line(self):
+        while True:
+            lt_status = self.read_digital()
+            if lt_status == [0, 0, 0, 0, 0]:
                 break
 
     def wait_tile_center(self):
@@ -103,5 +109,8 @@ class LineFollower(object):
 
 if __name__ == '__main__':
     lf = LineFollower()
+    lf.references = [40, 40, 40, 40, 40]
     while True:
         print(lf.read_analog())
+        print(lf.read_digital())
+        time.sleep(0.1)
