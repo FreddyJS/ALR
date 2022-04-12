@@ -1,5 +1,5 @@
 import time
-from typing import Tuple
+from typing import List, Tuple
 
 import api
 import picar
@@ -135,7 +135,7 @@ def wait_end_of_crosspath():
             break
 
 
-def follow_route(route: list[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "derecha._CRUCE_3", "izquierda._CRUCE_4"]):
+def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "derecha._CRUCE_3", "izquierda._CRUCE_4"]):
     global forward_speed
     current_hall = "pasillo0"
     room_count = 0
