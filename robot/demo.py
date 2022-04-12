@@ -1,3 +1,4 @@
+import json
 import time
 from typing import List, Tuple
 
@@ -10,15 +11,14 @@ import adafruit_tcs34725
 from sensors.LineFollower import LineFollower
 from sensors.UltrasonicSensor import UltrasonicSensor
 
+
 # Ultrasonic sensor
-obstacle = False
-
-
 def on_obstacle(blocked):
     global obstacle
     obstacle = blocked
 
 
+obstacle = False
 ultrasonicSensor = UltrasonicSensor(
     config.ULTRASONIC_SENSOR_CHANNEL, on_obstacle, config.ULTRASONIC_SENSOR_MIN_DISTANCE)
 ultrasonicSensor.start()
@@ -48,6 +48,8 @@ fw = wheels.Front_Wheels()
 bw = wheels.Back_Wheels()
 fw.ready()
 bw.ready()
+
+route = None
 
 
 def is_red() -> bool:
@@ -164,7 +166,7 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
 
             if lf_status == [1, 1, 1, 1, 1]:
                 if len(route) == 0:
-                    raise KeyboardInterrupt
+                    return
                 action = route.pop(0)
 
                 forward_speed = config.PICAR_CROSSPATH_SPEED
@@ -188,7 +190,7 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
                     wait_end_of_crosspath()
 
                     print("El robot ha pasado el segundo cruce, girando a la izquierda")
-                    
+
                     fw.turn(90 - 45)
                     lf.wait_tile_status(status=[0, 0, 0, 0, 1])
                     lf.wait_tile_center()
@@ -202,11 +204,11 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
 
                 elif action.startswith("derecha"):
                     print("Girando a la derecha")
-                    
+
                     fw.turn(90 + 45)
                     lf.wait_tile_status(status=[1, 0, 0, 0, 0])
                     lf.wait_tile_center()
-                    
+
                     print("Saliendo del cruce")
 
                 try:
@@ -227,23 +229,32 @@ def destroy():
 
 
 def processMessage(message: object):
+    global route
     print("Received message: " + str(message))
 
     if "type" not in message:
         return
 
     if message["type"] == "start":
-        dest_room = message["room"]
-        current_route = message["route"]
-        print("Starting route to room: " + dest_room)
-        print("Route: " + str(current_route))
+        route = json.loads(message["route"])
 
 
 if __name__ == '__main__':
     api.start_ws(processMessage)
     try:
-        time.sleep(1.5)
-        follow_route()
+        while True:
+            while route is None:
+                time.sleep(0.25)
+
+            print("Starting route to room: " + route["dest_room"])
+            follow_route(route=route["route"])
+
+            print("Finished route. Returning to hall...")
+            time.sleep(5)
+            follow_route(route=route["return_route"])
+            print("Finished return route")
+
+            route = None
     except KeyboardInterrupt:
         api.close_ws()
         ultrasonicSensor.kill()
