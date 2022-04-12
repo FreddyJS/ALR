@@ -5,11 +5,11 @@ from typing import List, Tuple
 import api
 import picar
 import board
-import wheels
 import config
 import adafruit_tcs34725
-from sensors.LineFollower import LineFollower
-from sensors.UltrasonicSensor import UltrasonicSensor
+from .wheels import Front_Wheels, Back_Wheels
+from .sensors.LineFollower import LineFollower
+from .sensors.UltrasonicSensor import UltrasonicSensor
 
 
 # Ultrasonic sensor
@@ -22,7 +22,6 @@ obstacle = False
 ultrasonicSensor = UltrasonicSensor(
     config.ULTRASONIC_SENSOR_CHANNEL, on_obstacle, config.ULTRASONIC_SENSOR_MIN_DISTANCE)
 ultrasonicSensor.start()
-
 
 # Color sensor
 i2c = board.I2C()
@@ -44,8 +43,8 @@ delay = 0.0005
 
 # PiCar Wheels
 picar.setup()
-fw = wheels.Front_Wheels()
-bw = wheels.Back_Wheels()
+fw = Front_Wheels()
+bw = Back_Wheels()
 fw.ready()
 bw.ready()
 
@@ -70,10 +69,10 @@ def follow_line() -> Tuple[bool, list]:
     """
     global forward_speed, off_track_count, obstacle, turning_angle, max_off_track_count
 
-    a_step = 3
-    b_step = 6
-    c_step = 12
-    d_step = 45
+    a_step = config.PICAR_A_STEP
+    b_step = config.PICAR_B_STEP
+    c_step = config.PICAR_C_STEP
+    d_step = config.PICAR_D_STEP
 
     # Measuring distance
     if obstacle:

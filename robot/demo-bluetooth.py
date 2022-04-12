@@ -1,7 +1,7 @@
 import time
 
 import picar
-import wheels
+from .wheels import Front_Wheels, Back_Wheels
 from .sensors.LineFollower import LineFollower
 from .sensors.UltrasonicSensor import UltrasonicSensor
 
@@ -15,13 +15,14 @@ DEVICE_NAME = "HuaweiAP"
 # TODO: create flag --no-robot to test connection without robot
 NO_ROBOT = False
 
+
+lf = LineFollower()
+lf.references = config.LINE_FOLLOWER_REFERENCES
 ultrasonicSensor = UltrasonicSensor(config.ULTRASONIC_SENSOR_CHANNEL)
 
-LF_REFERENCES = config.LINE_FOLLOWER_REFERENCES
-rssi_reference = 0
 forward_speed = config.PICAR_MED_SPEED
-new_forward_speed = forward_speed
 backward_speed = 70
+rssi_reference = 0
 turning_angle = 40
 
 max_off_track_count = 40
@@ -29,7 +30,7 @@ delay = 0.0005
 
 
 def processSample(message: str):
-    global rssi_reference, new_forward_speed
+    global rssi_reference, forward_speed
     sample = int(message.split(":")[0])
 
     if rssi_reference == 0:
@@ -44,13 +45,13 @@ def processSample(message: str):
 
         diff = abs(diff)
         if diff > 0 and diff < 5:
-            new_forward_speed = config.PICAR_MED_SPEED
+            forward_speed = config.PICAR_MED_SPEED
         elif diff >= 5 and diff < 10:
-            new_forward_speed = int(config.PICAR_MED_SPEED/2)
+            forward_speed = int(config.PICAR_MED_SPEED/2)
         elif diff >= 10 and diff < 15:
-            new_forward_speed = int(config.PICAR_MED_SPEED/3)
+            forward_speed = int(config.PICAR_MED_SPEED/3)
         elif diff >= 15:
-            new_forward_speed = 0
+            forward_speed = 0
 
 
 # To test when no robot connected
@@ -69,20 +70,16 @@ if NO_ROBOT:
 picar.setup()
 scanner.start(DEVICE_NAME, processSample)
 
-fw = wheels.Front_Wheels()
-bw = wheels.Back_Wheels()
-lf = LineFollower()
+fw = Front_Wheels()
+bw = Back_Wheels()
 
-lf.references = LF_REFERENCES
 fw.ready()
 bw.ready()
 fw.turning_max = 45
 
 
 def updateSpeed():
-    global forward_speed
-    if new_forward_speed != forward_speed:
-        forward_speed = new_forward_speed
+    if bw.speed != forward_speed:
         bw.speed = forward_speed
         bw.forward()
 
@@ -93,10 +90,10 @@ def main():
     bw.speed = forward_speed
     obstacle = False
 
-    a_step = 3
-    b_step = 6
-    c_step = 15
-    d_step = 45
+    a_step = config.PICAR_A_STEP
+    b_step = config.PICAR_B_STEP
+    c_step = config.PICAR_C_STEP
+    d_step = config.PICAR_D_STEP
     bw.forward()
     while True:
         distance = ultrasonicSensor.distance()
