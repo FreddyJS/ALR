@@ -113,7 +113,6 @@ def calculate_route(mapa: Mapa, inicio, fin) -> List[Nodo]:
     frontera.push(nodo)
 
     while (not frontera.vacia()):
-        # frontera.imprime()
         nodo: Nodo = frontera.pop()
         if (nodo.id == marca_fin):
             resultado = [nodo.padre, nodo.id]
@@ -298,3 +297,8 @@ def route_to_room(origin_room: str, dest_room: str, grados: int = 0):
     giros = get_giros(absolute_route, grados, colores)
 
     return giros
+
+
+if __name__ == "__main__":
+    route = route_to_room("hall", "03")
+    print(route)
