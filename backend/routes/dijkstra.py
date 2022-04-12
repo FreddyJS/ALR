@@ -293,7 +293,7 @@ def route_to_room(origin_room: str, dest_room: str, grados: int = 0):
 
     route = calculate_route(map, origin_room, dest_room)
     absolute_route = get_direcciones(map, route)
-    colores = color(map, route)
+    colores = appendNodeType(map, route)
     giros = get_giros(absolute_route, grados, colores)
 
     return giros
