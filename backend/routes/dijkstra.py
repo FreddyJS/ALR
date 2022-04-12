@@ -133,7 +133,7 @@ def calculate_route(mapa: Mapa, inicio, fin) -> List[Nodo]:
                 frontera.push(nodo_hijo)
 
 
-def color(mapa: Mapa, ruta):
+def appendNodeType(mapa: Mapa, ruta):
     aux = []
     for elemento in ruta:
         if (mapa.esCruce(elemento)):
