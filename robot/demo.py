@@ -7,7 +7,7 @@ import picar
 import board
 import config
 import adafruit_tcs34725
-from .wheels import Front_Wheels, Back_Wheels
+from wheels import Front_Wheels, Back_Wheels
 from .sensors.LineFollower import LineFollower
 from .sensors.UltrasonicSensor import UltrasonicSensor
 
@@ -136,6 +136,18 @@ def wait_end_of_crosspath():
             break
 
 
+def turn_left():
+    fw.turn(90 - 45)
+    lf.wait_tile_status(status=[0, 0, 0, 0, 1])
+    lf.wait_tile_center()
+
+
+def turn_right():
+    fw.turn(90 + 45)
+    lf.wait_tile_status(status=[1, 0, 0, 0, 0])
+    lf.wait_tile_center()
+
+
 def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "derecha._CRUCE_3", "izquierda._CRUCE_4"]):
     global forward_speed
     current_hall = "pasillo0"
@@ -144,6 +156,9 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
 
     bw.speed = forward_speed
     bw.forward()
+
+    if "vuelta" in route[0] and "False" in route[0]:
+        route.pop(0)
 
     while True:
         following, lf_status = follow_line()
@@ -190,9 +205,7 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
 
                     print("El robot ha pasado el segundo cruce, girando a la izquierda")
 
-                    fw.turn(90 - 45)
-                    lf.wait_tile_status(status=[0, 0, 0, 0, 1])
-                    lf.wait_tile_center()
+                    turn_left()
 
                     print(
                         "El robot ha pasado el segundo cruce. Esperando al tercer cruce...")
@@ -203,23 +216,34 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
 
                 elif action.startswith("derecha"):
                     print("Girando a la derecha")
-
-                    fw.turn(90 + 45)
-                    lf.wait_tile_status(status=[1, 0, 0, 0, 0])
-                    lf.wait_tile_center()
-
+                    turn_right()
                     print("Saliendo del cruce")
 
-                try:
-                    current_hall = "pasillo{}{}".format(
-                        action[-1], route[0][-1])
+                elif action.startswith("vuelta"):
+                    print("Pasillo con salida. Girando a la izquierda dos veces...")
+                    wait_for_crosspath()
+                    wait_end_of_crosspath()
+
+                    turn_left()
+
+                    wait_for_crosspath()
+                    wait_end_of_crosspath()
+
+                    print("El robot ha pasado el segundo cruce, girando a la izquierda")
+                    turn_left()
+
+                    wait_for_crosspath()
+                    wait_end_of_crosspath()
+                    print("El robot ha pasado el tercer cruce, continuando recto")
+
+                forward_speed = config.PICAR_MED_SPEED
+                if len(route) > 0:
+                    current_hall = f"pasillo{action[-1]}{route[0][-1]}"
                     print("Continuando recto, nuevo pasillo: " + current_hall)
-                    forward_speed = config.PICAR_MED_SPEED
-                    bw.speed = forward_speed
-                    bw.forward()
-                except Exception:
-                    print("Finished route")
-                    raise KeyboardInterrupt
+                else:
+                    bw.stop()
+                    print("Final de la ruta")
+                    return
 
 
 def destroy():
@@ -235,7 +259,7 @@ def processMessage(message: object):
         return
 
     if message["type"] == "start":
-        route = json.loads(message["route"])
+        route = message["route"]
 
 
 if __name__ == '__main__':
