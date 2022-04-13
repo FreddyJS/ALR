@@ -8,8 +8,8 @@ import board
 import config
 import adafruit_tcs34725
 from wheels import Front_Wheels, Back_Wheels
-from .sensors.LineFollower import LineFollower
-from .sensors.UltrasonicSensor import UltrasonicSensor
+from sensors.LineFollower import LineFollower
+from sensors.UltrasonicSensor import UltrasonicSensor
 
 
 # Ultrasonic sensor
