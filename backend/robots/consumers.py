@@ -70,8 +70,8 @@ class RobotConsumer(AsyncWebsocketConsumer):
             await self.close()
 
     async def disconnect(self, close_code):
-        # TODO: Should we delete the db entry if the UI or the robot is disconnected?
-        await self.channel_layer.group_discard(self.robot.robot_id, self.channel_name)
+        if self.robot is not None:
+            await self.channel_layer.group_discard(self.robot.robot_id, self.channel_name)
 
     async def receive(self, text_data):
         data = json.loads(text_data)

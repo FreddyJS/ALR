@@ -1,11 +1,12 @@
 import json
+import time
 import requests
 import websocket
 from threading import Thread
 from typing import Any, Callable
 
-WS_URL = "ws://localhost:8000/ws/robot/PiCar/"
-API_URL = "http://localhost:8000/api/"
+WS_URL = "ws://192.168.1.131:8000/ws/robot/R02/"
+API_URL = "http://192.168.1.131:8000/api/"
 
 ws: 'ServerWebSocket' = None
 websocket.enableTrace(False)
@@ -60,3 +61,16 @@ def close_ws():
 def get_route_by_room(room):
     res = requests.get(API_URL + "routes/{}".format(room))
     return res.json()
+
+
+if __name__ == "__main__":
+    def on_message(message):
+        print("Received message: {}".format(message))
+
+    start_ws(on_message)
+
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        close_ws()
