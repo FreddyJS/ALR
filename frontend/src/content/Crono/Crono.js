@@ -3,8 +3,6 @@ import "./Crono.css";
 
 import { useEffect, useReducer } from "react";
 
-let cuenta = true;
-
 const stopWatchState = {
   running: false,
   currentTime: 0,
@@ -48,7 +46,6 @@ function timeConverter(duration) {
   };
 }
 
-
 export default function Crono() {
   const [state, dispatch] = useReducer(stopWatchReducer, stopWatchState);
   const time = timeConverter(state.currentTime);
@@ -64,38 +61,27 @@ export default function Crono() {
     return () => cancelAnimationFrame(frame);
   }, []);
 
-  /*if (cuenta){
-    console.log("EI");
-    const contar = (e)=>{
-      dispatch({type:"start"});
-    }
-    contar();
-  }*/
-
   return (
     <div className="ppal">
       <div className="text"> Tiempo en ruta : </div>
-      <span className="timer">
+      <span className="timer" id="timer">
         {time.hours}:{time.minutes}:{time.seconds}.{time.milliseconds}
       </span>
-      <div className="p-4 space-x-4 ">
+      <div>
         <button id="restart" hidden
           onClick={() => dispatch({ type: "reset" })}
-          className="bg-yellow-500 border-4 border-yellow-700 rounded-full w-16 h-16 hover:bg-yellow-600"
         >
           Reset{" "}
         </button>
         {!state.running ? (
           <button id="start" hidden
             onClick={() => dispatch({ type: "start" })}
-            className="bg-green-500 border-4 border-green-700 rounded-full w-16 h-16 hover:bg-green-600"
           >
             start{" "}
           </button>
         ) : (
           <button id="stop" hidden
             onClick={() => dispatch({ type: "stop" })}
-            className="bg-red-500 border-4 border-red-700 rounded-full w-16 h-16 hover:bg-red-600"
           >
             stop{" "}
           </button>

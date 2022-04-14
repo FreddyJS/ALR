@@ -60,7 +60,6 @@ class RobotsViewSet(viewsets.ModelViewSet):
         robot.route = Route.objects.filter(origin_room=route['origin_room'], dest_room=route['dest_room']).first()
         robot.save()
 
-        # TODO: Update the UI with the new hall
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.send)(robot.ui_channel, {
                 'type': 'to.ui',

@@ -14,6 +14,8 @@ const Dashboard = () => {
   var hallsId=[];
   var cont_inic=true;
   var cont_parar=false;
+  var time=[];
+  var time2=[];
   for (let i = 0; i < halls.length; i++) {
     hallsId[i]="hall"+halls[i];
   }
@@ -27,17 +29,37 @@ const Dashboard = () => {
       halls.push(data.hall);
     }
     if (data.active!==undefined && data.active && cont_inic){
-      console.log("Comenzamos");
+      document.getElementById("restart").click();
       document.getElementById("start").click();
       cont_inic=!cont_inic;
       cont_parar=!cont_parar;
 
     }
     else if(data.active!==undefined && !data.active && cont_parar) {
-      console.log("Paramos");
       document.getElementById("stop").click();
+      var a=document.getElementById("timer").textContent;
+      time = a.split(":");
+      time2 = time[2].split(".")
       cont_parar=!cont_parar;
       cont_inic=!cont_inic;
+
+      var requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ robot_id: 'R01', destiny : data.route.dest_room, minutes: time[1], seconds: time2[0], miliseconds: time2[1] })
+    };
+
+      try {
+        fetch(
+            'http://localhost:8000/api/stats/', requestOptions)
+            .then(response => {
+                response.json()
+            })
+    }
+    catch (error) {
+        console.error(error);
+    }
+
     }
   };
 
@@ -66,7 +88,7 @@ const Dashboard = () => {
   
   return (
     <>
-    <Crono></Crono>
+    <Crono id="crono"></Crono>
     <Stage width={stage.stageWidth} height={stage.stageHeight} ref={stageRef}>
       {stage.layers.map((layer, index) => {
         const hallId = "hall" + hall;

@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     # Our apps
     "routes",
     "robots",
+    "stats",
 ]
 
 MIDDLEWARE = [
