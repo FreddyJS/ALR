@@ -8,7 +8,7 @@ const stopWatchState = {
   currentTime: 0,
   lastTime: 0
 };
-function stopWatchReducer(state: stopWatchState, action) {
+function stopWatchReducer(state, action) {
   switch (action.type) {
     case "reset":
       return { running: false, currentTime: 0, lastTime: 0 };

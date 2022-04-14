@@ -3,6 +3,7 @@ package com.lpro.guiame;
 import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.AdvertiseData;
 import android.bluetooth.le.AdvertisingSet;
 import android.bluetooth.le.AdvertisingSetCallback;
@@ -42,7 +43,8 @@ public class BluetoothAdvertiser {
      * @param activity: To turn on bluetooth if needed and to get the appContext
      */
     BluetoothAdvertiser(Activity activity) {
-        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+        BluetoothManager manager = (BluetoothManager) activity.getSystemService(Context.BLUETOOTH_SERVICE);
+        BluetoothAdapter adapter = manager.getAdapter();
         this.appContext = activity.getApplicationContext();
         this.setupBluetooth(adapter, activity);
 
@@ -134,7 +136,9 @@ public class BluetoothAdvertiser {
 
     public void updateAdvertiser() {
         this.stopAdvertising();
-        advertiser = BluetoothAdapter.getDefaultAdapter().getBluetoothLeAdvertiser();
+        BluetoothManager manager = (BluetoothManager) appContext.getSystemService(Context.BLUETOOTH_SERVICE);
+        BluetoothAdapter adapter = manager.getAdapter();
+        advertiser = adapter.getBluetoothLeAdvertiser();
     }
 
     public boolean isAdvertising() {

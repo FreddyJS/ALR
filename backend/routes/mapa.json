@@ -85,6 +85,11 @@
                 "id": "6",
                 "distancia": 1,
                 "direccion": "norte"
+            },
+            {
+                "id": "22",
+                "distancia": 1,
+                "direccion": "este"
             }
         ],
         "habitaciones":[]
@@ -229,5 +234,17 @@
             }
         ],
         "habitaciones":[]
+    },
+    {
+        "id": "22",
+        "tipo": "habitaciones",
+        "enlaces":[
+            {
+                "id": "4",
+                "distancia": 2,
+                "direccion": "oeste"
+            }
+        ],
+        "habitaciones":["57"]
     }
 ]

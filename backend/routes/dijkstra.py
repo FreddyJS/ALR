@@ -113,7 +113,6 @@ def calculate_route(mapa: Mapa, inicio, fin) -> List[Nodo]:
     frontera.push(nodo)
 
     while (not frontera.vacia()):
-        # frontera.imprime()
         nodo: Nodo = frontera.pop()
         if (nodo.id == marca_fin):
             resultado = [nodo.padre, nodo.id]
@@ -134,54 +133,31 @@ def calculate_route(mapa: Mapa, inicio, fin) -> List[Nodo]:
                 frontera.push(nodo_hijo)
 
 
-def color(mapa: Mapa, ruta):
+def appendNodeType(mapa: Mapa, ruta):
     aux = []
     for elemento in ruta:
         if (mapa.esCruce(elemento)):
             aux.append("_CRUCE_" + elemento)
         else:
-            aux.append("_HABITACION")
+            aux.append("_HABITACION_" + elemento)
 
     return (aux)
 
 
 def get_direcciones(mapa: Mapa, ruta):
-    i = 0
     direcciones = []
-    try:
-        while True:
-            e: list[dict] = mapa.enlaces(ruta[i])
-            for enl in e:
-                if(enl.get("id") == ruta[i+1]):
-                    if("cruce" in mapa.getNodo(ruta[i+1])["tipo"] or "habitaciones" in mapa.getNodo(ruta[i+1])["tipo"]):
-                       # print(ruta[i+1] + " es un: " + mapa.getNodo(ruta[i+1])["tipo"] +  " - ", end="")
-                        direcciones.append(enl.get("direccion"))
+    i = 0
 
-            i += 1
-    except IndexError as _:
-        # se añade ultimo enlace, no se añadió antes puesto que para el utlimo enlace lee que el siguiente nodo es de habnitaciones ->
-        # no entra if, no lo añade
-        n = len(ruta)-2
-        for enlace in mapa.enlaces(ruta[n]):
-            if(enlace.get("id") == ruta[n+1]):
-                direcciones.append(enlace.get("direccion"))
+    for node_id in ruta:
+        links: list[dict] = mapa.enlaces(node_id)
 
-        print("Cálculo de ruta finalizado.\n")
-        # ctr = 0
-        # ult_cruce = -1
-
-        # for elemento in ruta:
-        #     if (mapa.esCruce(elemento)):
-        #         ult_cruce = ctr
-        #     ctr += 1
-
-        # # se le añade esta string a la direccion para saber que es el ultimo cruce
-        # if (ult_cruce != -1):
-        #     direcciones[ult_cruce -
-        #                 1] = str(direcciones[ult_cruce - 1]) + "- Este es el último cruce."
-
-        if (len(direcciones) != 0):
-            direcciones.pop()  # se quita el ultimo elemento porque se repite, si se va a una habitacion estando en ese nodo no hay direcciones
+        for link in links:
+            try:
+                if (link.get("id") == ruta[i + 1]):
+                    direcciones.append(link.get("direccion"))
+                    i += 1
+            except IndexError:
+                pass
 
     return direcciones
 
@@ -207,7 +183,7 @@ def get_giros(ruta_absoluta, grados, colores):
 
             elif ("sur" in d):
                 grados += 180
-                giros.append("Dar vuelta.")
+                giros.append("vuelta.")
 
         elif (grados == 90):
             if ("norte" in d):
@@ -216,7 +192,7 @@ def get_giros(ruta_absoluta, grados, colores):
 
             elif ("oeste" in d):
                 grados += 180
-                giros.append("Dar la vuelta.")
+                giros.append("vuelta.")
 
             elif ("este" in d):
                 grados += 0
@@ -237,7 +213,7 @@ def get_giros(ruta_absoluta, grados, colores):
 
             elif ("este" in d):
                 grados += 180
-                giros.append("Dar la vuelta.")
+                giros.append("vuelta.")
 
             elif ("sur" in d):
                 grados += 270
@@ -246,7 +222,7 @@ def get_giros(ruta_absoluta, grados, colores):
         elif (grados == 180):
             if ("norte" in d):
                 grados += 180
-                giros.append("Dar la vuelta.")
+                giros.append("vuelta.")
 
             elif ("oeste" in d):
                 grados += 90
@@ -267,15 +243,70 @@ def get_giros(ruta_absoluta, grados, colores):
 
     counter = 0
     giros_final = []
-    try:
-        while True:
-            giros_final.append(str(giros[counter]) + str(colores[counter+1]))
-            counter += 1
-    except Exception:
-        pass
+    while True:
+        if (counter == len(giros) - 1):
+            giros_final.append(str(giros[counter]) + "." + colores[counter])
+            break
 
-    giros_final.append(giros.pop())
+        giros_final.append(str(giros[counter]) + str(colores[counter]))
+        counter += 1
+
     return giros_final
+
+
+def find_exit(mapa: Mapa, blocked_ids: List[str], current_id: str):
+    links: list[dict] = mapa.enlaces(current_id)
+    links = [link for link in links if link.get("id") not in blocked_ids]
+    if (len(links) == 0):
+        return False
+
+    # print("Current id: " + current_id)
+    # print("Blocked ids: " + str(blocked_ids))
+    # print("Links: " + str(links))
+
+    for link in links:
+        link_node = mapa.getNodo(link.get("id"))
+        if (link_node["tipo"] == "cruce"):
+            print("Pasillo con salida: " + link_node["id"])
+            return True
+        else:
+            blocked_ids.append(link.get("id"))
+            return find_exit(mapa, blocked_ids, link.get("id"))
+
+    print("Pasillo sin salida: " + current_id)
+    return False
+
+
+def get_rooms():
+    map_path = os.path.join(os.path.dirname(__file__), 'mapa.json')
+    rooms = []
+    with open(map_path, 'r') as f:
+        mapa = json.load(f)
+        for node in mapa:
+            if (node["tipo"] == "habitaciones"):
+                for room in node["habitaciones"]:
+                    rooms.append(room)
+
+    return rooms
+
+
+def has_exit(mapa: Mapa, giros: List[str]):
+    giros.reverse()
+    blocked_ids = []
+    current_id = -1
+    for giro in giros:
+        if "CRUCE" in giro:
+            blocked_ids.append(giro.split("_")[-1])
+            break
+        elif "HABITACION" in giro:
+            id = giro.split("_")[-1]
+            if current_id == -1:
+                current_id = id
+
+            blocked_ids.append(id)
+
+    giros.reverse()
+    return find_exit(mapa, blocked_ids=blocked_ids, current_id=current_id)
 
 
 def route_to_room(origin_room: str, dest_room: str, grados: int = 0):
@@ -292,9 +323,29 @@ def route_to_room(origin_room: str, dest_room: str, grados: int = 0):
     if (originId == None or map.getNodo(originId)["tipo"] != "habitaciones"):
         raise Exception("Origen no encontrado")
 
+    # Calculate route to destiny room
     route = calculate_route(map, origin_room, dest_room)
     absolute_route = get_direcciones(map, route)
-    colores = color(map, route)
-    giros = get_giros(absolute_route, grados, colores)
+    colores = appendNodeType(map, route)
+    giros: list[str] = get_giros(absolute_route, grados, colores)
 
-    return giros
+    # Calculate route to from destiny room to origin room
+    return_route = calculate_route(map, dest_room, origin_room)
+    return_absolute_route = get_direcciones(map, return_route)
+    return_types = appendNodeType(map, return_route)
+    return_giros = get_giros(return_absolute_route, int(
+        giros[-1].split(".")[0]), return_types)
+
+    blocked = has_exit(map, giros)
+    return_giros[0] = return_giros[0] + "." + str(blocked)
+
+    return giros, return_giros
+
+
+if __name__ == "__main__":
+    print("From 'hall' to '03'")
+    route, return_route = route_to_room("hall", "57")
+    print(route, "\n")
+
+    print("From '03' to 'hall'")
+    print(return_route)

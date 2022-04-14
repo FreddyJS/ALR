@@ -11,7 +11,7 @@ const RoomPage = () => {
   const [roomNumber, setRoomNumber] = React.useState('');
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [wrongRoomNumber, setWrongRoomNumber] = React.useState(false);
-  const [route, setRoute] = React.useState([]);
+  const [route, setRoute] = React.useState();
 
   const [inPath, setInPath] = React.useState(false);
   const [nextDirection, setNextDirection] = React.useState('');
@@ -35,7 +35,7 @@ const RoomPage = () => {
 
     if (route) {
       console.log("Route:", route);
-      setRoute(route.route);
+      setRoute(route);
       setIsModalOpen(true);
     } else {
       setWrongRoomNumber(true);
@@ -44,14 +44,14 @@ const RoomPage = () => {
 
   const onModalSubmit = () => {
     setInPath(true);
-    setNextDirection(route[0]);
+    setNextDirection(route.route[0]);
 
     const data = {
       type: 'to.robot',
       message: {
         type: 'start',
         room: roomNumber,
-        route: route,
+        route: route
       }
     };
     

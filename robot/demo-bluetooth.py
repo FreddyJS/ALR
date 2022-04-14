@@ -1,9 +1,9 @@
 import time
 
 import picar
-from picar import front_wheels
-from picar import back_wheels
-from LineFollower import LineFollower
+from .wheels import Front_Wheels, Back_Wheels
+from .sensors.LineFollower import LineFollower
+from .sensors.UltrasonicSensor import UltrasonicSensor
 
 import config
 import bluetooth.scanner as scanner
@@ -15,10 +15,14 @@ DEVICE_NAME = "HuaweiAP"
 # TODO: create flag --no-robot to test connection without robot
 NO_ROBOT = False
 
-LF_REFERENCES = config.LINE_FOLLOWER_REFERENCES
-rssi_reference = 0
-forward_speed = config.PICAR_MAX_SPEED
+
+lf = LineFollower()
+lf.references = config.LINE_FOLLOWER_REFERENCES
+ultrasonicSensor = UltrasonicSensor(config.ULTRASONIC_SENSOR_CHANNEL)
+
+forward_speed = config.PICAR_MED_SPEED
 backward_speed = 70
+rssi_reference = 0
 turning_angle = 40
 
 max_off_track_count = 40
@@ -26,8 +30,8 @@ delay = 0.0005
 
 
 def processSample(message: str):
-    global forward_speed, rssi_reference
-    sample = int(message)
+    global rssi_reference, forward_speed
+    sample = int(message.split(":")[0])
 
     if rssi_reference == 0:
         rssi_reference = sample
@@ -40,15 +44,13 @@ def processSample(message: str):
             return
 
         diff = abs(diff)
-        if diff >= 0 and diff <= 10:
-            forward_speed = 100
-        elif diff > 10 and diff <= 25:
-            forward_speed = 80
-        elif diff > 25 and diff <= 50:
-            forward_speed = 60
-        elif diff > 50 and diff <= 75:
-            forward_speed = 40
-        else:
+        if diff > 0 and diff < 5:
+            forward_speed = config.PICAR_MED_SPEED
+        elif diff >= 5 and diff < 10:
+            forward_speed = int(config.PICAR_MED_SPEED/2)
+        elif diff >= 10 and diff < 15:
+            forward_speed = int(config.PICAR_MED_SPEED/3)
+        elif diff >= 15:
             forward_speed = 0
 
 
@@ -68,34 +70,44 @@ if NO_ROBOT:
 picar.setup()
 scanner.start(DEVICE_NAME, processSample)
 
-fw = front_wheels.Front_Wheels(db='config')
-bw = back_wheels.Back_Wheels(db='config')
-lf = LineFollower()
+fw = Front_Wheels()
+bw = Back_Wheels()
 
-lf.references = LF_REFERENCES
 fw.ready()
 bw.ready()
 fw.turning_max = 45
 
 
 def updateSpeed():
-    bw.speed = forward_speed
-    bw.forward()
+    if bw.speed != forward_speed:
+        bw.speed = forward_speed
+        bw.forward()
 
 
 def main():
-    global turning_angle
+    global turning_angle, forward_speed
     off_track_count = 0
     bw.speed = forward_speed
+    obstacle = False
 
-    a_step = 3
-    b_step = 5
-    c_step = 10
-    d_step = 20
+    a_step = config.PICAR_A_STEP
+    b_step = config.PICAR_B_STEP
+    c_step = config.PICAR_C_STEP
+    d_step = config.PICAR_D_STEP
     bw.forward()
     while True:
+        distance = ultrasonicSensor.distance()
+        if (distance <= config.ULTRASONIC_SENSOR_MIN_DISTANCE and distance >= 0) or (distance < 0 and obstacle):
+            obstacle = True
+            forward_speed = 0
+            bw.stop()
+            continue
+        else:
+            obstacle = False
+
+        updateSpeed()
         lf_status = lf.read_digital()
-        print(lf_status)
+
         # Angle calculate
         if lf_status == [0, 0, 1, 0, 0]:
             step = 0
@@ -112,17 +124,14 @@ def main():
         if lf_status == [0, 0, 1, 0, 0]:
             off_track_count = 0
             fw.turn(90)
-            updateSpeed()
         # turn right
         elif lf_status in ([0, 1, 1, 0, 0], [0, 1, 0, 0, 0], [1, 1, 0, 0, 0], [1, 0, 0, 0, 0]):
             off_track_count = 0
             turning_angle = int(90 - step)
-            updateSpeed()
         # turn left
         elif lf_status in ([0, 0, 1, 1, 0], [0, 0, 0, 1, 0], [0, 0, 0, 1, 1], [0, 0, 0, 0, 1]):
             off_track_count = 0
             turning_angle = int(90 + step)
-            updateSpeed()
         elif lf_status == [0, 0, 0, 0, 0]:
             off_track_count += 1
             if off_track_count > max_off_track_count:
