@@ -138,13 +138,13 @@ def wait_end_of_crosspath():
 
 def turn_left():
     fw.turn(90 - 45)
-    lf.wait_tile_status(status=[0, 0, 0, 0, 1])
+    lf.wait_no_tile_center()
     lf.wait_tile_center()
 
 
 def turn_right():
     fw.turn(90 + 45)
-    lf.wait_tile_status(status=[1, 0, 0, 0, 0])
+    lf.wait_no_tile_center()
     lf.wait_tile_center()
 
 
@@ -188,21 +188,21 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
                 bw.forward()
 
                 print("The robot has reached a crosspath")
-                wait_end_of_crosspath()
-                print("The robot has passed the crosspath")
+                #wait_end_of_crosspath()
+                #print("The robot has passed the crosspath")
 
                 if action.startswith("recto"):
                     # We have to pass two crosspaths
+                    wait_end_of_crosspath()
                     print("Esperando a pasar el segundo cruce...")
                     wait_for_crosspath()
                     wait_end_of_crosspath()
                     print("El robot ha pasado el segundo cruce, continuando recto")
 
                 elif action.startswith("izquierda"):
+                    wait_end_of_crosspath()
                     print("Esperando al segundo cruce para girar a la izquierda")
                     wait_for_crosspath()
-                    wait_end_of_crosspath()
-
                     print("El robot ha pasado el segundo cruce, girando a la izquierda")
 
                     turn_left()
@@ -220,16 +220,19 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
                     print("Saliendo del cruce")
 
                 elif action.startswith("vuelta"):
+                    wait_end_of_crosspath()
                     print("Pasillo con salida. Girando a la izquierda dos veces...")
                     wait_for_crosspath()
                     fw.turn(90-45)
                     lf.wait_no_tile_center()
                     print("Sensor del medio no detectando linea")
+                    lf.wait_tile_center()
 
 
                     wait_for_crosspath()
                     fw.turn(90-45)  
                     lf.wait_no_tile_center()
+                    lf.wait_tile_center()
 
                     print("El robot ha pasado el segundo cruce, girando a la izquierda")
                     wait_for_crosspath()
