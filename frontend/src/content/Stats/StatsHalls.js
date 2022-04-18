@@ -22,7 +22,7 @@ export default function StatsHalls() {
       getData();
     }
     
-  }, []);
+  }, [loadingData]);
 
   const columns = useColumns2();
   const table = useTable({ columns, data }, useSortBy);

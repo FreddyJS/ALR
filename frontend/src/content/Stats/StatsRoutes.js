@@ -23,7 +23,7 @@ export default function StatsRoutes() {
       getData();
     }
     
-  }, []);
+  }, [loadingData]);
 
   const columns = useColumns();
   const table = useTable({ columns, data }, useSortBy);
