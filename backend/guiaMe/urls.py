@@ -19,11 +19,13 @@ from django.urls import include, path
 from routes import views as routes_views
 from robots import views as robots_views
 from stats import views as stats_views
+from statsHalls import views as statsHalls_views
 
 router = routers.DefaultRouter()
 router.register('routes', routes_views.RoutesViewSet)
 router.register('robots', robots_views.RobotsViewSet)
 router.register('stats', stats_views.StatsViewSet)
+router.register('statsHalls', statsHalls_views.StatsHallsViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

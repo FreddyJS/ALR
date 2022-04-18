@@ -21,6 +21,7 @@ export default function Stats() {
     if (loadingData) {
       getData();
     }
+    
   }, []);
 
   const columns = useColumns();
@@ -45,13 +46,11 @@ export default function Stats() {
                 // Aplicamos las propiedades de ordenación a cada columna
                 <th
                   {...column.getHeaderProps(column.getSortByToggleProps())}
-                  className={
-                    column.isSorted
-                      ? column.isSortedDesc
-                        ? "desc"
-                        : "asc"
-                      : ""
-                  }
+                  className={column.isSorted
+                    ? column.isSortedDesc
+                      ? "desc"
+                      : "asc"
+                    : ""}
                 >
                   {column.render("Header")}
                 </th>
@@ -75,17 +74,13 @@ export default function Stats() {
                       // Aplicamos las propiedades de las celdas
                       return (
                         <td {...cell.getCellProps()}>
-                          {
-                            cell.render("Cell")
-                          }
+                          {cell.render("Cell")}
                         </td>
                       );
-                    })
-                  }
+                    })}
                 </tr>
               );
-            })
-          }
+            })}
         </tbody>
       </table>
     </div>

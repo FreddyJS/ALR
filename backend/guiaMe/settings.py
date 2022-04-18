@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "routes",
     "robots",
     "stats",
+    "statsHalls",
 ]
 
 MIDDLEWARE = [
