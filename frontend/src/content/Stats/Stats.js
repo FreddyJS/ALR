@@ -1,15 +1,9 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { useTable, useSortBy } from "react-table";
-import useColumns from "./hooks/useColumns";
 import StatsHalls from "./StatsHalls";
 import StatsRoutes from "./StatsRoutes";
 
 import "./styles.css";
 
 export default function Stats() {
-  
-
   return (
     <>
     <div className="textt">Estadísticas de las rutas</div>
