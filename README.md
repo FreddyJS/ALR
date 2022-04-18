@@ -1,5 +1,5 @@
 # guiaMe
-Automated Leading Robot
+Automated Guiding Robot
 
 ## `docker-compose up --build`
 Build the docker images and starts the front and back services
