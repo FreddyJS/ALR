@@ -165,7 +165,7 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
         if not following:
             print("The robot has stopped. Probably cause an obstacle")
         else:
-            # Measuring color
+            # Room Detection
             red = is_red()
             if red and not in_red:
                 room_count += 1
@@ -187,6 +187,7 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
                 in_red = False
                 print("Passed room: " + current_hall)
 
+            # Crosspath Detection
             if lf_status == [1, 1, 1, 1, 1]:
                 action = route.pop(0)
 

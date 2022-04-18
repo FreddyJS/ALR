@@ -165,19 +165,29 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
         if not following:
             print("The robot has stopped. Probably cause an obstacle")
         else:
-            # Measuring color
+            # Room Detection
             red = is_red()
             if red and not in_red:
-                in_red = True
                 room_count += 1
-                current_hall = current_hall.split(
-                    "_")[0] + "_" + str(room_count)
+                in_red = True
 
-                print("Entered room " + current_hall)
+                current_hall = current_hall.split("_")[0]
+                current_hall = current_hall + "_" + str(room_count)
+                print("Detected room, current_hall: " + current_hall)
+                api.update_current_hall(current_hall)
+
+                if "HABITACION" in route[0]:
+                    action = route.pop(0)
+                    if "recto" not in action:
+                        print("Reched the destiny room!")
+                        bw.stop()
+                        return
+
             elif not red and in_red:
                 in_red = False
-                print("Left room " + current_hall)
+                print("Passed room: " + current_hall)
 
+            # Crosspath Detection
             if lf_status == [1, 1, 1, 1, 1]:
                 if len(route) == 0:
                     return
@@ -188,7 +198,7 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
                 bw.forward()
 
                 print("The robot has reached a crosspath")
-                #wait_end_of_crosspath()
+                # wait_end_of_crosspath()
                 #print("The robot has passed the crosspath")
 
                 if action.startswith("recto"):
@@ -228,9 +238,8 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
                     print("Sensor del medio no detectando linea")
                     lf.wait_tile_center()
 
-
                     wait_for_crosspath()
-                    fw.turn(90-45)  
+                    fw.turn(90-45)
                     lf.wait_no_tile_center()
                     lf.wait_tile_center()
 
@@ -238,15 +247,18 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
                     wait_for_crosspath()
                     wait_end_of_crosspath()
                     print("El robot ha pasado el tercer cruce, continuando recto")
+                else:
+                    print("Unexpected action for crosspath: " + action)
+                    raise KeyboardInterrupt
 
                 forward_speed = config.PICAR_MED_SPEED
-                if len(route) > 0:
-                    current_hall = f"pasillo{action[-1]}{route[0][-1]}"
-                    print("Continuando recto, nuevo pasillo: " + current_hall)
-                else:
-                    bw.stop()
-                    print("Final de la ruta")
-                    return
+                for step in route:
+                    if "CRUCE" in step:
+                        current_hall = f"pasillo{action[-1]}{step[-1]}"
+                        break
+
+                api.update_current_hall(current_hall)
+                print("Continuando recto, nuevo pasillo: " + current_hall)
 
 
 def destroy():
@@ -269,7 +281,7 @@ if __name__ == '__main__':
     api.start_ws(processMessage)
     try:
         while True:
-            #while route is None:
+            # while route is None:
             #    time.sleep(0.25)
 
             time.sleep(10)
