@@ -97,6 +97,12 @@ class LineFollower(object):
             lt_status = self.read_digital()
             if lt_status[2] == 1:
                 break
+    
+    def wait_no_tile_center(self):
+        while True:
+            lt_status = self.read_digital()
+            if lt_status[2] == 0:
+                break
 
     @property
     def references(self):
