@@ -5,8 +5,8 @@ import websocket
 from threading import Thread
 from typing import Any, Callable
 
-WS_URL = "ws://192.168.1.131:8000/ws/robot/R02/"
-API_URL = "http://192.168.1.131:8000/api/"
+WS_URL = "ws://localhost:8000/ws/robot/R02/"
+API_URL = "http://localhost:8000/api/"
 
 ws: 'ServerWebSocket' = None
 websocket.enableTrace(False)
