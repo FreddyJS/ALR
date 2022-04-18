@@ -164,7 +164,7 @@ const DashboardDev = () => {
   return (
     <div>
       <div style={{ display: "flex", flexDirection: "row", marginTop: "1rem", textAlign: "center", justifyContent: "space-around" }}>
-        {selectedShape !== null && shapes.find((s) => s.id === selectedShape) ?
+        {selectedShape !== null && shapes.find((s) => s.id === selectedShape).type === "Rect" ?
           <>
             <div><strong>Shape ID</strong> <TextInput id="change-id" labelText='' placeholder={shapes.find((s) => s.id === selectedShape).id.toString()} /></div>
             <div><strong>Shape Width</strong> <TextInput id="change-width" labelText='' placeholder={shapes.find((s) => s.id === selectedShape).width.toString()} /></div>
