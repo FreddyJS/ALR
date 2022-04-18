@@ -148,7 +148,7 @@ def turn_right():
     lf.wait_tile_center()
 
 
-def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "derecha._CRUCE_3", "izquierda._CRUCE_4"]):
+def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "derecha._CRUCE_3", "izquierda._CRUCE_4", "0._HABITACION_5"]):
     global forward_speed
     current_hall = "pasillo0"
     room_count = 0
@@ -168,19 +168,26 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
             # Measuring color
             red = is_red()
             if red and not in_red:
-                in_red = True
                 room_count += 1
-                current_hall = current_hall.split(
-                    "_")[0] + "_" + str(room_count)
+                in_red = True
 
-                print("Entered room " + current_hall)
+                current_hall = current_hall.split("_")[0]
+                current_hall = current_hall + "_" + str(room_count)
+                print("Detected room, current_hall: " + current_hall)
+                api.update_current_hall(current_hall)
+
+                if "HABITACION" in route[0]:
+                    action = route.pop(0)
+                    if "recto" not in action:
+                        print("Reched the destiny room!")
+                        bw.stop()
+                        return
+
             elif not red and in_red:
                 in_red = False
-                print("Left room " + current_hall)
+                print("Passed room: " + current_hall)
 
             if lf_status == [1, 1, 1, 1, 1]:
-                if len(route) == 0:
-                    return
                 action = route.pop(0)
 
                 forward_speed = config.PICAR_CROSSPATH_SPEED
@@ -235,15 +242,18 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
                     wait_for_crosspath()
                     wait_end_of_crosspath()
                     print("El robot ha pasado el tercer cruce, continuando recto")
+                else:
+                    print("Unexpected action for crosspath: " + action)
+                    raise KeyboardInterrupt
 
                 forward_speed = config.PICAR_MED_SPEED
-                if len(route) > 0:
-                    current_hall = f"pasillo{action[-1]}{route[0][-1]}"
-                    print("Continuando recto, nuevo pasillo: " + current_hall)
-                else:
-                    bw.stop()
-                    print("Final de la ruta")
-                    return
+                for step in route:
+                    if "CRUCE" in step:
+                        current_hall = f"pasillo{action[-1]}{step[-1]}"
+                        break
+
+                api.update_current_hall(current_hall)
+                print("Continuando recto, nuevo pasillo: " + current_hall)
 
 
 def destroy():

@@ -5,8 +5,8 @@ import websocket
 from threading import Thread
 from typing import Any, Callable
 
-WS_URL = "ws://localhost:8000/ws/robot/R02/"
-API_URL = "http://localhost:8000/api/"
+WS_URL = "ws://192.168.1.131:8000/ws/robot/R02/"
+API_URL = "http://192.168.1.131:8000/api/"
 
 ws: 'ServerWebSocket' = None
 websocket.enableTrace(False)
@@ -16,6 +16,7 @@ class ServerWebSocket(Thread):
     def __init__(self, on_message_callback) -> None:
         super().__init__()
         self.on_message_callback = on_message_callback
+        self.connected = False
         self.ws = websocket.WebSocketApp(WS_URL,
                                          on_message=self.on_message,
                                          on_error=self.on_error,
@@ -28,13 +29,18 @@ class ServerWebSocket(Thread):
         else:
             print("Unknown message type: {}".format(data["type"]))
 
+    def is_connected(self):
+        return self.connected
+
     def on_error(self, ws, error):
         print("ServerWebSocket error: {}".format(error))
 
     def on_close(self, ws, close_status_code, close_msg):
+        self.connected = False
         print("ServerWebSocket closed")
 
     def on_open(self, ws):
+        self.connected = True
         print("ServerWebSocket connected")
 
     def run(self):
@@ -58,9 +64,21 @@ def close_ws():
     ws.close()
 
 
-def get_route_by_room(room):
+def get_route_by_room(room: str):
     res = requests.get(API_URL + "routes/{}".format(room))
     return res.json()
+
+
+def update_current_hall(hall: str):
+    assert(ws.is_connected(), "WebSocket Disconnected cannot send messages")
+    data = {
+        "type": "to.ui",
+        "message": {
+            "hall": hall
+        }
+    }
+
+    ws.send(data)
 
 
 if __name__ == "__main__":
