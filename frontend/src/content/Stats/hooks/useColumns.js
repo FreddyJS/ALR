@@ -5,19 +5,23 @@ export default function useColumns() {
     () => [
       {
         Header: "ROBOT",
-        accessor: "robot"
+        accessor: "robot_id"
       },
       {
         Header: "DESTINO",
-        accessor: "destino"
+        accessor: "destiny"
       },
       {
-        Header: "HORA SALIDA",
-        accessor: "salida"
+        Header: "MINUTOS",
+        accessor: "minutes"
       },
       {
-        Header: "HORA LLEGADA",
-        accessor: "llegada"
+        Header: "SEGUNDOS",
+        accessor: "seconds"
+      },
+      {
+        Header: "MILISEGUNDOS",
+        accessor: "miliseconds"
       }
     ],
     []

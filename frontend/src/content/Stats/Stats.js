@@ -1,12 +1,29 @@
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { useTable, useSortBy } from "react-table";
-import useRows from "./hooks/useRows";
 import useColumns from "./hooks/useColumns";
 
 import "./styles.css";
 
 export default function Stats() {
+  const [loadingData, setLoadingData] = useState(true);
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    async function getData() {
+      await axios
+        .get("http://localhost:8000/api/stats/?format=json")
+        .then((response) => {
+          setData(response.data);
+          setLoadingData(false);
+        });
+    }
+    if (loadingData) {
+      getData();
+    }
+  }, []);
+
   const columns = useColumns();
-  const data = useRows();
   const table = useTable({ columns, data }, useSortBy);
 
   const {
