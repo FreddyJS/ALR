@@ -18,3 +18,10 @@ class StatsHallsViewSet(viewsets.ModelViewSet):
         # Example of how to use the channel layer in a viewset
 
         return super().list(request, *args, **kwargs)
+
+
+
+    def create(self, *args, **kwargs):
+        print("Hola")
+        
+        return super().create(*args, **kwargs)
