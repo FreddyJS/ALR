@@ -6,6 +6,7 @@ import "./styles.css";
 export default function Stats() {
   return (
     <>
+    <div></div>
     <div className="text">Estadísticas de las rutas</div>
     <StatsRoutes></StatsRoutes>
     <div className="text">Pasillos en los que se ha parado debido a obstaculos</div>
