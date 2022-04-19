@@ -68,6 +68,14 @@ def get_route_by_room(room: str):
     res = requests.get(API_URL + "routes/{}".format(room))
     return res.json()
 
+def active(active: bool, route: object):
+    data = {
+        "active": active,
+        "route": route
+    }
+
+    res = requests.put(API_URL + "robots/R02/active", data=data)
+    return res.json()
 
 def update_current_hall(hall: str):
     assert(ws.is_connected(), "WebSocket Disconnected cannot send messages")

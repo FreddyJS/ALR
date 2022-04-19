@@ -176,7 +176,6 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
             current_hall = current_hall.split("_")[0]
             current_hall = current_hall + "_" + str(room_count)
             print("Detected room, current_hall: " + current_hall)
-            api.update_current_hall(current_hall)
 
             if "HABITACION" in route[0]:
                 action = route.pop(0)
@@ -258,7 +257,6 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
                     current_hall = f"pasillo{action[-1]}{step[-1]}"
                     break
 
-            api.update_current_hall(current_hall)
             print("Continuando recto, nuevo pasillo: " + current_hall)
 
 
