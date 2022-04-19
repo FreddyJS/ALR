@@ -20,8 +20,14 @@ class StatsHallsViewSet(viewsets.ModelViewSet):
         return super().list(request, *args, **kwargs)
 
 
-
-    def create(self, *args, **kwargs):
+    @action(detail=True, methods=['put'])
+    def stopped(self, request, *args, **kwargs):
         print("Hola")
-        
-        return super().create(*args, **kwargs)
+        hall = kwargs['hall']
+        if (StatsHalls.objects.filter(hall=hall).count()==0):
+            StatsHalls.objects.create(hall=hall,stopped=1)
+        else:
+            statsHall : StatsHalls = self.get_object()
+            statsHall.stopped+=1
+            statsHall.save()
+        return self.retrieve(request, *args, **kwargs)
