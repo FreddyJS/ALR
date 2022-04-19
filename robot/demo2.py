@@ -36,6 +36,7 @@ max_off_track_count = config.LINE_FOLLOWER_MAX_OFF_TRACK_COUNT
 off_track_count = 0
 
 # Global variables
+current_hall = "pasillo0"
 forward_speed = config.PICAR_MED_SPEED
 backward_speed = 70
 turning_angle = 90
@@ -61,7 +62,7 @@ def is_blue() -> bool:
     return False if color_temp == None else color_temp < config.COLOR_SENSOR_BLUE_VALUE and color_temp > config.COLOR_SENSOR_RED_VALUE
 
 
-def follow_line() -> Tuple[bool, list]:
+def follow_line() -> List[int]:
     """ 
         Detects the line and turns the wheels to keep the line in the center. 
         Returns a boolean indicating if the line is being followed and a list with the status of the line follower.
@@ -77,10 +78,14 @@ def follow_line() -> Tuple[bool, list]:
     # Measuring distance
     if obstacle:
         bw.stop()
-        return False, []
-    else:
-        bw.speed = forward_speed
-        bw.forward()
+        api.obstacle_on_hall(current_hall)
+
+        print("Obstacle detected, current hall: " + current_hall)
+        while obstacle:
+            time.sleep(0.1)
+
+    bw.speed = forward_speed
+    bw.forward()
 
     lf_status = lf.read_digital()
 
@@ -119,19 +124,19 @@ def follow_line() -> Tuple[bool, list]:
         off_track_count = 0
 
     fw.turn(turning_angle)
-    return True, lf_status
+    return lf_status
 
 
 def wait_for_crosspath():
     while True:
-        _, lf_status = follow_line()
+        lf_status = follow_line()
         if lf_status == [1, 1, 1, 1, 1]:
             break
 
 
 def wait_end_of_crosspath():
     while True:
-        _, lf_status = follow_line()
+        lf_status = follow_line()
         if lf_status != [1, 1, 1, 1, 1]:
             break
 
@@ -149,8 +154,7 @@ def turn_right():
 
 
 def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "derecha._CRUCE_3", "izquierda._CRUCE_4"]):
-    global forward_speed
-    current_hall = "pasillo0"
+    global forward_speed, current_hall
     room_count = 0
     in_red = False
 
@@ -161,104 +165,101 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
         route.pop(0)
 
     while True:
-        following, lf_status = follow_line()
-        if not following:
-            print("The robot has stopped. Probably cause an obstacle")
-        else:
-            # Room Detection
-            red = is_red()
-            if red and not in_red:
-                room_count += 1
-                in_red = True
+        lf_status = follow_line()
 
-                current_hall = current_hall.split("_")[0]
-                current_hall = current_hall + "_" + str(room_count)
-                print("Detected room, current_hall: " + current_hall)
-                api.update_current_hall(current_hall)
+        # Room Detection
+        red = is_red()
+        if red and not in_red:
+            room_count += 1
+            in_red = True
 
-                if "HABITACION" in route[0]:
-                    action = route.pop(0)
-                    if "recto" not in action:
-                        print("Reched the destiny room!")
-                        bw.stop()
-                        return
+            current_hall = current_hall.split("_")[0]
+            current_hall = current_hall + "_" + str(room_count)
+            print("Detected room, current_hall: " + current_hall)
+            api.update_current_hall(current_hall)
 
-            elif not red and in_red:
-                in_red = False
-                print("Passed room: " + current_hall)
-
-            # Crosspath Detection
-            if lf_status == [1, 1, 1, 1, 1]:
-                if len(route) == 0:
-                    return
+            if "HABITACION" in route[0]:
                 action = route.pop(0)
+                if "recto" not in action:
+                    print("Reched the destiny room!")
+                    bw.stop()
+                    return
+        elif not red and in_red:
+            in_red = False
+            print("Passed room: " + current_hall)
 
-                forward_speed = config.PICAR_CROSSPATH_SPEED
-                bw.speed = forward_speed
-                bw.forward()
+        # Crosspath Detection
+        if lf_status == [1, 1, 1, 1, 1]:
+            if len(route) == 0:
+                return
+            action = route.pop(0)
 
-                print("The robot has reached a crosspath")
-                # wait_end_of_crosspath()
-                #print("The robot has passed the crosspath")
+            forward_speed = config.PICAR_CROSSPATH_SPEED
+            bw.speed = forward_speed
+            bw.forward()
 
-                if action.startswith("recto"):
-                    # We have to pass two crosspaths
-                    wait_end_of_crosspath()
-                    print("Esperando a pasar el segundo cruce...")
-                    wait_for_crosspath()
-                    wait_end_of_crosspath()
-                    print("El robot ha pasado el segundo cruce, continuando recto")
+            print("The robot has reached a crosspath")
+            # wait_end_of_crosspath()
+            #print("The robot has passed the crosspath")
 
-                elif action.startswith("izquierda"):
-                    wait_end_of_crosspath()
-                    print("Esperando al segundo cruce para girar a la izquierda")
-                    wait_for_crosspath()
-                    print("El robot ha pasado el segundo cruce, girando a la izquierda")
+            if action.startswith("recto"):
+                # We have to pass two crosspaths
+                wait_end_of_crosspath()
+                print("Esperando a pasar el segundo cruce...")
+                wait_for_crosspath()
+                wait_end_of_crosspath()
+                print("El robot ha pasado el segundo cruce, continuando recto")
 
-                    turn_left()
+            elif action.startswith("izquierda"):
+                wait_end_of_crosspath()
+                print("Esperando al segundo cruce para girar a la izquierda")
+                wait_for_crosspath()
+                print("El robot ha pasado el segundo cruce, girando a la izquierda")
 
-                    print(
-                        "El robot ha pasado el segundo cruce. Esperando al tercer cruce...")
-                    wait_for_crosspath()
-                    wait_end_of_crosspath()
-                    print(
-                        "El robot ha pasado el tercer cruce, continuando recto (fin de giro izquierda)")
+                turn_left()
 
-                elif action.startswith("derecha"):
-                    print("Girando a la derecha")
-                    turn_right()
-                    print("Saliendo del cruce")
+                print(
+                    "El robot ha pasado el segundo cruce. Esperando al tercer cruce...")
+                wait_for_crosspath()
+                wait_end_of_crosspath()
+                print(
+                    "El robot ha pasado el tercer cruce, continuando recto (fin de giro izquierda)")
 
-                elif action.startswith("vuelta"):
-                    wait_end_of_crosspath()
-                    print("Pasillo con salida. Girando a la izquierda dos veces...")
-                    wait_for_crosspath()
-                    fw.turn(90-45)
-                    lf.wait_no_tile_center()
-                    print("Sensor del medio no detectando linea")
-                    lf.wait_tile_center()
+            elif action.startswith("derecha"):
+                print("Girando a la derecha")
+                turn_right()
+                print("Saliendo del cruce")
 
-                    wait_for_crosspath()
-                    fw.turn(90-45)
-                    lf.wait_no_tile_center()
-                    lf.wait_tile_center()
+            elif action.startswith("vuelta"):
+                wait_end_of_crosspath()
+                print("Pasillo con salida. Girando a la izquierda dos veces...")
+                wait_for_crosspath()
+                fw.turn(90-45)
+                lf.wait_no_tile_center()
+                print("Sensor del medio no detectando linea")
+                lf.wait_tile_center()
 
-                    print("El robot ha pasado el segundo cruce, girando a la izquierda")
-                    wait_for_crosspath()
-                    wait_end_of_crosspath()
-                    print("El robot ha pasado el tercer cruce, continuando recto")
-                else:
-                    print("Unexpected action for crosspath: " + action)
-                    raise KeyboardInterrupt
+                wait_for_crosspath()
+                fw.turn(90-45)
+                lf.wait_no_tile_center()
+                lf.wait_tile_center()
 
-                forward_speed = config.PICAR_MED_SPEED
-                for step in route:
-                    if "CRUCE" in step:
-                        current_hall = f"pasillo{action[-1]}{step[-1]}"
-                        break
+                print("El robot ha pasado el segundo cruce, girando a la izquierda")
+                wait_for_crosspath()
+                wait_end_of_crosspath()
+                print("El robot ha pasado el tercer cruce, continuando recto")
+            else:
+                print("Unexpected action for crosspath: " + action)
+                raise KeyboardInterrupt
 
-                api.update_current_hall(current_hall)
-                print("Continuando recto, nuevo pasillo: " + current_hall)
+            forward_speed = config.PICAR_MED_SPEED
+            for step in route:
+                if "CRUCE" in step:
+                    current_hall = f"pasillo{action[-1]}{step[-1]}"
+                    break
+
+            api.update_current_hall(current_hall)
+            print("Continuando recto, nuevo pasillo: " + current_hall)
 
 
 def destroy():

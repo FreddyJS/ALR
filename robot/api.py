@@ -81,6 +81,11 @@ def update_current_hall(hall: str):
     ws.send(data)
 
 
+def obstacle_on_hall(hall: str):
+    res = requests.put(API_URL + "statsHalls/{}/stopped".format(hall))
+    return res.json()
+
+
 if __name__ == "__main__":
     def on_message(message):
         print("Received message: {}".format(message))
