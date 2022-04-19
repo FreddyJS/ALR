@@ -1,9 +1,9 @@
 import time
 
 import picar
-from .wheels import Front_Wheels, Back_Wheels
-from .sensors.LineFollower import LineFollower
-from .sensors.UltrasonicSensor import UltrasonicSensor
+from wheels import Front_Wheels, Back_Wheels
+from sensors.LineFollower import LineFollower
+from sensors.UltrasonicSensor import UltrasonicSensor
 
 import config
 import bluetooth.scanner as scanner
