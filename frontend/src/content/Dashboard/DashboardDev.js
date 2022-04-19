@@ -1,9 +1,11 @@
 import React from 'react';
 import './dashboard.scss';
 
-import { Button, Checkbox, TextInput } from 'carbon-components-react';
+import background from './background.png';
 
-import { Stage, Layer, Text } from 'react-konva';
+
+import { Stage, Layer, Text, Image } from 'react-konva';
+import { Button, Checkbox, TextInput } from 'carbon-components-react';
 import Rectangle from './Rectangle';
 
 
@@ -46,6 +48,8 @@ const defaultStickerProps = {
 const DashboardDev = () => {
   // Stage refence to export map to JSON
   const stageRef = React.useRef();
+  const backgroundImage = new window.Image();
+  backgroundImage.src = background;
 
   // List of shapes in the stage and selected shape id
   const [shapes, setShapes] = React.useState([]);
@@ -233,6 +237,7 @@ const DashboardDev = () => {
         <div style={{ border: "1px solid" }}>
           <Stage width={1280} height={720} ref={stageRef}>
             <Layer>
+              <Image image={backgroundImage} width={1280} height={720} />
               {shapes.map((shape, index) => {
                 const isSelected = selectedShape === shape.id;
                 if (shape.type === "Rect") {
