@@ -281,10 +281,15 @@ if __name__ == '__main__':
                 time.sleep(0.25)
 
             print("Starting route to room: " + route["dest_room"])
-            follow_route(route=route["route"])
+            api.active(True, route)
+            api.update_current_hall(current_hall)
 
-            print("Finished route. Returning to hall...")
+            follow_route(route=route["route"])
+            print("Finished route")
+            api.active(False, route)
             time.sleep(5)
+
+            print("Starting route to room: " + route["origin_room"])
             follow_route(route=route["return_route"])
             print("Finished return route")
 

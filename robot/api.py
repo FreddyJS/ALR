@@ -68,17 +68,22 @@ def get_route_by_room(room: str):
     res = requests.get(API_URL + "routes/{}".format(room))
     return res.json()
 
-
-def update_current_hall(hall: str):
-    assert(ws.is_connected(), "WebSocket Disconnected cannot send messages")
+def active(active: bool, route: object):
     data = {
-        "type": "to.ui",
-        "message": {
-            "hall": hall
-        }
+        "active": active,
+        "route": route
     }
 
-    ws.send(data)
+    res = requests.put(API_URL + "robots/R02/active", data=data)
+    return res.json()
+
+def update_current_hall(hall: str):
+    data = {
+        hall: hall
+    }
+
+    res = requests.put(API_URL + "robots/R02/hall", data=data)
+    return res.json()
 
 
 def obstacle_on_hall(hall: str):

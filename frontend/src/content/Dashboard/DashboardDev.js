@@ -1,9 +1,11 @@
 import React from 'react';
 import './dashboard.scss';
 
-import { Button, Checkbox, TextInput } from 'carbon-components-react';
+import background from './background.png';
 
-import { Stage, Layer, Text } from 'react-konva';
+
+import { Stage, Layer, Text, Image } from 'react-konva';
+import { Button, Checkbox, TextInput } from 'carbon-components-react';
 import Rectangle from './Rectangle';
 
 
@@ -46,6 +48,8 @@ const defaultStickerProps = {
 const DashboardDev = () => {
   // Stage refence to export map to JSON
   const stageRef = React.useRef();
+  const backgroundImage = new window.Image();
+  backgroundImage.src = background;
 
   // List of shapes in the stage and selected shape id
   const [shapes, setShapes] = React.useState([]);
@@ -171,6 +175,7 @@ const DashboardDev = () => {
             <div><strong>Shape Height</strong> <TextInput id="change-height" labelText='' placeholder={shapes.find((s) => s.id === selectedShape).height.toString()} /></div>
             <div><strong>Shape X-Position</strong> <TextInput id="change-x-pos" labelText='' placeholder={shapes.find((s) => s.id === selectedShape).x.toString()} /></div>
             <div><strong>Shape Y-Position</strong> <TextInput id="change-y-pos" labelText='' placeholder={shapes.find((s) => s.id === selectedShape).y.toString()} /></div>
+            <div><strong>Shape Color</strong> <TextInput id="change-color" labelText='' placeholder={shapes.find((s) => s.id === selectedShape).fill} /></div>
 
             <Button onClick={() => {
               const new_id = document.getElementById("change-id").value
@@ -178,6 +183,7 @@ const DashboardDev = () => {
               const new_height = document.getElementById("change-height").value
               const new_x = document.getElementById("change-x-pos").value
               const new_y = document.getElementById("change-y-pos").value
+              const new_color = document.getElementById("change-color").value
 
               const new_shapes = shapes.map((shape) => {
                 if (shape.id === selectedShape) {
@@ -186,6 +192,7 @@ const DashboardDev = () => {
                   shape.height = new_height !== '' ? parseInt(new_height) : shape.height
                   shape.x = new_x !== '' ? parseInt(new_x) : shape.x
                   shape.y = new_y !== '' ? parseInt(new_y) : shape.y
+                  shape.fill = new_color !== '' ? new_color : shape.fill
                 }
 
                 return shape
@@ -194,10 +201,11 @@ const DashboardDev = () => {
               setShapes(new_shapes)
               selectShape(new_id !== '' ? new_id : selectedShape)
             }}
-              style={{ marginLeft: "1rem" }}
+              style={{ marginLeft: "1rem", padding: "1rem" }}
             >
               Save Shape
             </Button>
+            <Button onClick={() => selectShape(null)} style={{ marginLeft: "10px", padding: "1rem" }}>Unselect</Button>
           </>
           :
           <></>
@@ -220,7 +228,12 @@ const DashboardDev = () => {
           <div>
             <TextInput id="text-input" labelText="" placeholder="Hello World" onChange={(e) => setNewTextData(e.target.value)} value={newTextData} />
           </div>
-          <Button onClick={() => setShapes(shapes.slice(0, shapes.length - 1))} style={{ margin: "1px" }}>Del Last</Button>
+          <Button onClick={() => {
+            if (selectedShape === shapes[shapes.length - 1].id) {
+              selectShape(null)
+            }
+            setShapes(shapes.slice(0, shapes.length - 1))
+          }} style={{ margin: "1px" }}>Del Last</Button>
           <Button onClick={() => exportCanvasToJSON()} style={{ margin: "1px" }}>Export</Button>
           {stageRef.current &&
             <>
@@ -233,6 +246,7 @@ const DashboardDev = () => {
         <div style={{ border: "1px solid" }}>
           <Stage width={1280} height={720} ref={stageRef}>
             <Layer>
+              <Image image={backgroundImage} width={1280} height={720} />
               {shapes.map((shape, index) => {
                 const isSelected = selectedShape === shape.id;
                 if (shape.type === "Rect") {

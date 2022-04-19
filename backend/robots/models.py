@@ -9,4 +9,4 @@ class Robot(models.Model):
   ui_channel = models.TextField(null=True)
   active = models.BooleanField(default=False)
   route = models.ForeignKey(Route, on_delete=models.SET_NULL, null=True)
-  hall = models.IntegerField(default=0) # TODO: Change to a foreign key to a hall
+  hall = models.TextField(default="BASE")

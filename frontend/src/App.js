@@ -16,7 +16,7 @@ import Stats from './content/Stats/Stats';
 function App() {
   return (
     <>
-      <PageHeader/>
+      {!window.location.href.includes("room") && <PageHeader/>}
       <Content>
         <div className="room-page__header">
           <h1>GuiaMe: Automated Guiding Robot</h1>
