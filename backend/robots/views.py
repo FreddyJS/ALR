@@ -44,8 +44,8 @@ class RobotsViewSet(viewsets.ModelViewSet):
         robot.save()
 
         channel_layer: InMemoryChannelLayer = get_channel_layer()
-        async_to_sync(channel_layer.send)(robot.ui_channel, {
-            'type': 'to.ui',
+        async_to_sync(channel_layer.group_send)("dashboard", {
+            'type': 'to.dashboard',
             'hall': robot.hall
         })
 
@@ -64,10 +64,15 @@ class RobotsViewSet(viewsets.ModelViewSet):
         robot.save()
 
         channel_layer: InMemoryChannelLayer = get_channel_layer()
-        async_to_sync(channel_layer.send)(robot.ui_channel, {
+        data = {
             'type': 'to.ui',
             'active': robot.active,
             'route': route
-        })
+        }
+
+        async_to_sync(channel_layer.send)(robot.ui_channel, data)
+
+        data["type"] = "to.dashboard"
+        async_to_sync(channel_layer.group_send)("dashboard", data)
 
         return self.retrieve(request, *args, **kwargs)

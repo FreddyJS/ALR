@@ -10,5 +10,9 @@ UISocket.onmessage = (event) => {
   console.log("UISocket Received: ", data);
 };
 
+const dashboardSocket = () => {
+  return new WebSocket('ws://localhost:8000/ws/dashboard/');
+}
 
-export { UISocket, RobotSocket };
+
+export { UISocket, RobotSocket, dashboardSocket };

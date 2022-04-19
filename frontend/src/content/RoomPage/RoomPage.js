@@ -1,4 +1,5 @@
 import React from 'react';
+import robot from './robot.png'
 
 import { RobotSocket, UISocket } from '../../sockets';
 import { Button, Tile, Modal } from 'carbon-components-react';
@@ -8,6 +9,7 @@ import RoomInput from '../../components/RoomInput';
 import { AiOutlineArrowUp, AiOutlineArrowRight, AiOutlineArrowDown, AiOutlineArrowLeft } from "react-icons/ai";
 
 const RoomPage = () => {
+  const debug = false;
   const [roomNumber, setRoomNumber] = React.useState('');
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [wrongRoomNumber, setWrongRoomNumber] = React.useState(false);
@@ -61,10 +63,12 @@ const RoomPage = () => {
 
   return(
     <div className="room-page">
-      <div style={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", marginBottom: "10px"}}>
-        <Button style={{margin: "0.1rem"}} onClick={() => sendHelllo("UI")}> Client Message </Button>
-        <Button style={{margin: "0.1rem"}} onClick={() => sendHelllo("Robot")}> Robot Message </Button>    
-      </div>
+      {debug &&
+        <div style={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", marginBottom: "10px"}}>
+          <Button style={{margin: "0.1rem"}} onClick={() => sendHelllo("UI")}> Client Message </Button>
+          <Button style={{margin: "0.1rem"}} onClick={() => sendHelllo("Robot")}> Robot Message </Button>    
+        </div>
+      }
 
       {isModalOpen && (
         <Modal
@@ -90,14 +94,16 @@ const RoomPage = () => {
           <RoomInput onSubmit={() => onRoomSubmit()} onChange={(room) => {setRoomNumber(room); setWrongRoomNumber(false);}} value={roomNumber} />
         :
           <div>
-            <h4>En el próximo cruce: {nextDirection.split(".")[0]}</h4>
-            {nextDirection.startsWith('recto') && <AiOutlineArrowUp style={{ width: "75%", height: "75%", fill: "green"}}/>}
-            {nextDirection.startsWith('derecha') && <AiOutlineArrowRight style={{ width: "75%", height: "75%", fill: "green"}}/>}
-            {nextDirection.startsWith('atras') && <AiOutlineArrowDown style={{ width: "75%", height: "75%", fill: "green"}}/>}
-            {nextDirection.startsWith('izquierda') && <AiOutlineArrowLeft style={{ width: "75%", height: "75%", fill: "green"}}/>}
+            <h4>En el próximo cruce: <strong>{nextDirection.split(".")[0]}</strong></h4>
+            {nextDirection.startsWith('recto') && <AiOutlineArrowUp style={{ width: "70%", height: "70%", fill: "green"}}/>}
+            {nextDirection.startsWith('derecha') && <AiOutlineArrowRight style={{ width: "70%", height: "70%", fill: "green"}}/>}
+            {nextDirection.startsWith('atras') && <AiOutlineArrowDown style={{ width: "70%", height: "70%", fill: "green"}}/>}
+            {nextDirection.startsWith('izquierda') && <AiOutlineArrowLeft style={{ width: "70%", height: "70%", fill: "green"}}/>}
           </div>
         }
+
       </Tile>
+      <img src={robot} alt="robot"/>
     </div>
   )
 };

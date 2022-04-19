@@ -78,15 +78,12 @@ def active(active: bool, route: object):
     return res.json()
 
 def update_current_hall(hall: str):
-    assert(ws.is_connected(), "WebSocket Disconnected cannot send messages")
     data = {
-        "type": "to.ui",
-        "message": {
-            "hall": hall
-        }
+        hall: hall
     }
 
-    ws.send(data)
+    res = requests.put(API_URL + "robots/R02/hall", data=data)
+    return res.json()
 
 
 def obstacle_on_hall(hall: str):

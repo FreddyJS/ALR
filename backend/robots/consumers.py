@@ -2,7 +2,6 @@ import json
 import string
 
 from .models import Robot
-from channels.layers import get_channel_layer
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 
@@ -21,7 +20,8 @@ class RobotConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def create_robot(self, robot_id: str, robot_channel: str, ui_channel: str = None) -> Robot:
-        robot = Robot(robot_id=robot_id, robot_channel=robot_channel, ui_channel=ui_channel)
+        robot = Robot(robot_id=robot_id,
+                      robot_channel=robot_channel, ui_channel=ui_channel)
         robot.save()
         return robot
 
@@ -34,13 +34,23 @@ class RobotConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
         print(self.channel_layer)
-        self.robot_id: string = self.scope['url_route']['kwargs']['robot_id']
-        self.connection_type: string = self.scope['url_route']['kwargs']['connection_type']
-        print("A connection was made: robot_name: {}, connection_type: {}".format(self.robot_id, self.connection_type))
+        try:
+            self.robot_id: string = self.scope['url_route']['kwargs']['robot_id']
+            self.connection_type: string = self.scope['url_route']['kwargs']['connection_type']
+        except KeyError:
+            self.connection_type = "dashboard" if "dashboard" in self.scope['raw_path'].decode(
+            ) else "None"
+            self.robot_id = "dashboard"
+
+        print("A connection was made: robot_name: {}, connection_type: {}".format(
+            self.robot_id, self.connection_type))
 
         self.robot: Robot = await self.get_robot(self.robot_id)
 
-        if (self.connection_type == "robot"):
+        if (self.connection_type == "dashboard"):
+            await self.channel_layer.group_add("dashboard", self.channel_name)
+            await self.accept()
+        elif (self.connection_type == "robot"):
             if (self.robot is None):
                 # Create a new robot
                 self.robot: Robot = await self.create_robot(self.robot_id, self.channel_name)
@@ -57,26 +67,28 @@ class RobotConsumer(AsyncWebsocketConsumer):
                 await self.close()
             else:
                 # Robot found, UI can stablish the connection
-                self.robot = await self.update_robot(self.robot, {'ui_channel': self.channel_name})
-                
+                self.robot: Robot = await self.update_robot(self.robot, {'ui_channel': self.channel_name})
+
                 await self.channel_layer.group_add(self.robot.robot_id, self.channel_name)
                 await self.accept()
 
                 await self.send(text_data=json.dumps({
                     'message': "UI connected"
                 }))
-                
+
         else:
             await self.close()
 
     async def disconnect(self, close_code):
         if self.robot is not None:
             await self.channel_layer.group_discard(self.robot.robot_id, self.channel_name)
+        
+        if self.connection_type == "dashboard":
+            await self.channel_layer.group_discard("dashboard", self.channel_name)
 
     async def receive(self, text_data):
         data = json.loads(text_data)
         message_type: string = data['type']
-        print("Message Received: " + str(data['message']) + " (type: " + message_type + ")")
 
         if (message_type == "to.robot"):
             # Received message from UI, forward it to the robot
@@ -86,13 +98,12 @@ class RobotConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_send(self.robot.robot_id, data)
 
     async def to_ui(self, data: dict):
-        if (self.connection_type == "robot"):
-            return
-
-        await self.send(text_data=json.dumps(data))
+        if (self.connection_type == "ui"):
+            await self.send(text_data=json.dumps(data))
 
     async def to_robot(self, data: dict):
-        if (self.connection_type == "ui"):
-            return
+        if (self.connection_type == "robot"):
+            await self.send(text_data=json.dumps(data))
 
+    async def to_dashboard(self, data: dict):
         await self.send(text_data=json.dumps(data))

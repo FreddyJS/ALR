@@ -4,4 +4,5 @@ from .consumers import RobotConsumer
 
 websocket_urlpatterns = [
     re_path(r'ws/(?P<connection_type>\w+)/(?P<robot_id>\w+)/', RobotConsumer.as_asgi()),
+    re_path(r'ws/dashboard/', RobotConsumer.as_asgi()),
 ]

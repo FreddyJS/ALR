@@ -282,6 +282,7 @@ if __name__ == '__main__':
 
             print("Starting route to room: " + route["dest_room"])
             api.active(True, route)
+            api.update_current_hall(current_hall)
 
             follow_route(route=route["route"])
             print("Finished route")

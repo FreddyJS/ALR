@@ -306,7 +306,7 @@
         {
           "type": "Rect",
           "attrs": {
-            "id": "hall0",
+            "id": "BASE",
             "x": 392,
             "y": 591,
             "width": 100,
