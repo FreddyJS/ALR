@@ -1,6 +1,6 @@
-import json
 import time
-from typing import List, Tuple
+import threading
+from typing import List
 
 import api
 import picar
@@ -253,13 +253,9 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
                     current_hall = f"pasillo{action[-1]}{step[-1]}"
                     break
 
-            api.update_current_hall(current_hall)
+            threading.Thread(target=api.update_current_hall,
+                             args=(current_hall,)).start()
             print("Continuando recto, nuevo pasillo: " + current_hall)
-
-
-def destroy():
-    bw.stop()
-    fw.turn(90)
 
 
 def processMessage(message: object):
@@ -281,30 +277,23 @@ if __name__ == '__main__':
                 time.sleep(0.25)
 
             print("Starting route to room: " + route["dest_room"])
-            print("route:", route)
             api.active(True, route)
             api.update_current_hall(current_hall)
 
-            follow_route(route=["recto._CRUCE_2", "recto._CRUCE_2", "recto._CRUCE_2", "derecha._CRUCE_2", "0._HABITACION_2"])
+            follow_route(route=route["route"])
             print("Finished route")
             api.active(False, route)
             time.sleep(5)
 
             print("Starting route to room: " + route["origin_room"])
-            if turning_angle > 90:
-                fw.turn(85)
-            else:
-                fw.turn(95)
 
             bw.speed = config.PICAR_MED_SPEED
-            bw.forward()
-            lf.wait_tile_center()
-            
-            follow_route(route=["vuelta._CRUCE_2.False", "recto._CRUCE_1", "derecha._CRUCE_1", "recto._CRUCE_1", "recto._CRUCE_1", "0._HABITACION_2"])
+            follow_route(route=route["return_route"])
             print("Finished return route")
 
             route = None
     except KeyboardInterrupt:
+        bw.stop()
+        fw.turn(90)
         api.close_ws()
         ultrasonicSensor.kill()
-        destroy()
