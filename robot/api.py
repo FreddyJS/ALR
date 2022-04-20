@@ -65,8 +65,11 @@ def close_ws():
 
 
 def get_route_by_room(room: str):
-    res = requests.get(API_URL + "routes/{}".format(room))
-    return res.json()
+    try:
+        res = requests.get(API_URL + "routes/{}".format(room))
+        return res.json()
+    except Exception:
+        return None
 
 def active(active: bool, route: object):
     data = {
@@ -74,21 +77,30 @@ def active(active: bool, route: object):
         "route": route
     }
 
-    res = requests.put(API_URL + "robots/R02/active", data=data)
-    return res.json()
+    try:
+        res = requests.put(API_URL + "robots/R02/active", data=data)
+        return res.json()
+    except Exception:
+        return None
 
 def update_current_hall(hall: str):
     data = {
         hall: hall
     }
 
-    res = requests.put(API_URL + "robots/R02/hall", data=data)
-    return res.json()
+    try:
+        res = requests.put(API_URL + "robots/R02/hall", data=data)
+        return res.json()
+    except Exception:
+        return None
 
 
 def obstacle_on_hall(hall: str):
-    res = requests.put(API_URL + "statsHalls/{}/stopped".format(hall))
-    return res.json()
+    try:
+        res = requests.put(API_URL + "statsHalls/{}/stopped".format(hall))
+        return res.json()
+    except Exception:
+        return None
 
 
 if __name__ == "__main__":
