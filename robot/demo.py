@@ -144,13 +144,13 @@ def wait_end_of_crosspath():
 def turn_left():
     fw.turn(90 - 45)
     lf.wait_tile_status(status=[0, 0, 0, 0, 1])
-    lf.wait_tile_center()
+    lf.wait_tile_status(status=[1, 0, 0, 0, 0])
 
 
 def turn_right():
     fw.turn(90 + 45)
     lf.wait_tile_status(status=[1, 0, 0, 0, 0])
-    lf.wait_tile_center()
+    lf.wait_tile_status(status=[0, 0, 0, 0, 1])
 
 
 def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "derecha._CRUCE_3", "izquierda._CRUCE_4", "0._HABITACION_5"]):
@@ -281,16 +281,26 @@ if __name__ == '__main__':
                 time.sleep(0.25)
 
             print("Starting route to room: " + route["dest_room"])
+            print("route:", route)
             api.active(True, route)
             api.update_current_hall(current_hall)
 
-            follow_route(route=route["route"])
+            follow_route(route=["recto._CRUCE_2", "recto._CRUCE_2", "recto._CRUCE_2", "derecha._CRUCE_2", "0._HABITACION_2"])
             print("Finished route")
             api.active(False, route)
             time.sleep(5)
 
             print("Starting route to room: " + route["origin_room"])
-            follow_route(route=route["return_route"])
+            if turning_angle > 90:
+                fw.turn(85)
+            else:
+                fw.turn(95)
+
+            bw.speed = config.PICAR_MED_SPEED
+            bw.forward()
+            lf.wait_tile_center()
+            
+            follow_route(route=["vuelta._CRUCE_2.False", "recto._CRUCE_1", "derecha._CRUCE_1", "recto._CRUCE_1", "recto._CRUCE_1", "0._HABITACION_2"])
             print("Finished return route")
 
             route = None
