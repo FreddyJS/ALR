@@ -4,4 +4,4 @@ WORKDIR /app
 COPY . .
 ENV PATH /app/node_modules/.bin:$PATH
 
-RUN yarn install
+RUN yarn install --network-timeout 10000000 
