@@ -1,5 +1,19 @@
 version: '3.8'
 services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    volumes:
+      - node_modules:/app/node_modules
+      - ./frontend:/app
+    command:
+      - bash
+      - -c
+      - yarn start
+
   db:
     image: postgres:13.0-alpine
     volumes:
@@ -32,7 +46,7 @@ services:
     command:
       - bash
       - -c
-      - echo 'Freezing container. Execute in container "python manage.py runserver 0.0.0.0:8000"' && tail -f /dev/null
+      - python manage.py runserver 0.0.0.0:8000
 
 volumes:
     node_modules:
