@@ -55,7 +55,7 @@ const Dashboard = () => {
 
       try {
         fetch(
-          'http://localhost:8000/api/stats/', requestOptions)
+          'http://guiame.ddns.net:8000/api/stats/', requestOptions)
           .then(response => {
             response.json()
           })
