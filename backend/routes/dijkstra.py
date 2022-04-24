@@ -344,7 +344,7 @@ def route_to_room(origin_room: str, dest_room: str, grados: int = 0):
 
 if __name__ == "__main__":
     print("From 'hall' to '03'")
-    route, return_route = route_to_room("hall", "57")
+    route, return_route = route_to_room("hall", "03")
     print(route, "\n")
 
     print("From '03' to 'hall'")

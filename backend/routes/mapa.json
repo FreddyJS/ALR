@@ -4,7 +4,7 @@
         "tipo": "habitaciones",
         "enlaces":[
             {
-                "id": "2",
+                "id": "1",
                 "distancia": 1,
                 "direccion": "norte"
             }
@@ -16,34 +16,12 @@
         "tipo": "cruce",
         "enlaces":[
             {
-                "id": "2",
-                "distancia": 4,
-                "direccion": "este"
-            },
-            {
-                "id": "9",
-                "distancia": 5,
-                "direccion": "norte"
-            }
-        ],
-        "habitaciones":[]
-    },
-    {
-        "id": "2",
-        "tipo": "cruce",
-        "enlaces":[
-            {
                 "id": "0",
                 "distancia": 1,
                 "direccion": "sur"
             },
             {
-                "id": "1",
-                "distancia": 4,
-                "direccion": "oeste"
-            },
-            {
-                "id": "3",
+                "id": "2",
                 "distancia": 1,
                 "direccion": "este"
             },
@@ -51,9 +29,31 @@
                 "id": "5",
                 "distancia": 1,
                 "direccion": "norte"
+            },
+            {
+                "id": "6",
+                "distancia": 1,
+                "direccion": "oeste"
             }
         ],
         "habitaciones":[]
+    },
+    {
+        "id": "2",
+        "tipo": "habitaciones",
+        "enlaces":[
+            {
+                "id": "1",
+                "distancia": 1,
+                "direccion": "oeste"
+            },
+            {
+                "id": "3",
+                "distancia": 1,
+                "direccion": "este"
+            }
+        ],
+        "habitaciones":["01", "02"]
     },
     {
         "id": "3",
@@ -70,181 +70,42 @@
                 "direccion": "este"
             }
         ],
-        "habitaciones":["01","02"]
+        "habitaciones":["03", "04"]
     },
     {
         "id": "4",
-        "tipo": "cruce",
+        "tipo": "habitaciones",
         "enlaces":[
             {
                 "id": "3",
                 "distancia": 1,
                 "direccion": "oeste"
-            },
-            {
-                "id": "6",
-                "distancia": 1,
-                "direccion": "norte"
-            },
-            {
-                "id": "22",
-                "distancia": 1,
-                "direccion": "este"
             }
         ],
-        "habitaciones":[]
+        "habitaciones":["05"]
     },
     {
         "id": "5",
         "tipo": "habitaciones",
         "enlaces":[
             {
-                "id": "2",
+                "id": "1",
                 "distancia": 1,
                 "direccion": "sur"
-            },
-            {
-                "id": "7",
-                "distancia": 1,
-                "direccion": "norte"
             }
         ],
-        "habitaciones":["07", "09"]
+        "habitaciones":["salida"]
     },
     {
         "id": "6",
         "tipo": "habitaciones",
         "enlaces":[
             {
-                "id": "4",
-                "distancia": 1,
-                "direccion": "sur"
-            },
-            {
-                "id": "8",
-                "distancia": 1,
-                "direccion": "norte"
-            }
-        ],
-        "habitaciones":["05","03"]
-    },
-    {
-        "id": "7",
-        "tipo": "habitaciones",
-        "enlaces":[
-            {
-                "id": "5",
-                "distancia": 1,
-                "direccion": "sur"
-            },
-            {
-                "id": "11",
-                "distancia": 1,
-                "direccion": "norte"
-            }
-        ],
-        "habitaciones":["10","08"]
-    },
-    {
-        "id": "8",
-        "tipo": "habitaciones",
-        "enlaces":[
-            {
-                "id": "6",
-                "distancia": 1,
-                "direccion": "sur"
-            },
-            {
-                "id": "12",
-                "distancia": 1,
-                "direccion": "norte"
-            }
-        ],
-        "habitaciones":["06","04"]
-    },
-    {
-        "id": "9",
-        "tipo": "cruce",
-        "enlaces":[
-            {
                 "id": "1",
-                "distancia": 5,
-                "direccion": "sur"
-            },
-            {
-                "id": "10",
                 "distancia": 1,
                 "direccion": "este"
             }
         ],
-        "habitaciones":[]
-    },
-    {
-        "id": "10",
-        "tipo": "habitaciones",
-        "enlaces":[
-            {
-                "id": "9",
-                "distancia": 1,
-                "direccion": "oeste"
-            },
-            {
-                "id": "11",
-                "distancia": 1,
-                "direccion": "este"
-            }
-        ],
-        "habitaciones":["12","11"]
-    },
-    {
-        "id": "11",
-        "tipo": "cruce",
-        "enlaces":[
-            {
-                "id": "10",
-                "distancia": 1,
-                "direccion": "oeste"
-            },
-            {
-                "id": "12",
-                "distancia": 2,
-                "direccion": "este"
-            },
-            {
-                "id": "7",
-                "distancia": 1,
-                "direccion": "sur"
-            }
-        ],
-        "habitaciones":[]
-    },
-    {
-        "id": "12",
-        "tipo": "cruce",
-        "enlaces":[
-            {
-                "id": "11",
-                "distancia": 2,
-                "direccion": "oeste"
-            },
-            {
-                "id": "8",
-                "distancia": 1,
-                "direccion": "sur"
-            }
-        ],
-        "habitaciones":[]
-    },
-    {
-        "id": "22",
-        "tipo": "habitaciones",
-        "enlaces":[
-            {
-                "id": "4",
-                "distancia": 2,
-                "direccion": "oeste"
-            }
-        ],
-        "habitaciones":["57"]
+        "habitaciones":["escaleras"]
     }
 ]
