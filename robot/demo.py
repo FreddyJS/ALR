@@ -271,7 +271,10 @@ if __name__ == '__main__':
             while route is None:
                 time.sleep(0.25)
 
+
+            # Going to the destiny room
             print("Starting route to room: " + route["dest_room"])
+            current_hall = "pasillo{}{}".format(route["route"][0][-1], route["route"][1][-1])
             api.active(True, route)
             api.update_current_hall(current_hall)
 
@@ -280,11 +283,16 @@ if __name__ == '__main__':
             api.active(False, route)
             time.sleep(5)
 
+            # Going to the start room
             print("Starting route to room: " + route["origin_room"])
+            current_hall = "pasillo{}{}".format(route["return_route"][0][-1], route["return_route"][1][-1])
+            api.active(True, route)
+            api.update_current_hall(current_hall)
 
             bw.speed = config.PICAR_MED_SPEED
             follow_route(route=route["return_route"])
             print("Finished return route")
+            api.active(False, route)
 
             route = None
     except KeyboardInterrupt:
