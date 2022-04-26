@@ -157,6 +157,7 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
     global forward_speed, current_hall
     room_count = 0
     in_red = False
+    action = None
 
     bw.speed = forward_speed
     bw.forward()
@@ -170,23 +171,24 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
         # Room Detection
         red = is_red()
         if red and not in_red:
+            action = route.pop(0)
             room_count += 1
             in_red = True
 
-            current_hall = current_hall.split("_")[0]
-            current_hall = current_hall + "_" + str(room_count)
-            print("Detected room, current_hall: " + current_hall)
-            api.update_current_hall(current_hall)
+            print("Room detected, action: " + action)
 
-            if "HABITACION" in route[0]:
-                action = route.pop(0)
-                if "recto" not in action:
-                    print("Reched the destiny room!")
-                    bw.stop()
-                    return
+            if "recto" not in action:
+                print("Reached the destination")
+                bw.stop()
+                return
+            else:
+                current_hall = "pasillo{}{}".format(action[-1], route[0][-1])
+                print("Detected room, current_hall: " + current_hall)
+                threading.Thread(target=api.update_current_hall, args=(current_hall,)).start()
+
         elif not red and in_red:
+            print("Detected room exit")
             in_red = False
-            print("Passed room: " + current_hall)
 
         # Crosspath Detection
         if lf_status == [1, 1, 1, 1, 1]:
@@ -214,13 +216,11 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
 
                 print("El robot ha pasado el segundo cruce, girando a la izquierda")
                 turn_left()
-                print(
-                    "El robot ha pasado el segundo cruce. Esperando al tercer cruce...")
+                print("El robot ha pasado el segundo cruce. Esperando al tercer cruce...")
 
                 wait_for_crosspath()
                 wait_end_of_crosspath()
-                print(
-                    "El robot ha pasado el tercer cruce, continuando recto (fin de giro izquierda)")
+                print("El robot ha pasado el tercer cruce, continuando recto (fin de giro izquierda)")
 
             elif action.startswith("derecha"):
                 print("Girando a la derecha")
@@ -248,13 +248,8 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
                 raise KeyboardInterrupt
 
             forward_speed = config.PICAR_MED_SPEED
-            for step in route:
-                if "CRUCE" in step:
-                    current_hall = f"pasillo{action[-1]}{step[-1]}"
-                    break
-
-            threading.Thread(target=api.update_current_hall,
-                             args=(current_hall,)).start()
+            current_hall = f"pasillo{action[-1]}{route[0][-1]}"
+            threading.Thread(target=api.update_current_hall, args=(current_hall,)).start()
             print("Continuando recto, nuevo pasillo: " + current_hall)
 
 
