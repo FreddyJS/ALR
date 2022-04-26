@@ -13,14 +13,15 @@ import Dashboard from './content/Dashboard';
 import DashboardDev from './content/Dashboard/DashboardDev';
 import Stats from './content/Stats/Stats';
 
+import logo from './images/logo_guiame.jpg'
+
 function App() {
   return (
     <>
       {!window.location.href.includes("room") && <PageHeader/>}
       <Content>
         <div className="room-page__header">
-          <h1>GuiaMe: Automated Guiding Robot</h1>
-          <p>Un guía de confianza para gente de todo tipo</p>
+        <h1><img src={logo} alt='descripcion'/></h1>
         </div>
         <Switch>
           <Route exact path="/" component={Dashboard} />
