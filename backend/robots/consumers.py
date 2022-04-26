@@ -33,7 +33,6 @@ class RobotConsumer(AsyncWebsocketConsumer):
         return robot
 
     async def connect(self):
-        print(self.channel_layer)
         try:
             self.robot_id: string = self.scope['url_route']['kwargs']['robot_id']
             self.connection_type: string = self.scope['url_route']['kwargs']['connection_type']
