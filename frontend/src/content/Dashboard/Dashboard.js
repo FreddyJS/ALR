@@ -12,14 +12,13 @@ let halls = [];
 
 const Dashboard = () => {
   const [hallId, setHallId] = React.useState('BASE');
+  const [active, setActive] = React.useState(false);
   const stageRef = React.useRef(null);
   const rectRef = React.useRef(null);
 
   const backgroundImage = new window.Image();
   backgroundImage.src = background;
 
-  var cont_inic = true;
-  var cont_parar = false;
   var time = [];
   var time2 = [];
 
@@ -33,19 +32,19 @@ const Dashboard = () => {
       setHallId(data.hall);
     }
 
-    if (data.active !== undefined && data.active && cont_inic) {
+    if (data.active !== undefined && data.active && !active) {
+      setActive(true);
       document.getElementById("restart").click();
       document.getElementById("start").click();
-      cont_inic = !cont_inic;
-      cont_parar = !cont_parar;
 
-    } else if (data.active !== undefined && !data.active && cont_parar) {
+    } else if (data.active !== undefined && !data.active && active) {
+      setActive(false);
+      halls = [];
+      setHallId('BASE');
       document.getElementById("stop").click();
       var a = document.getElementById("timer").textContent;
       time = a.split(":");
       time2 = time[2].split(".")
-      cont_parar = !cont_parar;
-      cont_inic = !cont_inic;
 
       var requestOptions = {
         method: 'POST',
