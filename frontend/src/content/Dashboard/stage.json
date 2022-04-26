@@ -191,6 +191,17 @@
             "height": 30,
             "fill": "red"
           }
+        },
+        {
+          "type": "Rect",
+          "attrs": {
+            "id": "BASE",
+            "x": 345,
+            "y": 522,
+            "width": 50,
+            "height": 50,
+            "fill": "blue"
+          }
         }
       ]
     },
