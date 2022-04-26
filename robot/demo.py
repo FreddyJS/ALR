@@ -153,7 +153,7 @@ def turn_right():
     lf.wait_tile_status(status=[0, 0, 0, 0, 1])
 
 
-def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "derecha._CRUCE_3", "izquierda._CRUCE_4", "0._HABITACION_5"]):
+def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "derecha._CRUCE_3", "izquierda._CRUCE_4", "0._HABITACION_5"], returning: bool = False) -> str:
     global forward_speed, current_hall
     room_count = 0
     in_red = False
@@ -180,9 +180,13 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
             if "recto" not in action:
                 print("Reached the destination")
                 bw.stop()
-                return
+                return action
             else:
-                current_hall = "pasillo{}{}".format(action[-1], route[0][-1])
+                if returning:
+                    current_hall = "pasillo{}{}".format(route[0][-1], action[-1])
+                else:
+                    current_hall = "pasillo{}{}".format(action[-1], route[0][-1])
+
                 print("Detected room, current_hall: " + current_hall)
                 threading.Thread(target=api.update_current_hall, args=(current_hall,)).start()
 
@@ -248,9 +252,14 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
                 raise KeyboardInterrupt
 
             forward_speed = config.PICAR_MED_SPEED
-            current_hall = f"pasillo{action[-1]}{route[0][-1]}"
-            threading.Thread(target=api.update_current_hall, args=(current_hall,)).start()
+
+            if returning:
+                current_hall = "pasillo{}{}".format(route[0][-1], action[-1])
+            else:
+                current_hall = "pasillo{}{}".format(action[-1], route[0][-1])
+
             print("Continuando recto, nuevo pasillo: " + current_hall)
+            threading.Thread(target=api.update_current_hall, args=(current_hall,)).start()
 
 
 def processMessage(message: object):
@@ -271,26 +280,25 @@ if __name__ == '__main__':
             while route is None:
                 time.sleep(0.25)
 
-
             # Going to the destiny room
             print("Starting route to room: " + route["dest_room"])
-            current_hall = "pasillo{}{}".format(route["route"][0][-1], route["route"][1][-1])
+            current_hall = "pasillo01"
             api.active(True, route)
             api.update_current_hall(current_hall)
 
-            follow_route(route=route["route"])
+            last_action = follow_route(route=route["route"])
             print("Finished route")
             api.active(False, route)
             time.sleep(5)
 
             # Going to the start room
             print("Starting route to room: " + route["origin_room"])
-            current_hall = "pasillo{}{}".format(route["return_route"][0][-1], route["return_route"][1][-1])
+            current_hall = "pasillo{}{}".format(route["return_route"][0][-1], last_action[-1])
             api.active(True, route)
             api.update_current_hall(current_hall)
 
             bw.speed = config.PICAR_MED_SPEED
-            follow_route(route=route["return_route"])
+            follow_route(route=route["return_route"], returning=True)
             print("Finished return route")
             api.active(False, route)
 
