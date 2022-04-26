@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         WebSettings wvSettings = webView.getSettings();
         wvSettings.setJavaScriptEnabled(true);
         wvSettings.setDomStorageEnabled(true);
-        webView.loadUrl("https://freddyjs.github.io/guiaMe/#/room");
+        webView.loadUrl("http://guiame.ddns.net/#/room");
 
         // Start Bluetooth Advertiser
         advertiser = BluetoothAdvertiser.getInstance(this);
