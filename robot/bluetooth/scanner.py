@@ -70,7 +70,7 @@ class SocketScanner(Thread):
         while self._running:
             try:
                 data, addr = self.socket.recvfrom(1024)
-                print("Received: " + data.decode("utf-8") + " from " + str(addr))
+                # print("Received: " + data.decode("utf-8") + " from " + str(addr))
 
                 self.processSample(data.decode("utf-8")[0:-1])
             except Exception:

@@ -108,12 +108,11 @@ int main(int argc, char *argv[])
 
     unsigned now = (unsigned)time(NULL);
     unsigned last_detection_time = now;
-    int count = 0;
 
     // Keep scanning until we see nothing for 10 secs or we have seen lots of advertisements.  Then exit.
     // We exit in this case because the scan may have failed or stopped. Higher level code can restart
     printf("Starting scanning.....\n");
-    while (count < 300)
+    while (1)
     {
         // printf("%i",getc(stdin));
         len = read(device, buf, sizeof(buf));
@@ -140,7 +139,6 @@ int main(int argc, char *argv[])
                         gettimeofday(&timestamp, NULL);
                         unsigned long timest = (timestamp.tv_sec-start.tv_sec) * 1000000 + (timestamp.tv_usec-start.tv_usec);
                         printf("\nRSSI received: %d %lu\n", rssi,timest);
-                        count++;
                         last_detection_time = (unsigned)time(NULL);
 
                         // Mientras no tengamos un valor de referencia, entramos en el siguiente if hasta obtener dicho valor
