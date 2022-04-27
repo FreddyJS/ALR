@@ -41,37 +41,33 @@ def processSample(message: str):
         # rssi_reference = sample
         print("rssi_reference: " + str(rssi_reference))
     else:
-        print("rssi_sample: " + str(sample))
+        print("rssi_sample: {}, contador: {}".format(sample, contador))
         diff = sample - rssi_reference
 
         if (diff > 0):
-            forward_speed = config.PICAR_MED_SPEED
-            return
+            diff = 1
 
         diff = abs(diff)
-        print(contador)
-        if diff > 0 and diff < 4:
+        if diff >= 0 and diff < 4:
             if estado != 1:
                 contador = 0
-            elif contador == 20:
+            elif contador == 10:
                 forward_speed = config.PICAR_MED_SPEED
                 print("Seteando speed %i" % forward_speed)
             estado = 1
             contador += 1
         elif diff >= 4 and diff < 8:
-            if estado == 3:
-                contador = -10
-            elif estado != 2:
+            if estado != 2:
                 contador = 0
-            elif contador == 20:
-                forward_speed = int(config.PICAR_MED_SPEED/3)
+            elif contador == 10:
+                forward_speed = int(config.PICAR_MED_SPEED/2)
                 print("Seteando speed %i" % forward_speed)
             estado = 2
             contador += 1
         elif diff >= 8:
             if estado != 3:
                 contador = 0
-            elif contador == 20:
+            elif contador == 10:
                 forward_speed = 0
                 print("PArando vehiculo %i " % forward_speed)
             estado = 3
