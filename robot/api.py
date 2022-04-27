@@ -5,8 +5,8 @@ import websocket
 from threading import Thread
 from typing import Any, Callable
 
-WS_URL = "ws://guiame.ddns.net:8000/ws/robot/PiCar/"
-API_URL = "http://guiame.ddns.net:8000/api/"
+WS_URL = "ws://localhost:8000/ws/robot/PiCar/"
+API_URL = "http://localhost:8000/api/"
 
 ws: 'ServerWebSocket' = None
 websocket.enableTrace(False)
@@ -66,7 +66,7 @@ def close_ws():
 
 def get_route_by_room(room: str):
     try:
-        res = requests.get(API_URL + "routes/{}".format(room))
+        res = requests.get(API_URL + "routes/{}/".format(room))
         return res.json()
     except Exception:
         return None
@@ -78,7 +78,7 @@ def active(active: bool, route: object):
     }
 
     try:
-        res = requests.put(API_URL + "robots/R02/active", data=data)
+        res = requests.put(API_URL + "robots/PiCar/active/", data=data)
         return res.json()
     except Exception:
         return None
@@ -89,7 +89,7 @@ def update_current_hall(hall: str):
     }
 
     try:
-        res = requests.put(API_URL + "robots/R02/hall", data=data)
+        res = requests.put(API_URL + "robots/PiCar/hall/", data=data)
         return res.json()
     except Exception:
         return None
@@ -97,7 +97,7 @@ def update_current_hall(hall: str):
 
 def obstacle_on_hall(hall: str):
     try:
-        res = requests.put(API_URL + "statsHalls/{}/stopped".format(hall))
+        res = requests.put(API_URL + "statsHalls/{}/stopped/".format(hall))
         return res.json()
     except Exception:
         return None
