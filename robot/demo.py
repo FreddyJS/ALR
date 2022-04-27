@@ -171,24 +171,25 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
         # Room Detection
         red = is_red()
         if red and not in_red:
-            action = route.pop(0)
-            room_count += 1
-            in_red = True
+            if "HABITACION" in route[0]:
+                action = route.pop(0)
+                room_count += 1
+                in_red = True
 
-            print("Room detected, action: " + action)
+                print("Room detected, action: " + action)
 
-            if "recto" not in action:
-                print("Reached the destination")
-                bw.stop()
-                return action
-            else:
-                if returning:
-                    current_hall = "pasillo{}{}".format(route[0][-1], action[-1])
+                if "recto" not in action and "HABITACION" in action:
+                    print("Reached the destination")
+                    bw.stop()
+                    return action
                 else:
-                    current_hall = "pasillo{}{}".format(action[-1], route[0][-1])
+                    if returning:
+                        current_hall = "pasillo{}{}".format(route[0][-1], action[-1])
+                    else:
+                        current_hall = "pasillo{}{}".format(action[-1], route[0][-1])
 
-                print("Detected room, current_hall: " + current_hall)
-                threading.Thread(target=api.update_current_hall, args=(current_hall,)).start()
+                    print("Detected room, current_hall: " + current_hall)
+                    threading.Thread(target=api.update_current_hall, args=(current_hall,)).start()
 
         elif not red and in_red:
             print("Detected room exit")
@@ -283,6 +284,8 @@ if __name__ == '__main__':
             # Going to the destiny room
             print("Starting route to room: " + route["dest_room"])
             current_hall = "pasillo01"
+            route["route"].pop(0)
+            print(route["route"])
             api.active(True, route)
             api.update_current_hall(current_hall)
 
