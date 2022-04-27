@@ -285,18 +285,17 @@ if __name__ == '__main__':
             print("Starting route to room: " + route["dest_room"])
             current_hall = "pasillo01"
             route["route"].pop(0)
-            print(route["route"])
             api.active(True, route)
             api.update_current_hall(current_hall)
 
             last_action = follow_route(route=route["route"])
-            print("Finished route")
             api.active(False, route)
             time.sleep(5)
 
             # Going to the start room
             print("Starting route to room: " + route["origin_room"])
-            current_hall = "pasillo{}{}".format(route["return_route"][0][-1], last_action[-1])
+            node = route["return_route"][1].split(".")[1][-1]
+            current_hall = "pasillo{}{}".format(node, last_action[-1])
             api.active(True, route)
             api.update_current_hall(current_hall)
 

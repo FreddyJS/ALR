@@ -78,18 +78,18 @@ def active(active: bool, route: object):
     }
 
     try:
-        res = requests.put(API_URL + "robots/PiCar/active/", data=data)
+        res = requests.put(API_URL + "robots/PiCar/active/", json=data)
         return res.json()
     except Exception:
         return None
 
 def update_current_hall(hall: str):
     data = {
-        hall: hall
+        "hall": hall
     }
 
     try:
-        res = requests.put(API_URL + "robots/PiCar/hall/", data=data)
+        res = requests.put(API_URL + "robots/PiCar/hall/", json=data)
         return res.json()
     except Exception:
         return None
