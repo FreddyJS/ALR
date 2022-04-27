@@ -31,7 +31,7 @@
                 "direccion": "norte"
             },
             {
-                "id": "6",
+                "id": "8",
                 "distancia": 1,
                 "direccion": "oeste"
             }
@@ -92,12 +92,46 @@
                 "id": "1",
                 "distancia": 1,
                 "direccion": "sur"
+            },
+            {
+                "id": "6",
+                "distancia": 1,
+                "direccion": "norte"
             }
         ],
-        "habitaciones":["salida"]
+        "habitaciones":["06"]
     },
     {
         "id": "6",
+        "tipo": "cruce",
+        "enlaces":[
+            {
+                "id": "7",
+                "distancia": 1,
+                "direccion": "norte"
+            },
+            {
+                "id": "5",
+                "distancia": 1,
+                "direccion": "sur"
+            }
+        ],
+        "habitaciones":[]
+    },
+    {
+        "id": "7",
+        "tipo": "habitaciones",
+        "enlaces":[
+            {
+                "id": "6",
+                "distancia": 1,
+                "direccion": "norte"
+            }
+        ],
+        "habitaciones":["07"]
+    },
+    {
+        "id": "8",
         "tipo": "habitaciones",
         "enlaces":[
             {
@@ -106,6 +140,6 @@
                 "direccion": "este"
             }
         ],
-        "habitaciones":["escaleras"]
+        "habitaciones":["08"]
     }
 ]
