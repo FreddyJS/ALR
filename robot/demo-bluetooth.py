@@ -18,7 +18,7 @@ NO_ROBOT = False
 
 lf = LineFollower()
 lf.references = config.LINE_FOLLOWER_REFERENCES
-ultrasonicSensor = UltrasonicSensor(config.ULTRASONIC_SENSOR_CHANNEL)
+ultrasonicSensor = UltrasonicSensor(config.ULTRASONIC_SENSOR_CHANNEL, None, config.ULTRASONIC_SENSOR_MIN_DISTANCE)
 
 forward_speed = config.PICAR_MED_SPEED
 backward_speed = 70
@@ -27,31 +27,67 @@ turning_angle = 40
 
 max_off_track_count = 40
 delay = 0.0005
+contador = 0
+estado = 0
 
 
 def processSample(message: str):
     global rssi_reference, forward_speed
     sample = int(message.split(":")[0])
+    global contador, estado
 
     if rssi_reference == 0:
-        rssi_reference = sample
+        rssi_reference = -58
+        # rssi_reference = sample
         print("rssi_reference: " + str(rssi_reference))
     else:
         print("rssi_sample: " + str(sample))
         diff = sample - rssi_reference
 
         if (diff > 0):
+            forward_speed = config.PICAR_MED_SPEED
             return
 
         diff = abs(diff)
+        print(contador)
         if diff > 0 and diff < 5:
-            forward_speed = config.PICAR_MED_SPEED
+            if estado != 1:
+                contador = 0
+            elif contador == 15:
+                forward_speed = config.PICAR_MED_SPEED
+                print("Seteando speed %i" % forward_speed)
+            contador += 1
+            estado = 1
         elif diff >= 5 and diff < 10:
-            forward_speed = int(config.PICAR_MED_SPEED/2)
+            if estado == 3:
+                contador = -1
+            elif estado != 2:
+                contador = 0
+            elif contador == 15:
+                forward_speed = int(config.PICAR_MED_SPEED/2)
+                print("Seteando speed %i" % forward_speed)
+
+            contador += 1
+            estado = 2
         elif diff >= 10 and diff < 15:
-            forward_speed = int(config.PICAR_MED_SPEED/3)
+            if estado == 4:
+                contador = -1
+            elif estado != 15:
+                contador = 0
+            elif contador == 3:
+                forward_speed = int(config.PICAR_MED_SPEED/3)
+                print("Seteando speed %i" % forward_speed)
+
+            contador += 1
+            estado = 3
         elif diff >= 15:
-            forward_speed = 0
+            if estado != 4:
+                contador = 0
+            elif contador == 3:
+                forward_speed = 0
+                print("PArando vehiculo %i " % forward_speed)
+            contador += 1
+            estado = 4
 
 
 # To test when no robot connected
