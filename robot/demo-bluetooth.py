@@ -67,7 +67,7 @@ def processSample(message: str):
         elif diff >= 8:
             if estado != 3:
                 contador = 0
-            elif contador == 10:
+            elif contador == 20:
                 forward_speed = 0
                 print("PArando vehiculo %i " % forward_speed)
             estado = 3
@@ -99,9 +99,8 @@ fw.turning_max = 45
 
 
 def updateSpeed():
-    if bw.speed != forward_speed:
-        bw.speed = forward_speed
-        bw.forward()
+    bw.speed = forward_speed
+    bw.forward()
 
 
 def main():
@@ -119,7 +118,6 @@ def main():
         distance = ultrasonicSensor.distance()
         if (distance <= config.ULTRASONIC_SENSOR_MIN_DISTANCE and distance >= 0) or (distance < 0 and obstacle):
             obstacle = True
-            forward_speed = 0
             bw.stop()
             continue
         else:
