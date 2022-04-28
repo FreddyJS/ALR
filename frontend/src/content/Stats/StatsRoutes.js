@@ -13,7 +13,7 @@ export default function StatsRoutes() {
   useEffect(() => {
     async function getData() {
       await axios
-        .get("http://localhost:8000/api/stats/?format=json")
+        .get("http://guiame.ddns.net:8000/api/stats/?format=json")
         .then((response) => {
           setData(response.data);
           setLoadingData(false);

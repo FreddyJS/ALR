@@ -12,7 +12,7 @@ export default function StatsHalls() {
   useEffect(() => {
     async function getData() {
       await axios
-        .get("http://localhost:8000/api/statsHalls/?format=json")
+        .get("http://guiame.ddns.net:8000/api/statsHalls/?format=json")
         .then((response) => {
           setData(response.data);
           setLoadingData(false);

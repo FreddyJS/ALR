@@ -7,7 +7,6 @@ import { Stage, Layer, Rect, Text, Image } from 'react-konva';
 import { dashboardSocket } from '../../sockets';
 import Crono from '../Crono/Crono';
 
-const dSocket = dashboardSocket();
 let halls = [];
 
 const Dashboard = () => {
@@ -15,6 +14,7 @@ const Dashboard = () => {
   const [active, setActive] = React.useState(false);
   const stageRef = React.useRef(null);
   const rectRef = React.useRef(null);
+  const dSocket = dashboardSocket();
 
   const backgroundImage = new window.Image();
   backgroundImage.src = background;
@@ -54,7 +54,7 @@ const Dashboard = () => {
 
       try {
         fetch(
-          'http://localhost:8000/api/stats/', requestOptions)
+          'http://guiame.ddns.net:8000/api/stats/', requestOptions)
           .then(response => {
             response.json()
           })

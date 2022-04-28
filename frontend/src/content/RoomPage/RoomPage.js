@@ -1,7 +1,7 @@
 import React from 'react';
 import robot from './robot.png'
 
-import { RobotSocket, UISocket } from '../../sockets';
+import { createUISocket, RobotSocket } from '../../sockets';
 import { Button, Tile, Modal } from 'carbon-components-react';
 
 import { getRoutes } from '../../services/routes';
@@ -14,6 +14,7 @@ const RoomPage = () => {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [wrongRoomNumber, setWrongRoomNumber] = React.useState(false);
   const [route, setRoute] = React.useState();
+  const socket = createUISocket("PiCar");
 
   const [inPath, setInPath] = React.useState(false);
   const [nextDirection, setNextDirection] = React.useState('');
@@ -25,7 +26,7 @@ const RoomPage = () => {
     };
 
     if (from === "UI") {
-      UISocket.send(JSON.stringify(data));
+      socket.send(JSON.stringify(data));
     } else {
       RobotSocket.send(JSON.stringify(data));
     }
@@ -57,7 +58,7 @@ const RoomPage = () => {
       }
     };
     
-    UISocket.send(JSON.stringify(data));
+    socket.send(JSON.stringify(data));
     setIsModalOpen(false);
   };
 
