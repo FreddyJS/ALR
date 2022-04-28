@@ -63,7 +63,7 @@ export default function Crono() {
 
   return (
     <div className="ppal">
-      <div className="textt"> Tiempo en ruta : </div>
+      <div className="textt"> Tempo en ruta : </div>
       <span className="timer" id="timer">
         {time.hours}:{time.minutes}:{time.seconds}.{time.milliseconds}
       </span>

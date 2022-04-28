@@ -8,7 +8,7 @@ export default function useColumns2() {
         accessor: "hall"
       },
       {
-        Header: "SE HA DETENIDO",
+        Header: "DETÍVOSE",
         accessor: "stopped"
       }
     ],

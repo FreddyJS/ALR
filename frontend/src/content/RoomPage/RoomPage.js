@@ -87,19 +87,19 @@ const RoomPage = () => {
       )}
 
       <Tile className="room-page__content">
-        {roomNumber === "" ? <h3>Introduce el número de habitación</h3> : <h3>Habitación: {roomNumber}</h3>}
-        {wrongRoomNumber && <h3 style={{color: "red"}}>No existe la habitación</h3>}
+        {roomNumber === "" ? <h3>Introduce o número da habitación</h3> : <h3>Habitación: {roomNumber}</h3>}
+        {wrongRoomNumber && <h3 style={{color: "red"}}>Non existe a habitación</h3>}
         {/* <TextInput id="room-number" type="text" value={roomNumber} placeholder="Nº de habitación" disabled/> */}
 
         {!inPath ?
           <RoomInput onSubmit={() => onRoomSubmit()} onChange={(room) => {setRoomNumber(room); setWrongRoomNumber(false);}} value={roomNumber} />
         :
           <div>
-            <h4>En el próximo cruce: <strong>{nextDirection.split(".")[0]}</strong></h4>
+            <h4>No próximo cruce: <strong>{nextDirection.split(".")[0]}</strong></h4>
             {nextDirection.startsWith('recto') && <AiOutlineArrowUp style={{ width: "70%", height: "70%", fill: "green"}}/>}
-            {nextDirection.startsWith('derecha') && <AiOutlineArrowRight style={{ width: "70%", height: "70%", fill: "green"}}/>}
+            {nextDirection.startsWith('dereita') && <AiOutlineArrowRight style={{ width: "70%", height: "70%", fill: "green"}}/>}
             {nextDirection.startsWith('atras') && <AiOutlineArrowDown style={{ width: "70%", height: "70%", fill: "green"}}/>}
-            {nextDirection.startsWith('izquierda') && <AiOutlineArrowLeft style={{ width: "70%", height: "70%", fill: "green"}}/>}
+            {nextDirection.startsWith('esquerda') && <AiOutlineArrowLeft style={{ width: "70%", height: "70%", fill: "green"}}/>}
           </div>
         }
 

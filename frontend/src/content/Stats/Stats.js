@@ -7,9 +7,9 @@ export default function Stats() {
   return (
     <>
     <div></div>
-    <div className="text">Estadísticas de las rutas</div>
+    <div className="text">Estadísticas das rutas</div>
     <StatsRoutes></StatsRoutes>
-    <div className="text">Pasillos en los que se ha parado debido a obstaculos</div>
+    <div className="text">Pasillos noss que se parou debido a obstáculos</div>
     <StatsHalls></StatsHalls>
     </>
   );
