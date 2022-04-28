@@ -21,7 +21,7 @@ function App() {
       {!window.location.href.includes("room") && <PageHeader/>}
       <Content>
         <div className="room-page__header">
-        <h1><img src={logo} alt='descripcion'/></h1>
+        <h1><img src={logo} alt='descripcion' style={{ maxWidth: "100%" }}/></h1>
         </div>
         <Switch>
           <Route exact path="/" component={Dashboard} />
