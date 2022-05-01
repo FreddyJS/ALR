@@ -122,7 +122,7 @@ const RoomPage = () => {
           <div>
             {nextDirection === 'stop' ?
               <>
-                <h4>Has chegado ao destino</h4>
+                <h4>Chegou ao destino</h4>
                 <AiFillStop style={{ width: "70%", height: "70%", fill: "green" }} onClick={() => window.location.reload()} />
               </>
               :
