@@ -71,6 +71,7 @@ def get_route_by_room(room: str):
     except Exception:
         return None
 
+
 def active(active: bool, route: object):
     data = {
         "active": active,
@@ -82,6 +83,7 @@ def active(active: bool, route: object):
         return res.json()
     except Exception:
         return None
+
 
 def update_current_hall(hall: str):
     data = {
@@ -106,6 +108,11 @@ def obstacle_on_hall(hall: str):
 def ui_next_direction():
     ws.send({"type": "to.ui", "message": {"type": "next_direction"}})
 
+
+def ui_finished_route():
+    ws.send({"type": "to.ui", "message": {"type": "finished_route"}})
+
+
 if __name__ == "__main__":
     def on_message(message):
         print("Received message: {}".format(message))
@@ -121,5 +128,6 @@ if __name__ == "__main__":
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
+        ui_finished_route()
         active(False, route)
         close_ws()

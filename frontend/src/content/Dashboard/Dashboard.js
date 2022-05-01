@@ -14,7 +14,7 @@ const Dashboard = () => {
   const [active, setActive] = React.useState(false);
   const stageRef = React.useRef(null);
   const rectRef = React.useRef(null);
-  const dSocket = dashboardSocket();
+  const [socket,] = React.useState(dashboardSocket());
 
   const backgroundImage = new window.Image();
   backgroundImage.src = background;
@@ -22,7 +22,7 @@ const Dashboard = () => {
   var time = [];
   var time2 = [];
 
-  dSocket.onmessage = (event) => {
+  socket.onmessage = (event) => {
     const data = JSON.parse(event.data);
     console.log("Dashboard Received: ", data);
 
@@ -45,7 +45,7 @@ const Dashboard = () => {
       time2 = time[2].split(".")
       setActive(false);
       setHallId('BASE');
-      
+
       var requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

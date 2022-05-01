@@ -6,7 +6,13 @@ import { Button, Tile, Modal } from 'carbon-components-react';
 
 import { getRoutes } from '../../services/routes';
 import RoomInput from '../../components/RoomInput';
-import { AiOutlineArrowUp, AiOutlineArrowRight, AiOutlineArrowDown, AiOutlineArrowLeft } from "react-icons/ai";
+import {
+  AiOutlineArrowUp,
+  AiOutlineArrowRight,
+  AiOutlineArrowDown,
+  AiOutlineArrowLeft,
+  AiFillStop
+} from "react-icons/ai";
 
 const RoomPage = () => {
   const debug = false;
@@ -16,8 +22,8 @@ const RoomPage = () => {
   const [route, setRoute] = React.useState();
   const [inPath, setInPath] = React.useState(false);
   const [nextDirection, setNextDirection] = React.useState('');
+  const [socket,] = React.useState(createUISocket("PiCar"));
 
-  const socket = createUISocket("PiCar");
   socket.onmessage = (event) => {
     const data = JSON.parse(event.data);
     const message = data.message;
@@ -26,7 +32,6 @@ const RoomPage = () => {
       return;
     }
 
-
     if (message.type === "next_direction") {
       for (let i = 0; i < route["route"].length; i++) {
         if (route["route"][i].includes("CRUCE")) {
@@ -34,6 +39,8 @@ const RoomPage = () => {
           break;
         }
       }
+    } else if (message.type === "finished_route") {
+      setNextDirection('stop');
     }
   }
 
@@ -75,17 +82,17 @@ const RoomPage = () => {
         route: route
       }
     };
-    
+
     socket.send(JSON.stringify(data));
     setIsModalOpen(false);
   };
 
-  return(
+  return (
     <div className="room-page">
       {debug &&
-        <div style={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", marginBottom: "10px"}}>
-          <Button style={{margin: "0.1rem"}} onClick={() => sendHelllo("UI")}> Client Message </Button>
-          <Button style={{margin: "0.1rem"}} onClick={() => sendHelllo("Robot")}> Robot Message </Button>    
+        <div style={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", marginBottom: "10px" }}>
+          <Button style={{ margin: "0.1rem" }} onClick={() => sendHelllo("UI")}> Client Message </Button>
+          <Button style={{ margin: "0.1rem" }} onClick={() => sendHelllo("Robot")}> Robot Message </Button>
         </div>
       }
 
@@ -97,32 +104,40 @@ const RoomPage = () => {
           modalHeading="Confirmar destino"
           primaryButtonText="Submit"
         >
-          <div> 
+          <div>
             <h1>Ir a la habitación {roomNumber}?</h1>
-            <img src="https://i.etsystatic.com/17441626/r/il/362050/1469060776/il_fullxfull.1469060776_e867.jpg" alt='room'/>
+            <img src="https://i.etsystatic.com/17441626/r/il/362050/1469060776/il_fullxfull.1469060776_e867.jpg" alt='room' />
           </div>
         </Modal>
       )}
 
       <Tile className="room-page__content">
         {roomNumber === "" ? <h3>Introduce o número da habitación</h3> : <h3>Habitación: {roomNumber}</h3>}
-        {wrongRoomNumber && <h3 style={{color: "red"}}>Non existe a habitación</h3>}
+        {wrongRoomNumber && <h3 style={{ color: "red" }}>Non existe a habitación</h3>}
         {/* <TextInput id="room-number" type="text" value={roomNumber} placeholder="Nº de habitación" disabled/> */}
 
         {!inPath ?
-          <RoomInput onSubmit={() => onRoomSubmit()} onChange={(room) => {setRoomNumber(room); setWrongRoomNumber(false);}} value={roomNumber} />
-        :
+          <RoomInput onSubmit={() => onRoomSubmit()} onChange={(room) => { setRoomNumber(room); setWrongRoomNumber(false); }} value={roomNumber} />
+          :
           <div>
-            <h4>No próximo cruce: <strong>{nextDirection.split(".")[0]}</strong></h4>
-            {nextDirection.startsWith('recto') && <AiOutlineArrowUp style={{ width: "70%", height: "70%", fill: "green"}}/>}
-            {nextDirection.startsWith('derecha') && <AiOutlineArrowRight style={{ width: "70%", height: "70%", fill: "green"}}/>}
-            {nextDirection.startsWith('vuelta') && <AiOutlineArrowDown style={{ width: "70%", height: "70%", fill: "green"}}/>}
-            {nextDirection.startsWith('izquierda') && <AiOutlineArrowLeft style={{ width: "70%", height: "70%", fill: "green"}}/>}
+            {nextDirection === 'stop' ?
+              <>
+                <h4>Has chegado ao destino</h4>
+                <AiFillStop style={{ width: "70%", height: "70%", fill: "green" }} onClick={() => window.location.reload()} />
+              </>
+              :
+              <h4>No próximo cruce: <strong>{nextDirection.split(".")[0]}</strong></h4>
+            }
+
+            {nextDirection.startsWith('recto') && <AiOutlineArrowUp style={{ width: "70%", height: "70%", fill: "green" }} />}
+            {nextDirection.startsWith('derecha') && <AiOutlineArrowRight style={{ width: "70%", height: "70%", fill: "green" }} />}
+            {nextDirection.startsWith('vuelta') && <AiOutlineArrowDown style={{ width: "70%", height: "70%", fill: "green" }} />}
+            {nextDirection.startsWith('izquierda') && <AiOutlineArrowLeft style={{ width: "70%", height: "70%", fill: "green" }} />}
           </div>
         }
 
       </Tile>
-      <img src={robot} alt="robot"/>
+      <img src={robot} alt="robot" />
     </div>
   )
 };
