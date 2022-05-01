@@ -291,6 +291,7 @@ if __name__ == '__main__':
 
             last_action = follow_route(route=route["route"])
             api.active(False, route)
+            api.ui_finished_route()
             time.sleep(5)
 
             # Going to the start room

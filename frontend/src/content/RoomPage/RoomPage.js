@@ -35,7 +35,7 @@ const RoomPage = () => {
     if (message.type === "next_direction") {
       for (let i = 0; i < route["route"].length; i++) {
         if (route["route"][i].includes("CRUCE")) {
-          setNextDirection(route.route[i].split(".")[0]);
+          setNextDirection(route.route[i]);
           break;
         }
       }
