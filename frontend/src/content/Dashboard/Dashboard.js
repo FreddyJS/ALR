@@ -33,19 +33,19 @@ const Dashboard = () => {
     }
 
     if (data.active !== undefined && data.active && !active) {
-      setActive(true);
       document.getElementById("restart").click();
       document.getElementById("start").click();
+      setActive(true);
 
     } else if (data.active !== undefined && !data.active && active) {
-      setActive(false);
       halls = [];
-      setHallId('BASE');
       document.getElementById("stop").click();
       var a = document.getElementById("timer").textContent;
       time = a.split(":");
       time2 = time[2].split(".")
-
+      setActive(false);
+      setHallId('BASE');
+      
       var requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

@@ -73,19 +73,17 @@ export default function Crono() {
         >
           Reset{" "}
         </button>
-        {!state.running ? (
-          <button id="start" hidden
-            onClick={() => dispatch({ type: "start" })}
-          >
-            start{" "}
-          </button>
-        ) : (
-          <button id="stop" hidden
-            onClick={() => dispatch({ type: "stop" })}
-          >
-            stop{" "}
-          </button>
-        )}
+        <button id="start" hidden
+          onClick={() => dispatch({ type: "start" })}
+        >
+          start{" "}
+        </button>
+        
+        <button id="stop" hidden
+          onClick={() => dispatch({ type: "stop" })}
+        >
+          stop{" "}
+        </button>
       </div>
     </div>
   );
