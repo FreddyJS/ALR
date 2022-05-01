@@ -103,14 +103,23 @@ def obstacle_on_hall(hall: str):
         return None
 
 
+def ui_next_direction():
+    ws.send({"type": "to.ui", "message": {"type": "next_direction"}})
+
 if __name__ == "__main__":
     def on_message(message):
         print("Received message: {}".format(message))
 
+    route = get_route_by_room("01")
     start_ws(on_message)
+    time.sleep(1)
+
+    active(True, route)
+    ui_next_direction()
 
     try:
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
+        active(False, route)
         close_ws()

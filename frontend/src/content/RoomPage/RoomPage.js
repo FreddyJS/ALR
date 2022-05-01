@@ -14,10 +14,28 @@ const RoomPage = () => {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [wrongRoomNumber, setWrongRoomNumber] = React.useState(false);
   const [route, setRoute] = React.useState();
-  const socket = createUISocket("PiCar");
-
   const [inPath, setInPath] = React.useState(false);
   const [nextDirection, setNextDirection] = React.useState('');
+
+  const socket = createUISocket("PiCar");
+  socket.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    const message = data.message;
+    console.log("RoomPage Received: ", data);
+    if (message === undefined || message.type === undefined) {
+      return;
+    }
+
+
+    if (message.type === "next_direction") {
+      for (let i = 0; i < route["route"].length; i++) {
+        if (route["route"][i].includes("CRUCE")) {
+          setNextDirection(route.route[i].split(".")[0]);
+          break;
+        }
+      }
+    }
+  }
 
   const sendHelllo = (from) => {
     const data = {
@@ -97,9 +115,9 @@ const RoomPage = () => {
           <div>
             <h4>No próximo cruce: <strong>{nextDirection.split(".")[0]}</strong></h4>
             {nextDirection.startsWith('recto') && <AiOutlineArrowUp style={{ width: "70%", height: "70%", fill: "green"}}/>}
-            {nextDirection.startsWith('dereita') && <AiOutlineArrowRight style={{ width: "70%", height: "70%", fill: "green"}}/>}
-            {nextDirection.startsWith('atras') && <AiOutlineArrowDown style={{ width: "70%", height: "70%", fill: "green"}}/>}
-            {nextDirection.startsWith('esquerda') && <AiOutlineArrowLeft style={{ width: "70%", height: "70%", fill: "green"}}/>}
+            {nextDirection.startsWith('derecha') && <AiOutlineArrowRight style={{ width: "70%", height: "70%", fill: "green"}}/>}
+            {nextDirection.startsWith('vuelta') && <AiOutlineArrowDown style={{ width: "70%", height: "70%", fill: "green"}}/>}
+            {nextDirection.startsWith('izquierda') && <AiOutlineArrowLeft style={{ width: "70%", height: "70%", fill: "green"}}/>}
           </div>
         }
 

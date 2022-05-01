@@ -261,6 +261,7 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
 
             print("Continuando recto, nuevo pasillo: " + current_hall)
             threading.Thread(target=api.update_current_hall, args=(current_hall,)).start()
+            api.ui_next_direction()
 
 
 def processMessage(message: object):
