@@ -26,12 +26,12 @@
                 "direccion": "este"
             },
             {
-                "id": "5",
+                "id": "4",
                 "distancia": 1,
                 "direccion": "norte"
             },
             {
-                "id": "8",
+                "id": "7",
                 "distancia": 1,
                 "direccion": "oeste"
             }
@@ -53,7 +53,7 @@
                 "direccion": "este"
             }
         ],
-        "habitaciones":["01", "02"]
+        "habitaciones":["01", "04"]
     },
     {
         "id": "3",
@@ -63,33 +63,33 @@
                 "id": "2",
                 "distancia": 1,
                 "direccion": "oeste"
-            },
-            {
-                "id": "4",
-                "distancia": 1,
-                "direccion": "este"
             }
         ],
-        "habitaciones":["03", "04"]
+        "habitaciones":["02", "03"]
     },
     {
         "id": "4",
         "tipo": "habitaciones",
         "enlaces":[
             {
-                "id": "3",
+                "id": "1",
                 "distancia": 1,
-                "direccion": "oeste"
+                "direccion": "sur"
+            },
+            {
+                "id": "5",
+                "distancia": 1,
+                "direccion": "norte"
             }
         ],
         "habitaciones":["05"]
     },
     {
         "id": "5",
-        "tipo": "habitaciones",
+        "tipo": "cruce",
         "enlaces":[
             {
-                "id": "1",
+                "id": "4",
                 "distancia": 1,
                 "direccion": "sur"
             },
@@ -99,39 +99,22 @@
                 "direccion": "norte"
             }
         ],
-        "habitaciones":["06"]
+        "habitaciones":[]
     },
     {
         "id": "6",
-        "tipo": "cruce",
+        "tipo": "habitaciones",
         "enlaces":[
-            {
-                "id": "7",
-                "distancia": 1,
-                "direccion": "norte"
-            },
             {
                 "id": "5",
                 "distancia": 1,
                 "direccion": "sur"
             }
         ],
-        "habitaciones":[]
+        "habitaciones":["06"]
     },
     {
         "id": "7",
-        "tipo": "habitaciones",
-        "enlaces":[
-            {
-                "id": "6",
-                "distancia": 1,
-                "direccion": "norte"
-            }
-        ],
-        "habitaciones":["07"]
-    },
-    {
-        "id": "8",
         "tipo": "habitaciones",
         "enlaces":[
             {
@@ -140,6 +123,6 @@
                 "direccion": "este"
             }
         ],
-        "habitaciones":["08"]
+        "habitaciones":["07"]
     }
 ]
