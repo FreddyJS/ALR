@@ -143,16 +143,28 @@ def wait_end_of_crosspath():
             break
 
 
+def wait_tile_status(status):
+    while True:
+        if obstacle:
+            bw.stop()
+        else:
+            bw.forward()
+
+        lt_status = lf.read_digital()
+        if lt_status == status:
+            break
+
+
 def turn_left():
     fw.turn(90 - 45)
-    lf.wait_tile_status(status=[0, 0, 0, 0, 1])
-    lf.wait_tile_status(status=[1, 0, 0, 0, 0])
+    wait_tile_status(status=[0, 0, 0, 0, 1])
+    wait_tile_status(status=[1, 0, 0, 0, 0])
 
 
 def turn_right():
     fw.turn(90 + 45)
-    lf.wait_tile_status(status=[1, 0, 0, 0, 0])
-    lf.wait_tile_status(status=[0, 0, 0, 0, 1])
+    wait_tile_status(status=[1, 0, 0, 0, 0])
+    wait_tile_status(status=[0, 0, 0, 0, 1])
 
 
 def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "derecha._CRUCE_3", "izquierda._CRUCE_4", "0._HABITACION_5"], returning: bool = False) -> str:

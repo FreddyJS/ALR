@@ -64,7 +64,8 @@ int init_socket()
 int socket_send(int value,int times)
 {
     char buffer[64];
-    sprintf(buffer, "%i:%i", value,times);
+    // sprintf(buffer, "%i:%i", value,times);
+    sprintf(buffer, "%i:0", value);
     printf("socket_send(): %s\n", buffer);
     return sendto(socketfd, buffer, (strlen(buffer) + 1), 0, (struct sockaddr *)&server, sizeof(server));
 }
