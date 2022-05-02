@@ -53,8 +53,10 @@ route = None
 
 
 def is_red() -> bool:
-    color_temp = colorSensor.color_temperature
-    return False if color_temp == None else color_temp < config.COLOR_SENSOR_RED_VALUE
+    r, g, b, c = colorSensor.color_raw
+    return r > g + 2 and r > b + 2
+    # color_temp = colorSensor.color_temperature
+    # return False if color_temp == None else color_temp < config.COLOR_SENSOR_RED_VALUE
 
 
 def is_blue() -> bool:
@@ -164,6 +166,8 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
 
     if "vuelta" in route[0] and "False" in route[0]:
         route.pop(0)
+    elif "vuelta" in route[0] and "True" in route[0]:
+        route[0] = route[0].split(".True")[0]
 
     while True:
         lf_status = follow_line()
@@ -297,6 +301,7 @@ if __name__ == '__main__':
             # Going to the start room
             print("Starting route to room: " + route["origin_room"])
             node = route["return_route"][1].split(".")[1][-1]
+            # print("Last: " + last_action + " Node: " + node)
             current_hall = "pasillo{}{}".format(node, last_action[-1])
             api.active(True, route)
             api.update_current_hall(current_hall)
@@ -305,6 +310,7 @@ if __name__ == '__main__':
             follow_route(route=route["return_route"], returning=True)
             print("Finished return route")
             api.active(False, route)
+            api.ui_finished_route()
 
             route = None
     except KeyboardInterrupt:
