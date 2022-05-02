@@ -72,7 +72,12 @@ const RoomPage = () => {
 
   const onModalSubmit = () => {
     setInPath(true);
-    setNextDirection(route.route[0]);
+    for (let i = 0; i < route["route"].length; i++) {
+      if (route["route"][i].includes("CRUCE")) {
+        setNextDirection(route.route[i]);
+        break;
+      }
+    }
 
     const data = {
       type: 'to.robot',
