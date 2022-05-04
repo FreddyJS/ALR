@@ -58,6 +58,18 @@ const RoomPage = () => {
   };
 
   const onRoomSubmit = async () => {
+    if (roomNumber === 'BLE') {
+      const data = {
+        type: 'to.robot',
+        message: {
+          type: 'bluetooth'
+        }
+      }
+
+      socket.send(JSON.stringify(data));
+      return;
+    }
+
     const routes = await getRoutes();
     const route = routes.find(r => r.dest_room === roomNumber && r.origin_room === 'hall');
 
