@@ -3,6 +3,9 @@ import React from "react";
 import './room-input.scss';
 
 import { Button } from "carbon-components-react";
+import { ImExit } from "react-icons/im";
+import { MdStairs } from "react-icons/md";
+import { FaBluetooth } from "react-icons/fa";
 
 const RoomInput = ({ onSubmit, onChange, value }) => {
   return (
@@ -21,6 +24,11 @@ const RoomInput = ({ onSubmit, onChange, value }) => {
             <Button className="room-page__keyboard-button" onClick={() => onChange(value + "7")}>7</Button>
             <Button className="room-page__keyboard-button" onClick={() => onChange(value + "8")}>8</Button>
             <Button className="room-page__keyboard-button" onClick={() => onChange(value + "9")}>9</Button>
+          </div>
+          <div className="room-page__keyboard-row">
+            <Button className="room-page__keyboard-button" onClick={() => onChange("06")}><ImExit /></Button>
+            <Button className="room-page__keyboard-button" onClick={() => onChange("07")}><MdStairs /></Button>
+            <Button className="room-page__keyboard-button" onClick={() => onChange("BLE")}><FaBluetooth /></Button>
           </div>
           <div className="room-page__keyboard-row">
             <Button className="room-page__keyboard-button" onClick={() => onChange("")}>Reset</Button>
