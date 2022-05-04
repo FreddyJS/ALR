@@ -14,15 +14,32 @@ from sensors.LineFollower import LineFollower
 from sensors.UltrasonicSensor import UltrasonicSensor
 
 
+# Global variables
+max_off_track_count = config.LINE_FOLLOWER_MAX_OFF_TRACK_COUNT
+forward_speed = config.PICAR_MED_SPEED
+current_hall = "pasillo0"
+backward_speed = 70
+off_track_count = 0
+turning_angle = 90
+obstacle = False
+delay = 0.0005
+route = None
+
+# Bluetooth demo variables
+DEVICE_NAME = "HuaweiAP"
+bluetooth = False
+rssi_reference = 0
+contador = 0
+estado = 1
+
+
 # Ultrasonic sensor
 def on_obstacle(blocked):
     global obstacle
     obstacle = blocked
 
 
-obstacle = False
-ultrasonicSensor = UltrasonicSensor(
-    config.ULTRASONIC_SENSOR_CHANNEL, on_obstacle, config.ULTRASONIC_SENSOR_MIN_DISTANCE)
+ultrasonicSensor = UltrasonicSensor(config.ULTRASONIC_SENSOR_CHANNEL, on_obstacle, config.ULTRASONIC_SENSOR_MIN_DISTANCE)
 ultrasonicSensor.start()
 
 # Color sensor
@@ -34,16 +51,6 @@ colorSensor.gain = config.COLOR_SENSOR_GAIN
 # Line follower
 lf = LineFollower()
 lf.references = config.LINE_FOLLOWER_REFERENCES
-max_off_track_count = config.LINE_FOLLOWER_MAX_OFF_TRACK_COUNT
-off_track_count = 0
-
-# Global variables
-current_hall = "pasillo0"
-forward_speed = config.PICAR_MED_SPEED
-backward_speed = 70
-turning_angle = 90
-delay = 0.0005
-route = None
 
 # PiCar Wheels
 picar.setup()
@@ -53,11 +60,17 @@ fw.ready()
 bw.ready()
 
 
-# Bluetooth demo variables
-bluetooth = False
-rssi_reference = 0
-contador = 0
-estado = 1
+def processMessage(message: object):
+    global route, bluetooth
+    print("Received message: " + str(message))
+
+    if "type" not in message:
+        return
+
+    if message["type"] == "start":
+        route = message["route"]
+    elif message["type"] == "bluetooth":
+        bluetooth = not bluetooth
 
 
 def processSample(message: str):
@@ -387,21 +400,6 @@ def follow_route(route: List[str] = ["derecha._CRUCE_1", "izquierda._CRUCE_2", "
             api.ui_next_direction()
 
 
-def processMessage(message: object):
-    global route, bluetooth
-    print("Received message: " + str(message))
-
-    if "type" not in message:
-        return
-
-    if message["type"] == "start":
-        route = message["route"]
-    elif message["type"] == "bluetooth":
-        bluetooth = not bluetooth
-        if bluetooth is False:
-            print("Bluetooth disabled")
-
-
 if __name__ == '__main__':
     api.start_ws(processMessage)
     try:
@@ -410,11 +408,14 @@ if __name__ == '__main__':
                 time.sleep(0.25)
 
             if bluetooth is True:
-                print("Bluetooth enabled")
-                scanner.start()
+                print("Starting Bluetooth demo")
+                scanner.start(DEVICE_NAME, processSample)
+                while rssi_reference == 0:
+                    time.sleep(0.25)
+
                 follow_line_bluetooth()
                 scanner.stop()
-                print("Bluetooth disabled")
+                print("Bluetooth demo finished")
                 bw.stop()
                 fw.turn(90)
             else:
