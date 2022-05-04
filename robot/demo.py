@@ -54,7 +54,7 @@ route = None
 
 def is_red() -> bool:
     r, g, b, c = colorSensor.color_raw
-    return r > g + 2 and r > b + 2
+    return r > g + 4 and r > b + 4
     # color_temp = colorSensor.color_temperature
     # return False if color_temp == None else color_temp < config.COLOR_SENSOR_RED_VALUE
 
@@ -77,17 +77,8 @@ def follow_line() -> List[int]:
     c_step = config.PICAR_C_STEP
     d_step = config.PICAR_D_STEP
 
-    # Measuring distance
-    if obstacle:
-        bw.stop()
-        api.obstacle_on_hall(current_hall)
-
-        print("Obstacle detected, current hall: " + current_hall)
-        while obstacle:
-            time.sleep(0.1)
-
-    bw.speed = forward_speed
-    bw.forward()
+    # Obstacle detection
+    check_obstacle()  # It returns only if there is no obstacle
 
     lf_status = lf.read_digital()
 
@@ -129,6 +120,20 @@ def follow_line() -> List[int]:
     return lf_status
 
 
+def check_obstacle():
+    # Measuring distance
+    if obstacle:
+        bw.stop()
+        api.obstacle_on_hall(current_hall)
+
+        print("Obstacle detected, current hall: " + current_hall)
+        while obstacle:
+            time.sleep(0.1)
+
+    bw.speed = forward_speed
+    bw.forward()
+
+
 def wait_for_crosspath():
     while True:
         lf_status = follow_line()
@@ -145,11 +150,7 @@ def wait_end_of_crosspath():
 
 def wait_tile_status(status):
     while True:
-        if obstacle:
-            bw.stop()
-        else:
-            bw.forward()
-
+        check_obstacle()
         lt_status = lf.read_digital()
         if lt_status == status:
             break
