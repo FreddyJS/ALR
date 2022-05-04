@@ -41,6 +41,9 @@ const RoomPage = () => {
       }
     } else if (message.type === "finished_route") {
       setNextDirection('stop');
+      setTimeout(() => {
+        setInPath(false);
+      }, 5000);
     }
   }
 
